@@ -3,6 +3,5 @@
   "rules": {
     "class-methods-use-this": "off",
     "react/prefer-stateless-function": "off"
-  },
-  "parser": "babel-eslint"
+  }
 }

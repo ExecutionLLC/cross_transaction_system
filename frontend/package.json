@@ -13,7 +13,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "eslint": "./node_modules/.bin/eslint --ext .js --ext .jsx './'"
+    "eslint": "./node_modules/.bin/eslint --ext .js --ext .jsx ."
   },
   "devDependencies": {
     "babel-eslint": "^9.0.0",
