@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ViewBase from '../ViewBase';
 
 
-export default function (props) {
-  return (
-    <ViewBase {...props} pageHeader="Profile" />
-  );
+class Profile extends Component {
+  render() {
+    return (
+      <ViewBase {...this.props} pageHeader="Profile" />
+    );
+  }
 }
+
+
+export default Profile;
