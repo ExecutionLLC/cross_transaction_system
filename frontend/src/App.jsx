@@ -1,20 +1,29 @@
 import React, { Component } from 'react';
-import { PageHeader, Panel } from 'react-bootstrap';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import Profile from './Views/Profile/Profile';
+import MyServices from './Views/MyServices/MyServices';
+import OtherServices from './Views/OtherServices/OtherServices';
+import Cards from './Views/Cards/Cards';
+
+/* global document */
+
 
 class App extends Component {
+  componentDidMount() {
+    document.title = 'Cross transaction system';
+  }
+
   render() {
     return (
-      <div>
-        <PageHeader>
-          Page header
-        </PageHeader>
-        <Panel bsStyle="danger">
-          <Panel.Heading>
-            <Panel.Title componentClass="h3">Panel title</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body>Panel body</Panel.Body>
-        </Panel>
-      </div>
+      <Router>
+        <Switch>
+          <Route path="/profile" component={Profile} />
+          <Route path="/myservices" component={MyServices} />
+          <Route path="/otherservices" component={OtherServices} />
+          <Route path="/cards" component={Cards} />
+          <Route component={Profile} />
+        </Switch>
+      </Router>
     );
   }
 }
