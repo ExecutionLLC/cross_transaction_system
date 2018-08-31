@@ -1,13 +1,9 @@
 import React from 'react';
-import { PageHeader } from 'react-bootstrap';
+import ViewBase from '../ViewBase';
 
 
-export default function () {
+export default function (props) {
   return (
-    <div>
-      <PageHeader>
-        Cards
-      </PageHeader>
-    </div>
+    <ViewBase {...props} pageHeader="Cards" />
   );
 }
