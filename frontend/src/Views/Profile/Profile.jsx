@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
+import Loading from '../../Components/Loading';
 
 
 class Profile extends Component {
@@ -41,7 +42,7 @@ class Profile extends Component {
     const { isLoading, profileError, profileData } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Profile">
-        {isLoading && 'Загрузка...'}
+        {isLoading && <Loading />}
         {profileData && JSON.stringify(profileData)}
         {profileError && (
           <ErrorPanel
