@@ -27,7 +27,7 @@ function TimeoutPromise(time, f) {
 function getProfile() {
   return TimeoutPromise(500, (resolve, reject) => {
     if (Math.random() < 0.5) {
-      reject(new APIError(ERRORS.UNKNOWN, 'can not get profile info'));
+      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get profile info'));
       return;
     }
     resolve({
