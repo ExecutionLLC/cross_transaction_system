@@ -57,9 +57,18 @@ nconf.defaults({
   mongodb: {
     host: 'localhost',
     port: '27017',
-    user: 'csl',
-    password: 'csl',
-    database: 'csl',
+    user: 'cts',
+    password: 'cts',
+    database: 'cts',
+  },
+  hyperledger: {
+    storePath: '../runtime/hfc-key-store',
+    channelName: 'cts',
+    chaincodeId: 'cts',
+    ordererUrl: 'grpc://localhost:7050',
+    peerUrl: 'grpc://localhost:7051',
+    eventhubUrl: 'grpc://localhost:7053',
+    username: 'user1',
   },
 });
 
