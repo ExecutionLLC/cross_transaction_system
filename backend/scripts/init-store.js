@@ -3,8 +3,8 @@ const FabricCAClient = require('fabric-ca-client');
 
 const STORE_PATH = './runtime/hfc-key-store';
 const CA_SERVER_URL = 'http://localhost:7054';
-const CA_SERVER_NAME = 'ca.private.net';
-const ORGANIZATION_MSPID = 'Org0MSP';
+const CA_SERVER_NAME = 'ca.cts.net';
+const ORGANIZATION_MSPID = 'Org1MSP';
 
 const ADMIN_ENROLMENT_ID = 'admin';
 const ADMIN_ENROLMENT_SECRET = 'adminpw';
