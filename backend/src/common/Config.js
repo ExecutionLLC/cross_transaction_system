@@ -64,7 +64,7 @@ store.defaults({
     database: 'cts',
   },
   hyperledger: {
-    storePath: '../runtime/hfc-key-store',
+    storePath: './runtime/hfc-key-store',
     channelName: 'cts',
     chaincodeId: 'cts',
     ordererUrl: 'grpc://localhost:7050',
