@@ -6,7 +6,7 @@ const ServicesFacade = require('./services/ServicesFacade');
 const WebServer = require('./WebServer');
 
 const logger = LoggersContainer.getLogger('main');
-logger.debug(`CONFIG:\n${JSON.stringify(config.get(), null, 4)}`);
+logger.debug(`CONFIG:\n${JSON.stringify(config, null, 2)}`);
 
 const models = new ModelsFacade();
 const services = new ServicesFacade(models);
