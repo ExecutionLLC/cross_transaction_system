@@ -1,17 +1,19 @@
 {
-  "name": "cart-smart-lock-backend",
+  "name": "cross-transaction-system-backend",
   "version": "1.0.0",
-  "description": "Cart smart lock backend",
+  "description": "Cross transaction system backend",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "init-store": "node scripts/init-store.js"
   },
   "dependencies": {
-    "amqplib": "0.5.2",
     "body-parser": "1.18.3",
     "change-case": "3.0.2",
     "cors": "2.8.4",
     "express": "4.16.3",
+    "fabric-ca-client": "1.2.1",
+    "fabric-client": "1.2.1",
     "http-status-codes": "1.3.0",
     "mongoose": "5.2.9",
     "nconf": "0.10.0",
