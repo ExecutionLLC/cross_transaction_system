@@ -45,31 +45,34 @@ class ChaincodeApi extends AsyncInitializedObject {
   }
 
   _init() {
-    return FabricClient.newDefaultKeyValueStore({ path: this._storePath }).then((storeState) => {
-      this._fabricClient.setStateStore(storeState);
+    return FabricClient
+      .newDefaultKeyValueStore({ path: this._storePath })
+      .then((storeState) => {
+        this._fabricClient.setStateStore(storeState);
 
-      const cryptoSuite = FabricClient.newCryptoSuite();
-      const cryptoStore = FabricClient.newCryptoKeyStore({ path: this._storePath });
-      cryptoSuite.setCryptoKeyStore(cryptoStore);
-      this._fabricClient.setCryptoSuite(cryptoSuite);
+        const cryptoSuite = FabricClient.newCryptoSuite();
+        const cryptoStore = FabricClient.newCryptoKeyStore({ path: this._storePath });
+        cryptoSuite.setCryptoKeyStore(cryptoStore);
+        this._fabricClient.setCryptoSuite(cryptoSuite);
 
-      this._logger.info('Store successfully loaded');
+        this._logger.info('Store successfully loaded');
 
-      // get the enrolled user from persistence, this user will sign all requests
-      return this._fabricClient.getUserContext(this._username, true);
-    }).then((user) => {
-      if (user && user.isEnrolled()) {
-        this._logger.info('User loaded from store');
-      } else {
-        throw new Error('Failed to get user');
-      }
+        // get the enrolled user from persistence, this user will sign all requests
+        return this._fabricClient.getUserContext(this._username, true);
+      })
+      .then((user) => {
+        if (user && user.isEnrolled()) {
+          this._logger.info('User loaded from store');
+        } else {
+          throw new Error('Failed to get user');
+        }
 
-      this._eventHub.registerBlockEvent(
-        block => this._onBlockEvent(block),
-        error => this._onEventHubError(error),
-      );
-      this._eventHub.connect();
-    });
+        this._eventHub.registerBlockEvent(
+          block => this._onBlockEvent(block),
+          error => this._onEventHubError(error),
+        );
+        this._eventHub.connect();
+      });
   }
 
   _parseAndEmitChaincodeEvents(block) {
