@@ -6,7 +6,7 @@ const { format } = winston;
 
 class LoggersContainer {
   constructor() {
-    this._config = config.get('logging');
+    this._config = config.logging;
     this._initTransports();
     this._loggers = Object.create(null);
   }

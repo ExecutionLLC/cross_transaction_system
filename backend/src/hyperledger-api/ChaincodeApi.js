@@ -26,7 +26,7 @@ class ChaincodeApi extends AsyncInitializedObject {
       peerUrl,
       eventhubUrl,
       username,
-    } = config.get('hyperledger');
+    } = config.hyperledger;
 
     this._fabricClient = new FabricClient();
     this._channel = this._fabricClient.newChannel(channelName);

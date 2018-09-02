@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const URL = require('url');
 const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 const BaseModel = require('./BaseModel');
+const ChaincodeApi = require('../hyperledger-api/ChaincodeApi');
 const config = require('../common/Config');
 const UserModel = require('./UserModel');
 const Utils = require('../common/Utils');
@@ -11,13 +12,18 @@ class ModelsFacade extends AsyncInitializedObject {
     super();
 
     this._db = mongoose.createConnection();
+    this._chaincodeApi = new ChaincodeApi();
 
-    this.userModel = new UserModel(this._db);
+    this.userModel = new UserModel(this._db, this._chaincodeApi);
   }
 
   _init() {
-    const modelsInitPromises = this.getAllModels().map(model => model.init());
-    return this._initDb().then(() => Promise.all(modelsInitPromises));
+    return this._initDb()
+      .then(() => this._initChaincodeApi())
+      .then(() => {
+        const modelsInitPromises = this.getAllModels().map(model => model.init());
+        Promise.all(modelsInitPromises);
+      });
   }
 
   getAllModels() {
@@ -31,7 +37,7 @@ class ModelsFacade extends AsyncInitializedObject {
       user,
       password: pass,
       database,
-    } = config.get('mongodb');
+    } = config.mongodb;
 
     const uri = URL.format({
       protocol: 'mongodb',
@@ -41,6 +47,10 @@ class ModelsFacade extends AsyncInitializedObject {
       slashes: true,
     });
     return this._db.openUri(uri, { useNewUrlParser: true, user, pass });
+  }
+
+  _initChaincodeApi() {
+    return this._chaincodeApi.init();
   }
 }
 

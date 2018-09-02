@@ -9,7 +9,7 @@ const LoggersContainer = require('./common/LoggersContainer');
 
 class WebServer {
   constructor(models, services, controllers) {
-    this._config = config.get('webserver');
+    this._config = config.webserver;
 
     this._models = models;
     this._services = services;
