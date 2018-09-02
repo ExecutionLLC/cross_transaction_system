@@ -45,7 +45,7 @@ if (fs.existsSync(FILE_CONFIG_PATH)) {
 
 store.defaults({
   webserver: {
-    port: '6000',
+    port: 6000,
   },
   logging: {
     console: {
@@ -58,7 +58,7 @@ store.defaults({
   },
   mongodb: {
     host: 'localhost',
-    port: '27017',
+    port: 27017,
     user: 'cts',
     password: 'cts',
     database: 'cts',
