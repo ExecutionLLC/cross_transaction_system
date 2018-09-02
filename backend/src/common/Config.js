@@ -3,8 +3,10 @@ const fs = require('fs');
 const nconf = require('nconf');
 const path = require('path');
 
+const store = new nconf.Provider();
+
 const FILE_CONFIG_PATH = path.resolve(`${__dirname}/../../config.json`);
-const ENV_VARIABLES_PREFIX = 'CSL_';
+const ENV_VARIABLES_PREFIX = 'CTS_';
 
 // remove prefix and transform sub keys case to camel case
 function transformEnvVariable(keyValueObj) {
@@ -27,7 +29,7 @@ function transformEnvVariable(keyValueObj) {
 // 1. env
 // 2. file
 // 3. default values
-nconf.env({
+store.env({
   transform: transformEnvVariable,
   separator: '__',
   parseValues: true,
@@ -36,12 +38,12 @@ nconf.env({
 if (fs.existsSync(FILE_CONFIG_PATH)) {
   // eslint-disable-next-line no-console
   console.log(`found config file (path = "${FILE_CONFIG_PATH}")`);
-  nconf.file({
+  store.file({
     file: FILE_CONFIG_PATH,
   });
 }
 
-nconf.defaults({
+store.defaults({
   webserver: {
     port: '6000',
   },
@@ -72,4 +74,4 @@ nconf.defaults({
   },
 });
 
-module.exports = nconf;
+module.exports = store.get();
