@@ -12,9 +12,13 @@ class AddItemButton extends Component {
   }
 
   onExpandToggle(expand) {
+    const { onOpen } = this.props;
     this.setState({
       isExpanded: expand,
     });
+    if (expand) {
+      onOpen();
+    }
   }
 
   onSubmit() {
@@ -60,6 +64,7 @@ class AddItemButton extends Component {
 AddItemButton.propTypes = {
   caption: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
+  onOpen: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
 

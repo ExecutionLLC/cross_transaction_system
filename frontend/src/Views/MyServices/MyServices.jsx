@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Form, FormControl, ControlLabel } from 'react-bootstrap';
+import {
+  Form, FormGroup, FormControl, ControlLabel, HelpBlock
+} from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
@@ -8,12 +10,22 @@ import AddItemButton from '../../Components/AddItemButton';
 
 
 class MyServices extends Component {
+  static makeDefaultAddingServiceData() {
+    return {
+      name: '',
+      description: '',
+      minBalance: 0,
+      maxTransfer: 0,
+    };
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       isLoading: false,
       loadingError: null,
-      isAddingService: false,
+      addingServiceData: MyServices.makeDefaultAddingServiceData(),
+      addingServiceError: null,
       addindOperatorToService: null,
       operators: null,
       myServices: null,
@@ -64,6 +76,47 @@ class MyServices extends Component {
     });
   }
 
+  onAddServiceOpen() {
+    this.setState({
+      addingServiceData: MyServices.makeDefaultAddingServiceData(),
+    });
+  }
+
+  onAddServiceSubmit() {
+    this.addServiceValidation();
+  }
+
+  addServiceValidation() {
+    const {
+      addingServiceData: {
+        name, description, minBalance, maxTransfer,
+      },
+    } = this.state;
+
+    const setError = (error) => {
+      this.setState({ addingServiceError: error });
+    };
+
+    if (!name) {
+      setError({ name: 'Имя не задано' });
+      return false;
+    }
+    if (!description) {
+      setError({ description: 'Описание не задано' });
+      return false;
+    }
+    if (!(minBalance >= 0)) {
+      setError({ minBalance: 'Минимальный баланс должен быть нулём или больше' });
+      return false;
+    }
+    if (!(maxTransfer >= 0)) {
+      setError({ maxTransfer: 'Максимальное движение по счёту должно быть нулём или больше' });
+      return false;
+    }
+    setError(null);
+    return true;
+  }
+
   renderService(service) {
     const id = service._id;
     const { expandedServicesHash } = this.state;
@@ -85,26 +138,86 @@ class MyServices extends Component {
   }
 
   renderAddServiceControls() {
+    const {
+      addingServiceData: {
+        name, description,
+        minBalance, maxTransfer,
+      },
+      addingServiceError,
+    } = this.state;
+
+    const setData = (data) => {
+      const { addingServiceData } = this.state;
+      this.setState({
+        addingServiceData: {
+          ...addingServiceData,
+          ...data,
+        },
+      });
+    };
+
+    function wrapOnChange(f) {
+      return event => f(event.target.value);
+    }
+
+    /* eslint-disable no-shadow */
     return (
       <Form>
-        <ControlLabel>Название</ControlLabel>
-        <FormControl
-          type="text"
-        />
-        <ControlLabel>Описание</ControlLabel>
-        <FormControl
-          type="text"
-        />
-        <ControlLabel>Мининальный баланс</ControlLabel>
-        <FormControl
-          type="number"
-        />
-        <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
-        <FormControl
-          type="number"
-        />
+        <FormGroup
+          validationState={addingServiceError && addingServiceError.name ? 'error' : null}
+        >
+          <ControlLabel>Название</ControlLabel>
+          <FormControl
+            type="text"
+            value={name}
+            onChange={wrapOnChange(name => setData({ name }))}
+          />
+          {addingServiceError && addingServiceError.name
+          && <HelpBlock>{addingServiceError.name}</HelpBlock>
+          }
+        </FormGroup>
+        <FormGroup
+          validationState={addingServiceError && addingServiceError.description ? 'error' : null}
+        >
+          <ControlLabel>Описание</ControlLabel>
+          <FormControl
+            type="text"
+            value={description}
+            onChange={wrapOnChange(description => setData({ description }))}
+          />
+          {addingServiceError && addingServiceError.description
+          && <HelpBlock>{addingServiceError.description}</HelpBlock>
+          }
+        </FormGroup>
+        <FormGroup
+          validationState={addingServiceError && addingServiceError.minBalance ? 'error' : null}
+        >
+          <ControlLabel>Мининальный баланс</ControlLabel>
+          <FormControl
+            type="number"
+            value={minBalance}
+            onChange={wrapOnChange(minBalance => setData({ minBalance }))}
+          />
+          {addingServiceError && addingServiceError.minBalance
+          && <HelpBlock>{addingServiceError.minBalance}</HelpBlock>
+          }
+        </FormGroup>
+        <FormGroup
+          validationState={addingServiceError && addingServiceError.maxTransfer ? 'error' : null}
+        >
+          <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
+          <FormControl
+            type="number"
+            value={maxTransfer}
+            onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
+          />
+          {addingServiceError && addingServiceError.maxTransfer
+          && <HelpBlock>{addingServiceError.maxTransfer}</HelpBlock>
+          }
+        </FormGroup>
       </Form>
     );
+    /* eslint-disable no-shadow */
   }
 
   render() {
@@ -116,7 +229,8 @@ class MyServices extends Component {
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
         <AddItemButton
           caption="Добавить сервис"
-          onSubmit={() => true}
+          onOpen={() => this.onAddServiceOpen()}
+          onSubmit={() => this.onAddServiceSubmit()}
         >
           {this.renderAddServiceControls()}
         </AddItemButton>
