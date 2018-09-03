@@ -2,10 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PageHeader, Grid } from 'react-bootstrap';
 import Navigation from '../Components/Navigation';
+import Loading from '../Components/Loading';
 
 
 function ViewBase(props) {
-  const { match, pageHeader, children } = props;
+  const {
+    match, pageHeader, children, isLoading,
+  } = props;
   return (
     <Grid>
       <Navigation
@@ -14,7 +17,8 @@ function ViewBase(props) {
       <PageHeader>
         {pageHeader}
       </PageHeader>
-      {children}
+      {isLoading && <Loading />}
+      {!isLoading && children}
     </Grid>
   );
 }
@@ -24,10 +28,12 @@ ViewBase.propTypes = {
     url: PropTypes.string.isRequired,
   }).isRequired,
   pageHeader: PropTypes.string.isRequired,
+  isLoading: PropTypes.bool,
   children: PropTypes.node,
 };
 
 ViewBase.defaultProps = {
+  isLoading: false,
   children: null,
 };
 

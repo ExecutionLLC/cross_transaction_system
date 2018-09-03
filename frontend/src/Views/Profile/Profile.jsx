@@ -7,7 +7,6 @@ import {
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
-import Loading from '../../Components/Loading';
 
 
 class Profile extends Component {
@@ -115,8 +114,7 @@ class Profile extends Component {
   render() {
     const { isLoading, profileError, profileData } = this.state;
     return (
-      <ViewBase {...this.props} pageHeader="Profile">
-        {isLoading && <Loading />}
+      <ViewBase {...this.props} pageHeader="Profile" isLoading={isLoading}>
         {profileData && this.renderProfileData()}
         {profileError && (
           <ErrorPanel
