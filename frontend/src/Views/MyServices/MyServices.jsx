@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
+import { Form, FormControl, ControlLabel } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
 import ExpandableListItem from '../../Components/ExpandableListItem';
+import AddItemButton from '../../Components/AddItemButton';
 
 
 class MyServices extends Component {
@@ -83,6 +84,29 @@ class MyServices extends Component {
     return myServices.map(service => this.renderService(service));
   }
 
+  renderAddServiceControls() {
+    return (
+      <Form>
+        <ControlLabel>Название</ControlLabel>
+        <FormControl
+          type="text"
+        />
+        <ControlLabel>Описание</ControlLabel>
+        <FormControl
+          type="text"
+        />
+        <ControlLabel>Мининальный баланс</ControlLabel>
+        <FormControl
+          type="number"
+        />
+        <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
+        <FormControl
+          type="number"
+        />
+      </Form>
+    );
+  }
+
   render() {
     const {
       isLoading, loadingError, myServices,
@@ -90,9 +114,12 @@ class MyServices extends Component {
     return (
       <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
-        <Button>
-          Добавить сервис
-        </Button>
+        <AddItemButton
+          caption="Добавить сервис"
+          onSubmit={() => true}
+        >
+          {this.renderAddServiceControls()}
+        </AddItemButton>
         {myServices && this.renderServices()}
       </ViewBase>
     );
