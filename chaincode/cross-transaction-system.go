@@ -9,12 +9,12 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-type ProcessingInfo{
+type ProcessingInfo struct{
 	Name string `json:"name"`
 	Description string `json:"description"`
 }
 
-type ServiceInfo{
+type ServiceInfo struct{
 	ParentProcessingName string `json:"parentProcessingName"`
 	Name string `json:"name"`
 	Description string `json:"description"`
@@ -23,22 +23,42 @@ type ServiceInfo{
 	IsActive bool `json:"isActive"`
 }
 
-type OperatorInfo{
+type OperatorInfo struct{
 	ServiceProcessingName string `json:"serviceProcessingName"`
 	ServiceName string `json:"serviceName"`
 	ParentProcessingName string `json:"parentProcessingName"`
 	IsActive bool `json:"isActive"`
 }
 
-type WalletInfo{
+type WalletInfo struct{
 	ID string `json:"id"`
 	Balance float32 `json:"balance"`
 }
 
+type OperatorExtendedInfo struct{
+	ProcessingName string `json:"processingName"`
+	IsActive bool `json:"isActive"`
+}
+
+type ServiceExtendedInfo struct{
+	ServiceName string `json:"serviceName"`
+	IsActive bool `json:"isActive"`
+	Operators []OperatorExtendedInfo `json:"operators"`
+}
+
+type ExternalServiceExtendedInfo struct{
+	ServiceName string `json:"serviceName"`
+	IsActive bool `json:"isActive"`	
+}
+
+type ProcessingExtendedInfo struct{
+	Name string `json:"name"`
+	Description string `json:"description"`
+	Services []ServiceExtendedInfo `json:"services"`
+	ExternalServices []ExternalServiceExtendedInfo `json:"externalServices"`
+}
+
 const (
-	INTERNAL_SERVICE_RELATION_TYPE = "INTERNAL"
-	EXTERNAL_SERVICE_RELATION_TYPE = "EXTERNAL"
-	
 	PROCESSING_INDX = "processingName"
 	SERVICES_INDX = "serviceProcessingName~serviceName"
 	EXTERNAL_SERVICES_INDEX = "processingName~serviceProcessingName~serviceName"
@@ -71,8 +91,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 //		return cts.addWallet(APIstub, functionArgs)
 //	case "addTransaction":
 //		return cts.addTransaction(APIstub, functionArgs)
-//	case "getProcessing":
-//		return cts.getProcessing(APIstub, functionArgs)
+	case "getProcessing":
+		return cts.getProcessing(APIstub, functionArgs)
 //	case "getService":
 //		return cts.getService(APIstub, functionArgs)
 //	case "setServiceState":
