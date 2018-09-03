@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Button, Panel } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
+import ExpandableListItem from '../../Components/ExpandableListItem';
 
 
 class MyServices extends Component {
@@ -52,14 +53,11 @@ class MyServices extends Component {
 
   renderService(service) {
     return (
-      <Panel key={service._id} expanded={false} onToggle={() => {}}>
-        <Panel.Heading>{service.name}</Panel.Heading>
-        <Panel.Collapse>
-          <Panel.Body>
-            {service.description}
-          </Panel.Body>
-        </Panel.Collapse>
-      </Panel>
+      <ExpandableListItem
+        key={service._id}
+        header={service.name}
+        content={service.description}
+      />
     );
   }
 
