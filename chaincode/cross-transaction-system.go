@@ -30,6 +30,8 @@ type OperatorInfo struct{
 	IsActive bool `json:"isActive"`
 }
 
+type ExternalServiceInfo OperatorInfo
+
 type WalletInfo struct{
 	ID string `json:"id"`
 	Balance float32 `json:"balance"`
@@ -43,10 +45,11 @@ type OperatorExtendedInfo struct{
 type ServiceExtendedInfo struct{
 	ServiceName string `json:"serviceName"`
 	IsActive bool `json:"isActive"`
-	Operators []OperatorExtendedInfo `json:"operators"`
+	Operators []*OperatorExtendedInfo `json:"operators"`
 }
 
 type ExternalServiceExtendedInfo struct{
+	ServiceProcessingName string `json:"serviceProcessingName"`
 	ServiceName string `json:"serviceName"`
 	IsActive bool `json:"isActive"`	
 }
@@ -54,8 +57,8 @@ type ExternalServiceExtendedInfo struct{
 type ProcessingExtendedInfo struct{
 	Name string `json:"name"`
 	Description string `json:"description"`
-	Services []ServiceExtendedInfo `json:"services"`
-	ExternalServices []ExternalServiceExtendedInfo `json:"externalServices"`
+	Services []*ServiceExtendedInfo `json:"services"`
+	ExternalServices []*ExternalServiceExtendedInfo `json:"externalServices"`
 }
 
 const (
@@ -93,8 +96,6 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 //		return cts.addTransaction(APIstub, functionArgs)
 	case "getProcessing":
 		return cts.getProcessing(APIstub, functionArgs)
-//	case "getService":
-//		return cts.getService(APIstub, functionArgs)
 //	case "setServiceState":
 //		return cts.setServiceState(APIstub, functionArgs)
 //	case "setOperatorState":
@@ -198,7 +199,7 @@ func (cts *CrossTransactionSystem) addService(APIstub shim.ChaincodeStubInterfac
 	return shim.Success(nil)
 }
 
-func (cts *CrossTransactionSystem) addOperator(APIstub, functionArgs) pb.Response {
+func (cts *CrossTransactionSystem) addOperator(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 1 {
 		return shim.Error("Expected 1 parameter")
 	}
@@ -248,6 +249,154 @@ func (cts *CrossTransactionSystem) addOperator(APIstub, functionArgs) pb.Respons
 	}
 	
 	return shim.Success(nil)
+}
+
+func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterface, processingName string) ([]*ServiceExtendedInfo, error) {
+	servicesIter, err := GetStateByPartialCompositeKey(SERVICES_INDX, []string{processingName})
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Cannot get services index: %s", err))
+	}
+	defer servicesIter.Close()
+
+	servicesMap := make(map[string][]*ServiceExtendedInfo)
+	for servicesIter.HasNext() {
+		serviceKey, err := servicesIter.Next()
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read next service index value: %s", err))
+		}
+		serviceInfoBytes, err := APIstub.GetState(serviceKey)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read service info: %s", err))
+		}
+		serviceInfo ServiceInfo
+		err = json.Unmarshal(serviceInfoBytes, &serviceInfo)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot unmarshal service info: %s", err))
+		}
+
+		servicesMap[serviceInfo.Name] = &ServiceExtendedInfo{
+			ServiceName: serviceInfo.Name,
+			IsActive: serviceInfo.IsActive,
+			Operators: make([]OperatorExtendedInfo, 0),
+		}
+	}
+
+	operatorsIter, err := GetStateByPartialCompositeKey(OPERATORS_INDX, []string{processingName})
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Cannot get operators index: %s", err))
+	}
+	defer operatorsIter.Close()
+
+	for operatorsIter.HasNext() {
+		operatorKey, err := operatorsIter.Next()
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read next operator index value: %s", err))
+		}
+		operatorInfoBytes, err := APIstub.GetState(operatorKey)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read operator info: %s", err))
+		}
+		operatorInfo OperatorInfo
+		err = json.Unmarshal(operatorInfoBytes, &operatorInfo)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot unmarshal operator info: %s", err))
+		}
+		operatorExtendedInfo := OperatorExtendedInfo{
+			ProcessingName: operatorInfo.ParentProcessingName, 
+			IsActive: operatorInfo.IsActive,
+		}
+		service, hasItem := servicesMap[operatorInfo.ServiceName]
+		if !hasItem {
+			return nil, errors.New("Cannot find service of operator")
+		}
+		service.Operators = append(service.Operators, &operatorExtendedInfo)
+	}
+	
+	result := make([]*ServiceExtendedInfo, 0, len(servicesMap))
+	for _, service := range servicesMap {
+		result = append(result, service)
+	}
+	
+	return result, nil
+}
+
+func (cts *CrossTransactionSystem) getExternalServices(APIstub shim.ChaincodeStubInterface, processingName string) ([]*ExternalServiceExtendedInfo, error) {
+	externalServicesIter, err := GetStateByPartialCompositeKey(EXTERNAL_SERVICES_INDEX, []string{processingName})
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Cannot get external services index: %s", err))
+	}
+	defer externalServicesIter.Close()
+
+	result := make([]*ExternalServiceExtendedInfo, 0)
+	for externalServicesIter.HasNext() {
+		externalServiceKey, err := externalServicesIter.Next()
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read next external service index value: %s", err))
+		}
+		externalServiceInfoBytes, err := APIstub.GetState(externalServiceKey)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read external service info: %s", err))
+		}
+		externalServiceInfo ServiceInfo
+		err = json.Unmarshal(externalServiceInfoBytes, &externalServiceInfo)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot unmarshal external service info: %s", err))
+		}
+		externalServiceExtendedInfo := &ExternalServiceExtendedInfo{
+			ServiceProcessingName: externalServiceInfo.ServiceProcessingName,
+			ServiceName: externalServiceInfo.ServiceName,
+			IsActive: serviceInfo.IsActive,
+		}
+		result = append(result, externalServiceExtendedInfo)
+	}
+
+	return result, nil
+}
+
+func (cts *CrossTransactionSystem) getProcessing(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+
+	processingName := args[0]
+	key, err := APIstub.CreateCompositeKey(PROCESSING_INDX, []string{name})
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot create composite key: %s", err))
+	}
+	processingInfoBytes, err := APIstub.GetState(key)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot get state: %s", err))
+	}
+	if processingInfoBytes == nil {
+		return shim.Error("Cannot find processing")
+	}
+	processingInfo ProcessingInfo
+	err := json.Unmarshal([]byte(processingInfoBytes), &processingInfo)
+	if err != nil {
+		return shim.Error("Cannot unmarshal processing")
+	}
+
+	services, err := cts.getServices(APIstub, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	externalServices, err := cts.getExternalServices(APIstub, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	processingExtendedInfo := ProcessingExtendedInfo{
+		Name: processingName,
+		Description: processingInfo.Description,
+		Services: services,
+		ExternalServices: externalServices,
+	}
+	processingExtendedInfoBytes, err := json.Marshal(processingExtendedInfo)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot marshal processing info: %s", err))		
+	}
+
+	return shim.Success(processingExtendedInfoBytes)
 }
 
 func main() {
