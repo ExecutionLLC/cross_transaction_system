@@ -1,3 +1,6 @@
+import utils from '../utils/utils';
+
+
 class APIError extends Error {
   constructor(code, message) {
     super(message);
@@ -150,21 +153,13 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
   });
 }
 
-function immutableReplaceArrayItem(array, index, newItem) {
-  return [
-    ...array.slice(0, index),
-    newItem,
-    ...array.slice(index + 1),
-  ];
-}
-
 function updateMyService(index, newService) {
-  myServices = immutableReplaceArrayItem(myServices, index, newService);
+  myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
 }
 
 function addOperator(serviceId, operatorId) {
   return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = myServices.findIndex(s => s._id === serviceId);
+    const serviceIndex = utils.findIndexById(myServices, serviceId);
     if (serviceIndex < 0) {
       reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
       return;
@@ -195,14 +190,14 @@ function addOperator(serviceId, operatorId) {
 
 function setOperatorActive(serviceId, operatorId, isActive) {
   return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = myServices.findIndex(s => s._id === serviceId);
+    const serviceIndex = utils.findIndexById(myServices, serviceId);
     if (serviceIndex < 0) {
       reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
       return;
     }
     const service = myServices[serviceIndex];
     const { operators } = service;
-    const operatorIndex = operators.findIndex(o => o._id === operatorId);
+    const operatorIndex = utils.findIndexById(operators, operatorId);
     if (operatorIndex < 0) {
       reject(new APIError(ERRORS.NOT_FOUND), 'operator not found');
       return;
@@ -212,7 +207,7 @@ function setOperatorActive(serviceId, operatorId, isActive) {
       ...operator,
       isActive,
     };
-    const newOperators = immutableReplaceArrayItem(operators, operatorIndex, newOperator);
+    const newOperators = utils.immutableReplaceArrayItem(operators, operatorIndex, newOperator);
     const newService = {
       ...service,
       operators: newOperators,
