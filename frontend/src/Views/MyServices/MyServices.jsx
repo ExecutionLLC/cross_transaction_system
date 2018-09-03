@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Button } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 
 
-export default function (props) {
-  return (
-    <ViewBase {...props} pageHeader="My services" />
-  );
+class MyServices extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: false,
+      loadingError: null,
+      isAddingService: false,
+      addindOperatorToService: null,
+      myServices: null,
+    };
+  }
+
+  render() {
+    return (
+      <ViewBase {...this.props} pageHeader="Мои сервисы">
+        <Button>
+          Добавить сервис
+        </Button>
+      </ViewBase>
+    );
+  }
 }
+
+
+export default MyServices;
