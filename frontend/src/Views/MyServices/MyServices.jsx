@@ -16,6 +16,8 @@ class MyServices extends Component {
       addindOperatorToService: null,
       operators: null,
       myServices: null,
+      expandedServicesHash: Object.create(null),
+      expandedServicesOperatorsHash: Object.create(null),
     };
   }
 
@@ -51,12 +53,27 @@ class MyServices extends Component {
       });
   }
 
+  onServiceExpandToggle(serviceId, expand) {
+    const { expandedServicesHash } = this.state;
+    this.setState({
+      expandedServicesHash: {
+        ...expandedServicesHash,
+        [serviceId]: expand,
+      },
+    });
+  }
+
   renderService(service) {
+    const id = service._id;
+    const { expandedServicesHash } = this.state;
+    const isExpanded = expandedServicesHash[id];
     return (
       <ExpandableListItem
-        key={service._id}
+        key={id}
         header={service.name}
         content={service.description}
+        isExpanded={isExpanded}
+        onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
       />
     );
   }
