@@ -114,7 +114,7 @@ class Profile extends Component {
   render() {
     const { isLoading, profileError, profileData } = this.state;
     return (
-      <ViewBase {...this.props} pageHeader="Profile" isLoading={isLoading}>
+      <ViewBase {...this.props} pageHeader="Профиль" isLoading={isLoading}>
         {profileData && this.renderProfileData()}
         {profileError && (
           <ErrorPanel
