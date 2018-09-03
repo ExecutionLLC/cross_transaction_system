@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Nav, Navbar, NavItem } from 'react-bootstrap';
 
 
@@ -38,5 +39,10 @@ function Navigation(props) {
     </Navbar>
   );
 }
+
+Navigation.propTypes = {
+  page: PropTypes.string.isRequired,
+};
+
 
 export default Navigation;
