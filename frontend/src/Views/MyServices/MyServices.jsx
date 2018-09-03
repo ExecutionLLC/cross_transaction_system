@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Panel } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
@@ -50,18 +50,35 @@ class MyServices extends Component {
       });
   }
 
+  renderService(service) {
+    return (
+      <Panel key={service._id} expanded={false} onToggle={() => {}}>
+        <Panel.Heading>{service.name}</Panel.Heading>
+        <Panel.Collapse>
+          <Panel.Body>
+            {service.description}
+          </Panel.Body>
+        </Panel.Collapse>
+      </Panel>
+    );
+  }
+
+  renderServices() {
+    const { myServices } = this.state;
+    return myServices.map(service => this.renderService(service));
+  }
+
   render() {
     const {
-      isLoading, loadingError, operators, myServices,
+      isLoading, loadingError, myServices,
     } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
-        {operators && JSON.stringify(operators)}
-        {myServices && JSON.stringify(myServices)}
         <Button>
           Добавить сервис
         </Button>
+        {myServices && this.renderServices()}
       </ViewBase>
     );
   }
