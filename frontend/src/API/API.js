@@ -11,6 +11,9 @@ const ERRORS = {
   UNKNOWN: 'UNKNOWN',
   USER_EXISTS: 'USER_EXISTS',
   WRONG_PASSWORD: 'WRONG_PASSWORD',
+  ALREADY_EXISTS: 'ALREADY_EXISTS',
+  VALIDATION_FAILS: 'VALIDATION_FAILS',
+  NOT_FOUND: 'NOT_FOUND',
 };
 
 
@@ -31,6 +34,7 @@ function getProfile() {
       return;
     }
     resolve({
+      _id: 4,
       dateRange: [new Date('01/01/2017'), new Date()],
       ownServicesOwnCards: {
         count: 10,
@@ -48,8 +52,183 @@ function getProfile() {
   });
 }
 
+function getOperators() {
+  return TimeoutPromise(300, (resolve, reject) => {
+    if (Math.random() < 0.3) {
+      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get operators list'));
+      return;
+    }
+    resolve([
+      {
+        _id: 1,
+        name: 'Тройка',
+      },
+      {
+        _id: 2,
+        name: 'Умка',
+      },
+      {
+        _id: 3,
+        name: 'Червёрка',
+      },
+      {
+        _id: 4,
+        name: 'Хрумка',
+      },
+    ]);
+  });
+}
+
+let myServices = [
+  {
+    _id: 1,
+    name: 'Проезд',
+    description: 'Проезд в городском транспорте г. Рязань',
+    limits: {
+      minBalance: 50,
+      maxTransfer: 1500,
+    },
+    operators: [
+      {
+        id: 1,
+        startDate: +new Date('1 jan 2005'),
+        isActive: true,
+      },
+    ],
+  },
+  {
+    _id: 2,
+    name: 'Кофе',
+    description: 'Кофейные автоматы в г. Рязань',
+    limits: {
+      minBalance: 100,
+      maxTransfer: 1000,
+    },
+    operators: [
+      {
+        id: 1,
+        startDate: +new Date('20 feb 2015'),
+        isActive: false,
+      },
+    ],
+  },
+];
+
+function getMyServices() {
+  return TimeoutPromise(1000, (resolve, reject) => {
+    if (Math.random() < 0.3) {
+      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get my services'));
+      return;
+    }
+    resolve(myServices);
+  });
+}
+
+function addService({ name, description, limits: { minBalance, maxTransfer } }) {
+  return TimeoutPromise(500, (resolve, reject) => {
+    if (myServices.find(s => s.name === name)) {
+      reject(new APIError(ERRORS.ALREADY_EXISTS), 'service exists');
+      return;
+    }
+    if (!name || !description) {
+      reject(new APIError(ERRORS.VALIDATION_FAILS, 'add service validation fails'));
+      return;
+    }
+    myServices = [
+      ...myServices,
+      {
+        name,
+        description,
+        limits: {
+          minBalance,
+          maxTransfer,
+        },
+        operators: [],
+      },
+    ];
+    resolve(myServices);
+  });
+}
+
+function immutableReplaceArrayItem(array, index, newItem) {
+  return [
+    ...array.slice(0, index),
+    newItem,
+    ...array.slice(index + 1),
+  ];
+}
+
+function updateMyService(index, newService) {
+  myServices = immutableReplaceArrayItem(myServices, index, newService);
+}
+
+function addOperator(serviceId, operatorId) {
+  return TimeoutPromise(500, (resolve, reject) => {
+    const serviceIndex = myServices.findIndex(s => s._id === serviceId);
+    if (serviceIndex < 0) {
+      reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
+      return;
+    }
+    const service = myServices[serviceIndex];
+    const { operators } = service;
+    if (operators.find(o => o._id === operatorId)) {
+      reject(new APIError(ERRORS.ALREADY_EXISTS), 'operator exists');
+      return;
+    }
+    const newOperator = {
+      id: operatorId,
+      startDate: +new Date(),
+      isActive: true,
+    };
+    const newOperators = [
+      ...operators,
+      newOperator,
+    ];
+    const newService = {
+      ...service,
+      operators: newOperators,
+    };
+    updateMyService(serviceIndex, newService);
+    resolve(myServices);
+  });
+}
+
+function setOperatorActive(serviceId, operatorId, isActive) {
+  return TimeoutPromise(500, (resolve, reject) => {
+    const serviceIndex = myServices.findIndex(s => s._id === serviceId);
+    if (serviceIndex < 0) {
+      reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
+      return;
+    }
+    const service = myServices[serviceIndex];
+    const { operators } = service;
+    const operatorIndex = operators.findIndex(o => o._id === operatorId);
+    if (operatorIndex < 0) {
+      reject(new APIError(ERRORS.NOT_FOUND), 'operator not found');
+      return;
+    }
+    const operator = operators[operatorIndex];
+    const newOperator = {
+      ...operator,
+      isActive,
+    };
+    const newOperators = immutableReplaceArrayItem(operators, operatorIndex, newOperator);
+    const newService = {
+      ...service,
+      operators: newOperators,
+    };
+    updateMyService(serviceIndex, newService);
+    resolve(myServices);
+  });
+}
+
 
 export default {
   getProfile,
+  getOperators,
+  getMyServices,
+  addService,
+  addOperator,
+  setOperatorActive,
   ERRORS,
 };
