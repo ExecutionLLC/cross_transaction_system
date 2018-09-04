@@ -66,7 +66,7 @@ store.defaults({
   hyperledger: {
     storePath: './runtime/hfc-key-store',
     channelName: 'cts',
-    chaincodeId: 'cts',
+    chaincodeId: 'cross-transaction-system',
     ordererUrl: 'grpc://localhost:7050',
     peerUrl: 'grpc://localhost:7051',
     eventhubUrl: 'grpc://localhost:7053',

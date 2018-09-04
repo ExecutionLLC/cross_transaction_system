@@ -21,5 +21,5 @@ execPeerCommand "2" "0" "peer" "channel" "fetch" "0" "${PUBLIC_CHANNEL_NAME}.blo
 execPeerCommand "2" "0" "peer" "channel" "join" "-b" "${PUBLIC_CHANNEL_NAME}.block"
 execPeerCommand "2" "0" "peer" "channel" "update" "-o" "$ORDERER_URL" "-c" "$PUBLIC_CHANNEL_NAME" "-f" "/etc/hyperledger/configtx/Org2_${PUBLIC_CHANNEL_NAME}_anchors.tx"
 
-# deployChaincode "$PUBLIC_CHANNEL_NAME" "documents_checker_public"
+deployChaincode "$PUBLIC_CHANNEL_NAME" "cross-transaction-system"
 

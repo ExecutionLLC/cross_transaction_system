@@ -99,7 +99,7 @@ services:
     command: /bin/bash
     volumes:
         - /var/run/:/host/var/run/
-        - ./../chaincode/:/opt/gopath/src/github.com/documents-checker
+        - ./../chaincode/:/opt/gopath/src/github.com/cts
         - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
         - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config/
     networks:
