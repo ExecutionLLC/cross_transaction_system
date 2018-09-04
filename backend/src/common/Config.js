@@ -72,6 +72,9 @@ store.defaults({
     eventhubUrl: 'grpc://localhost:7053',
     username: 'user1',
   },
+  tokens: {
+    secret: 'cts',
+  },
 });
 
 module.exports = store.get();
