@@ -7,6 +7,7 @@ import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
 import ExpandableListItem from '../../Components/ExpandableListItem';
 import AddItemButton from '../../Components/AddItemButton';
+import Loading from '../../Components/Loading';
 
 
 class MyServices extends Component {
@@ -26,6 +27,7 @@ class MyServices extends Component {
       loadingError: null,
       addingServiceData: MyServices.makeDefaultAddingServiceData(),
       addingServiceError: null,
+      addingServiceLoading: false,
       addindOperatorToService: null,
       operators: null,
       myServices: null,
@@ -83,7 +85,42 @@ class MyServices extends Component {
   }
 
   onAddServiceSubmit() {
-    this.addServiceValidation();
+    if (!this.addServiceValidation()) {
+      return false;
+    }
+    this.setState({
+      addingServiceLoading: true,
+      addingServiceError: null,
+    });
+    const {
+      addingServiceData: {
+        name, description, minBalance, maxTransfer,
+      },
+    } = this.state;
+    return API.addService({
+      name,
+      description,
+      limits: {
+        minBalance,
+        maxTransfer,
+      },
+    })
+      .then((services) => {
+        this.setState({
+          addingServiceLoading: false,
+          myServices: services,
+        });
+        return true;
+      })
+      .catch((error) => {
+        this.setState({
+          addingServiceLoading: false,
+          addingServiceError: {
+            message: error.message,
+          },
+        });
+        return false;
+      });
   }
 
   addServiceValidation() {
@@ -144,6 +181,7 @@ class MyServices extends Component {
         minBalance, maxTransfer,
       },
       addingServiceError,
+      addingServiceLoading,
     } = this.state;
 
     const setData = (data) => {
@@ -215,6 +253,14 @@ class MyServices extends Component {
           && <HelpBlock>{addingServiceError.maxTransfer}</HelpBlock>
           }
         </FormGroup>
+        {addingServiceLoading && <Loading />}
+        {addingServiceError && addingServiceError.message && (
+          <FormGroup
+            validationState="error"
+          >
+            <HelpBlock>{addingServiceError.message}</HelpBlock>
+          </FormGroup>
+        )}
       </Form>
     );
     /* eslint-disable no-shadow */
