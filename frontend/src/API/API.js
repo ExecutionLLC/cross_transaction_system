@@ -133,7 +133,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
       reject(new APIError(ERRORS.ALREADY_EXISTS, 'service exists'));
       return;
     }
-    if (!name || !description) {
+    if (!name || !description || description === '1') {
       reject(new APIError(ERRORS.VALIDATION_FAILS, 'add service validation fails'));
       return;
     }
