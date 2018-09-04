@@ -21,33 +21,33 @@ class AddingServiceData extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      addingServiceData: AddingServiceData.makeDefaultAddingServiceData(),
-      addingServiceError: null,
-      addingServiceLoading: false,
-      addingServiceLiveValidation: false,
+      data: AddingServiceData.makeDefaultAddingServiceData(),
+      error: null,
+      isLoading: false,
+      isLiveValidation: false,
     };
   }
 
   onAddServiceOpen() {
     this.setState({
-      addingServiceData: AddingServiceData.makeDefaultAddingServiceData(),
-      addingServiceLiveValidation: false,
+      data: AddingServiceData.makeDefaultAddingServiceData(),
+      isLiveValidation: false,
     });
   }
 
   onAddServiceSubmit() {
     if (!this.addServiceValidation()) {
       this.setState({
-        addingServiceLiveValidation: true,
+        isLiveValidation: true,
       });
       return false;
     }
     this.setState({
-      addingServiceLoading: true,
-      addingServiceError: null,
+      isLoading: true,
+      error: null,
     });
     const {
-      addingServiceData: {
+      data: {
         name, description, minBalance, maxTransfer,
       },
     } = this.state;
@@ -62,7 +62,7 @@ class AddingServiceData extends Component {
       .then((services) => {
         this.setState(
           {
-            addingServiceLoading: false,
+            isLoading: false,
           },
           () => {
             const { onServiceAdded } = this.props;
@@ -71,41 +71,41 @@ class AddingServiceData extends Component {
         );
         return true;
       })
-      .catch((error) => {
-        let addingServiceError;
-        if (error.code === API.ERRORS.ALREADY_EXISTS) {
-          addingServiceError = {
+      .catch((apiError) => {
+        let error;
+        if (apiError.code === API.ERRORS.ALREADY_EXISTS) {
+          error = {
             name: 'Сервис существует',
           };
         } else {
-          addingServiceError = {
-            message: `Ошибка добавления сервиса: ${error.message}`,
+          error = {
+            message: `Ошибка добавления сервиса: ${apiError.message}`,
           };
         }
         this.setState({
-          addingServiceLoading: false,
-          addingServiceError,
+          isLoading: false,
+          error,
         });
         return false;
       });
   }
 
   onAddingServiceDataChange() {
-    const { addingServiceLiveValidation } = this.state;
-    if (addingServiceLiveValidation) {
+    const { isLiveValidation } = this.state;
+    if (isLiveValidation) {
       this.addServiceValidation();
     }
   }
 
   addServiceValidation() {
     const {
-      addingServiceData: {
+      data: {
         name, description, minBalance, maxTransfer,
       },
     } = this.state;
 
     const setError = (error) => {
-      this.setState({ addingServiceError: error });
+      this.setState({ error });
     };
 
     if (!name) {
@@ -130,21 +130,21 @@ class AddingServiceData extends Component {
 
   renderAddServiceControls() {
     const {
-      addingServiceData: {
+      data: {
         name, description,
         minBalance, maxTransfer,
       },
-      addingServiceError,
-      addingServiceLoading,
+      error,
+      isLoading,
     } = this.state;
 
-    const setData = (data) => {
-      const { addingServiceData } = this.state;
+    const setData = (newData) => {
+      const { data } = this.state;
       this.setState(
         {
-          addingServiceData: {
-            ...addingServiceData,
+          data: {
             ...data,
+            ...newData,
           },
         },
         () => {
@@ -156,13 +156,13 @@ class AddingServiceData extends Component {
       return event => f(event.target.value);
     }
 
-    function renderFormGroup(content, error) {
+    function renderFormGroup(content, groupError) {
       return (
         <FormGroup
-          validationState={error ? 'error' : null}
+          validationState={groupError ? 'error' : null}
         >
           {content}
-          {error && <HelpBlock>{error}</HelpBlock>
+          {groupError && <HelpBlock>{groupError}</HelpBlock>
           }
         </FormGroup>
       );
@@ -180,7 +180,7 @@ class AddingServiceData extends Component {
               onChange={wrapOnChange(name => setData({ name }))}
             />
           </div>,
-          addingServiceError && addingServiceError.name,
+          error && error.name,
         )}
         {renderFormGroup(
           <div>
@@ -191,7 +191,7 @@ class AddingServiceData extends Component {
               onChange={wrapOnChange(description => setData({ description }))}
             />
           </div>,
-          addingServiceError && addingServiceError.description,
+          error && error.description,
         )}
         {renderFormGroup(
           <div>
@@ -202,7 +202,7 @@ class AddingServiceData extends Component {
               onChange={wrapOnChange(minBalance => setData({ minBalance }))}
             />
           </div>,
-          addingServiceError && addingServiceError.minBalance,
+          error && error.minBalance,
         )}
         {renderFormGroup(
           <div>
@@ -213,14 +213,14 @@ class AddingServiceData extends Component {
               onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
             />
           </div>,
-          addingServiceError && addingServiceError.maxTransfer,
+          error && error.maxTransfer,
         )}
-        {addingServiceLoading && <Loading />}
-        {addingServiceError && addingServiceError.message && (
+        {isLoading && <Loading />}
+        {error && error.message && (
           <FormGroup
             validationState="error"
           >
-            <HelpBlock>{addingServiceError.message}</HelpBlock>
+            <HelpBlock>{error.message}</HelpBlock>
           </FormGroup>
         )}
       </Form>
