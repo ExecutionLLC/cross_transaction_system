@@ -5,6 +5,8 @@ import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
 import ExpandableListItem from '../../Components/ExpandableListItem';
 import AddingServiceData from './AddingServiceData';
+import Operator from './Operator';
+import utils from '../../utils/utils';
 
 
 class MyServices extends Component {
@@ -15,9 +17,10 @@ class MyServices extends Component {
       loadingError: null,
       // addindOperatorToService: null, TODO uncomment and handle
       operators: null,
+      operatorsHash: null,
       myServices: null,
       expandedServicesHash: Object.create(null),
-      // expandedServicesOperatorsHash: Object.create(null), TODO uncomment and handle
+      expandedServicesOperatorsHash: Object.create(null),
     };
   }
 
@@ -29,6 +32,7 @@ class MyServices extends Component {
       .then((operators) => {
         this.setState({
           operators,
+          operatorsHash: utils.makeHashById(operators),
         });
         return API.getMyServices()
           .then((myServices) => {
@@ -69,7 +73,47 @@ class MyServices extends Component {
     });
   }
 
+  onExpandServiceOperatorToggle(serviceId, operatorId, isExpanded) {
+    const { expandedServicesOperatorsHash } = this.state;
+    this.setState({
+      expandedServicesOperatorsHash: {
+        ...expandedServicesOperatorsHash,
+        [serviceId]: {
+          ...expandedServicesOperatorsHash[serviceId],
+          [operatorId]: isExpanded,
+        },
+      },
+    });
+  }
+
+  onServiceOperatorActiveToggle(serviceId, operatorId, isActive) {
+    // eslint-disable-next-line no-console
+    console.log('onServiceOperatorActiveToggle', serviceId, operatorId, isActive);
+  }
+
+  renderServiceOperators(serviceOperators, serviceId, expandedHash) {
+    const { operatorsHash } = this.state;
+    return serviceOperators.map(
+      operator => (
+        <Operator
+          key={operator.id}
+          name={operatorsHash[operator.id].name}
+          isActive={operator.isActive}
+          startDate={`${new Date(operator.startDate)}`}
+          isExpanded={expandedHash[operator.id]}
+          onExpandToggle={expanded => (
+            this.onExpandServiceOperatorToggle(serviceId, operator.id, expanded)
+          )}
+          onActivateToggle={active => (
+            this.onServiceOperatorActiveToggle(serviceId, operator.id, active)
+          )}
+        />
+      ),
+    );
+  }
+
   renderServiceContent(service) {
+    const { expandedServicesOperatorsHash } = this.state;
     return (
       <Grid>
         <Row>
@@ -90,6 +134,13 @@ class MyServices extends Component {
           <Col sm={3}>
             {service.limits.maxTransfer}
           </Col>
+        </Row>
+        <Row>
+          {this.renderServiceOperators(
+            service.operators,
+            service._id,
+            expandedServicesOperatorsHash[service._id] || Object.create(null),
+          )}
         </Row>
       </Grid>
     );

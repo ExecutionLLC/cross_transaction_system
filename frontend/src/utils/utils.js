@@ -10,8 +10,16 @@ function findIndexById(array, id) {
   return array.findIndex(item => item._id === id);
 }
 
+function makeHashById(array) {
+  return array.reduce(
+    (hash, item) => ({ ...hash, [item._id]: item }),
+    Object.create(null),
+  );
+}
+
 
 export default {
   immutableReplaceArrayItem,
   findIndexById,
+  makeHashById,
 };
