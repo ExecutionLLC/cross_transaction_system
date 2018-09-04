@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import ViewBase from '../ViewBase';
+import PropTypes from 'prop-types';
+import {
+  Form, FormGroup, FormControl, ControlLabel, HelpBlock,
+} from 'react-bootstrap';
 import API from '../../API/API';
-import ErrorPanel from '../../Components/ErrorPanel';
-import ExpandableListItem from '../../Components/ExpandableListItem';
-import AddingServiceData from './AddingServiceData';
+import AddItemButton from '../../Components/AddItemButton';
+import Loading from '../../Components/Loading';
 
 
-class MyServices extends Component {
+class AddingServiceData extends Component {
   static makeDefaultAddingServiceData() {
     return {
       name: '',
@@ -19,74 +21,20 @@ class MyServices extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false,
-      loadingError: null,
-      addindOperatorToService: null,
-      operators: null,
-      myServices: null,
-      expandedServicesHash: Object.create(null),
-      expandedServicesOperatorsHash: Object.create(null),
+      addingServiceData: AddingServiceData.makeDefaultAddingServiceData(),
+      addingServiceError: null,
+      addingServiceLoading: false,
+      addingServiceLiveValidation: false,
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      isLoading: true,
-    });
-    API.getOperators()
-      .then((operators) => {
-        this.setState({
-          operators,
-        });
-        return API.getMyServices()
-          .then((myServices) => {
-            this.setState({
-              isLoading: false,
-              loadingError: false,
-              myServices,
-            });
-          })
-          .catch(() => {
-            this.setState({
-              isLoading: false,
-              loadingError: 'Не загрузился список собственных сервисов',
-            });
-          });
-      })
-      .catch(() => {
-        this.setState({
-          isLoading: false,
-          loadingError: 'Не загрузился список операторов',
-        });
-      });
-  }
-
-  onServiceExpandToggle(serviceId, expand) {
-    const { expandedServicesHash } = this.state;
-    this.setState({
-      expandedServicesHash: {
-        ...expandedServicesHash,
-        [serviceId]: expand,
-      },
-    });
-  }
-
-  onServiceAdded(services) {
-    this.setState({
-      myServices: services,
-    });
-  }
-
-  /*
   onAddServiceOpen() {
     this.setState({
-      addingServiceData: MyServices.makeDefaultAddingServiceData(),
+      addingServiceData: AddingServiceData.makeDefaultAddingServiceData(),
       addingServiceLiveValidation: false,
     });
   }
-  */
 
-  /*
   onAddServiceSubmit() {
     if (!this.addServiceValidation()) {
       this.setState({
@@ -112,10 +60,15 @@ class MyServices extends Component {
       },
     })
       .then((services) => {
-        this.setState({
-          addingServiceLoading: false,
-          myServices: services,
-        });
+        this.setState(
+          {
+            addingServiceLoading: false,
+          },
+          () => {
+            const { onServiceAdded } = this.props;
+            onServiceAdded(services);
+          },
+        );
         return true;
       })
       .catch((error) => {
@@ -136,18 +89,14 @@ class MyServices extends Component {
         return false;
       });
   }
-  */
 
-  /*
   onAddingServiceDataChange() {
     const { addingServiceLiveValidation } = this.state;
     if (addingServiceLiveValidation) {
       this.addServiceValidation();
     }
   }
-  */
 
-  /*
   addServiceValidation() {
     const {
       addingServiceData: {
@@ -178,29 +127,7 @@ class MyServices extends Component {
     setError(null);
     return true;
   }
-  */
 
-  renderService(service) {
-    const id = service._id;
-    const { expandedServicesHash } = this.state;
-    const isExpanded = expandedServicesHash[id];
-    return (
-      <ExpandableListItem
-        key={id}
-        header={service.name}
-        content={service.description}
-        isExpanded={isExpanded}
-        onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
-      />
-    );
-  }
-
-  renderServices() {
-    const { myServices } = this.state;
-    return myServices.map(service => this.renderService(service));
-  }
-
-  /*
   renderAddServiceControls() {
     const {
       addingServiceData: {
@@ -225,7 +152,6 @@ class MyServices extends Component {
         },
       );
     };
-
     function wrapOnChange(f) {
       return event => f(event.target.value);
     }
@@ -242,7 +168,7 @@ class MyServices extends Component {
       );
     }
 
-    /!* eslint-disable no-shadow *!/
+    /* eslint-disable no-shadow */
     return (
       <Form>
         {renderFormGroup(
@@ -299,34 +225,25 @@ class MyServices extends Component {
         )}
       </Form>
     );
-    /!* eslint-disable no-shadow *!/
+    /* eslint-disable no-shadow */
   }
-  */
 
   render() {
-    const {
-      isLoading, loadingError, myServices,
-    } = this.state;
     return (
-      <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
-        {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
-        <AddingServiceData
-          onServiceAdded={(services) => this.onServiceAdded(services)}
-        />
-        {/*
-        <AddItemButton
-          caption="Добавить сервис"
-          onOpen={() => this.onAddServiceOpen()}
-          onSubmit={() => this.onAddServiceSubmit()}
-        >
-          {this.renderAddServiceControls()}
-        </AddItemButton>
-        */}
-        {myServices && this.renderServices()}
-      </ViewBase>
+      <AddItemButton
+        caption="Добавить сервис"
+        onOpen={() => this.onAddServiceOpen()}
+        onSubmit={() => this.onAddServiceSubmit()}
+      >
+        {this.renderAddServiceControls()}
+      </AddItemButton>
     );
   }
 }
 
+AddingServiceData.propTypes = {
+  onServiceAdded: PropTypes.func.isRequired,
+};
 
-export default MyServices;
+
+export default AddingServiceData;
