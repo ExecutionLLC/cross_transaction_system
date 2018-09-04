@@ -9,7 +9,7 @@ import Loading from '../../Components/Loading';
 
 
 class AddingServiceData extends Component {
-  static makeDefaultAddingServiceData() {
+  static makeDefaultData() {
     return {
       name: '',
       description: '',
@@ -21,7 +21,7 @@ class AddingServiceData extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: AddingServiceData.makeDefaultAddingServiceData(),
+      data: AddingServiceData.makeDefaultData(),
       error: null,
       isLoading: false,
       isLiveValidation: false,
@@ -30,13 +30,13 @@ class AddingServiceData extends Component {
 
   onAddServiceOpen() {
     this.setState({
-      data: AddingServiceData.makeDefaultAddingServiceData(),
+      data: AddingServiceData.makeDefaultData(),
       isLiveValidation: false,
     });
   }
 
   onAddServiceSubmit() {
-    if (!this.addServiceValidation()) {
+    if (!this.validate()) {
       this.setState({
         isLiveValidation: true,
       });
@@ -90,14 +90,14 @@ class AddingServiceData extends Component {
       });
   }
 
-  onAddingServiceDataChange() {
+  onDataChange() {
     const { isLiveValidation } = this.state;
     if (isLiveValidation) {
-      this.addServiceValidation();
+      this.validate();
     }
   }
 
-  addServiceValidation() {
+  validate() {
     const {
       data: {
         name, description, minBalance, maxTransfer,
@@ -148,7 +148,7 @@ class AddingServiceData extends Component {
           },
         },
         () => {
-          this.onAddingServiceDataChange();
+          this.onDataChange();
         },
       );
     };
