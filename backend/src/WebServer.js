@@ -3,9 +3,11 @@ const cors = require('cors');
 const Express = require('express');
 const Http = require('http');
 
-const RequestResponseHelper = require('./common/RequestResponseHelper');
+const { AuthTokenHelper } = require('./common/AuthTokenHelper');
 const config = require('./common/Config');
 const LoggersContainer = require('./common/LoggersContainer');
+const RequestResponseHelper = require('./common/RequestResponseHelper');
+const UnauthorizedError = require('./common/errors/UnauthorizedError');
 
 class WebServer {
   constructor(models, services, controllers) {
@@ -38,6 +40,23 @@ class WebServer {
     return new Promise((resolve) => {
       const app = new Express();
 
+      if (this._config.useTokens) {
+        app.use((request, response, next) => {
+          const token = request.header('x-access-token');
+          if (!token) {
+            next(new UnauthorizedError('Token is empty'));
+          } else {
+            const { tokensSecret } = this._config;
+            AuthTokenHelper
+              .decodeAndVerifyAuthToken(token, tokensSecret)
+              .then((tokenData) => {
+                request.tokenData = tokenData;
+                next();
+              }).catch(next);
+          }
+        });
+      }
+
       app.use(bodyParser.json());
       app.use(cors());
       app.use('/', apiRouter);
@@ -59,15 +78,10 @@ class WebServer {
     });
   }
 
-  _handleErrors(error, request, response) {
-    RequestResponseHelper.sendError(response, error);
-    const errorMessage = (error && error.message) ? error.message : 'Unknown error';
-    this._logger.error(
-      `${request.method} ${response.statusCode} ${request.url}: ${errorMessage}`,
-    );
-    if (error.stack) {
-      this._logger.debug(error.stack);
-    }
+  // eslint-disable-next-line no-unused-vars
+  _handleErrors(error, request, response, next) {
+    RequestResponseHelper
+      .sendErrorAndWriteResponseLogAndErrorLog(this._logger, null, response, error);
   }
 }
 
