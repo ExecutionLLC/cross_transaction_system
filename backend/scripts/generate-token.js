@@ -1,4 +1,4 @@
-const { PROCESSING_USER_TYPE, AuthTokenHelper } = require('../src/common/AuthTokenHelper');
+const { ADMIN_USER_TYPE, PROCESSING_USER_TYPE, AuthTokenHelper } = require('../src/common/AuthTokenHelper');
 
 const { argv } = process;
 
@@ -21,10 +21,13 @@ if (argv.length !== 4 && argv.length !== 5) {
       .generateProcessingAuthToken(processingName, secretPhrase)
       .then(console.log)
       .catch(console.error);
-  } else {
+  } else if (userType === ADMIN_USER_TYPE) {
     AuthTokenHelper
       .generateAdminAuthToken(secretPhrase)
       .then(console.log)
       .catch(console.error);
+  } else {
+    console.error(`got unknown user type => "${userType}"`);
+    printUsage();
   }
 }
