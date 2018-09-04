@@ -223,61 +223,65 @@ class MyServices extends Component {
       return event => f(event.target.value);
     }
 
+    function renderFormGroup(content, error) {
+      return (
+        <FormGroup
+          validationState={error ? 'error' : null}
+        >
+          {content}
+          {error && <HelpBlock>{error}</HelpBlock>
+          }
+        </FormGroup>
+      );
+    }
+
     /* eslint-disable no-shadow */
     return (
       <Form>
-        <FormGroup
-          validationState={addingServiceError && addingServiceError.name ? 'error' : null}
-        >
-          <ControlLabel>Название</ControlLabel>
-          <FormControl
-            type="text"
-            value={name}
-            onChange={wrapOnChange(name => setData({ name }))}
-          />
-          {addingServiceError && addingServiceError.name
-          && <HelpBlock>{addingServiceError.name}</HelpBlock>
-          }
-        </FormGroup>
-        <FormGroup
-          validationState={addingServiceError && addingServiceError.description ? 'error' : null}
-        >
-          <ControlLabel>Описание</ControlLabel>
-          <FormControl
-            type="text"
-            value={description}
-            onChange={wrapOnChange(description => setData({ description }))}
-          />
-          {addingServiceError && addingServiceError.description
-          && <HelpBlock>{addingServiceError.description}</HelpBlock>
-          }
-        </FormGroup>
-        <FormGroup
-          validationState={addingServiceError && addingServiceError.minBalance ? 'error' : null}
-        >
-          <ControlLabel>Мининальный баланс</ControlLabel>
-          <FormControl
-            type="number"
-            value={minBalance}
-            onChange={wrapOnChange(minBalance => setData({ minBalance }))}
-          />
-          {addingServiceError && addingServiceError.minBalance
-          && <HelpBlock>{addingServiceError.minBalance}</HelpBlock>
-          }
-        </FormGroup>
-        <FormGroup
-          validationState={addingServiceError && addingServiceError.maxTransfer ? 'error' : null}
-        >
-          <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
-          <FormControl
-            type="number"
-            value={maxTransfer}
-            onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
-          />
-          {addingServiceError && addingServiceError.maxTransfer
-          && <HelpBlock>{addingServiceError.maxTransfer}</HelpBlock>
-          }
-        </FormGroup>
+        {renderFormGroup(
+          <div>
+            <ControlLabel>Название</ControlLabel>
+            <FormControl
+              type="text"
+              value={name}
+              onChange={wrapOnChange(name => setData({ name }))}
+            />
+          </div>,
+          addingServiceError && addingServiceError.name,
+        )}
+        {renderFormGroup(
+          <div>
+            <ControlLabel>Описание</ControlLabel>
+            <FormControl
+              type="text"
+              value={description}
+              onChange={wrapOnChange(description => setData({ description }))}
+            />
+          </div>,
+          addingServiceError && addingServiceError.description,
+        )}
+        {renderFormGroup(
+          <div>
+            <ControlLabel>Мининальный баланс</ControlLabel>
+            <FormControl
+              type="number"
+              value={minBalance}
+              onChange={wrapOnChange(minBalance => setData({ minBalance }))}
+            />
+          </div>,
+          addingServiceError && addingServiceError.minBalance,
+        )}
+        {renderFormGroup(
+          <div>
+            <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
+            <FormControl
+              type="number"
+              value={maxTransfer}
+              onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
+            />
+          </div>,
+          addingServiceError && addingServiceError.maxTransfer,
+        )}
         {addingServiceLoading && <Loading />}
         {addingServiceError && addingServiceError.message && (
           <FormGroup
