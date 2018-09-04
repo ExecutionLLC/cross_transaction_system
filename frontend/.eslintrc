@@ -2,6 +2,7 @@
   "extends": "airbnb",
   "rules": {
     "class-methods-use-this": "off",
-    "react/prefer-stateless-function": "off"
+    "react/prefer-stateless-function": "off",
+    "no-underscore-dangle": "off"
   }
 }
