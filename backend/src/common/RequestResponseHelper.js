@@ -49,11 +49,11 @@ class RequestResponseHelper {
     return requestId;
   }
 
-  static writeResponseLog(logger, requestId, response, json, logLevel) {
+  static writeResponseLog(logger, requestId, response, data, logLevel) {
     const { statusCode } = response;
     logger.log(
       logLevel || DEFAULT_RESPONSE_LOG_LEVEL,
-      `RESPONSE (${requestId}) (statusCode = ${statusCode}; json = "${json}")`,
+      `RESPONSE (${requestId}) (statusCode = ${statusCode}; json = "${JSON.stringify(data)}")`,
     );
   }
 
