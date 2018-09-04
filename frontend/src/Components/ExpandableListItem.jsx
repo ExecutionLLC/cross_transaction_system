@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Panel, Button } from 'react-bootstrap';
+import { Panel, Button, Glyphicon } from 'react-bootstrap';
 
 
 class ExpandableListItem extends Component {
@@ -26,7 +26,10 @@ class ExpandableListItem extends Component {
       <Panel expanded={isExpanded} onToggle={() => {}}>
         <Panel.Heading>
           <Button onClick={this.onExpandToggle}>
-            {isExpanded ? 'v' : '>'}
+            {isExpanded
+              ? <Glyphicon glyph="triangle-bottom" />
+              : <Glyphicon glyph="triangle-right" />
+            }
           </Button>
           {header}
         </Panel.Heading>
