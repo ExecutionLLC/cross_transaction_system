@@ -113,11 +113,19 @@ class MyServices extends Component {
         return true;
       })
       .catch((error) => {
+        let addingServiceError;
+        if (error.code === API.ERRORS.ALREADY_EXISTS) {
+          addingServiceError = {
+            name: 'Сервис существует',
+          };
+        } else {
+          addingServiceError = {
+            message: `Ошибка добавления сервиса: ${error.message}`,
+          };
+        }
         this.setState({
           addingServiceLoading: false,
-          addingServiceError: {
-            message: error.message,
-          },
+          addingServiceError,
         });
         return false;
       });
