@@ -2,14 +2,14 @@ const Express = require('express');
 const HttpStatusCodes = require('http-status-codes');
 const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 const BaseController = require('./BaseController');
+const ProcessingController = require('./ProcessingController');
 const RequestResponseHelper = require('../common/RequestResponseHelper');
-const UserController = require('./UserController');
 const Utils = require('../common/Utils');
 
 class ControllersFacade extends AsyncInitializedObject {
   constructor(services) {
     super();
-    this.userController = new UserController(services);
+    this.processingController = new ProcessingController(services);
   }
 
   _init() {
@@ -24,7 +24,7 @@ class ControllersFacade extends AsyncInitializedObject {
   createRouter() {
     const router = new Express();
 
-    router.use('/user', this.userController.createRouter());
+    router.use('/processing', this.processingController.createRouter());
     router.use(this._notFoundHandler.bind(this));
 
     return router;

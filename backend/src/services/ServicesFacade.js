@@ -1,13 +1,13 @@
 const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 const BaseService = require('./BaseService');
-const UserService = require('./UserService');
+const ProcessingService = require('./ProcessingService');
 const Utils = require('../common/Utils');
 
 class ServicesFacade extends AsyncInitializedObject {
   constructor(models) {
     super();
     this._models = models;
-    this.userService = new UserService(models);
+    this.processingService = new ProcessingService(models);
   }
 
   _init() {

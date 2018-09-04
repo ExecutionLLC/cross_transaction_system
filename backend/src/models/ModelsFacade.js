@@ -4,7 +4,7 @@ const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 const BaseModel = require('./BaseModel');
 const ChaincodeApi = require('../hyperledger-api/ChaincodeApi');
 const config = require('../common/Config');
-const UserModel = require('./UserModel');
+const ProcessingModel = require('./ProcessingModel');
 const Utils = require('../common/Utils');
 
 class ModelsFacade extends AsyncInitializedObject {
@@ -14,7 +14,7 @@ class ModelsFacade extends AsyncInitializedObject {
     this._db = mongoose.createConnection();
     this._chaincodeApi = new ChaincodeApi();
 
-    this.userModel = new UserModel(this._db, this._chaincodeApi);
+    this.processingModel = new ProcessingModel(this._db, this._chaincodeApi);
   }
 
   _init() {
