@@ -37,7 +37,7 @@ function getProfile() {
       return;
     }
     resolve({
-      _id: 4,
+      _id: '4',
       dateRange: [new Date('01/01/2017'), new Date()],
       ownServicesOwnCards: {
         count: 10,
@@ -63,19 +63,19 @@ function getOperators() {
     }
     resolve([
       {
-        _id: 1,
+        _id: '1',
         name: 'Тройка',
       },
       {
-        _id: 2,
+        _id: '2',
         name: 'Умка',
       },
       {
-        _id: 3,
+        _id: '3',
         name: 'Червёрка',
       },
       {
-        _id: 4,
+        _id: '4',
         name: 'Хрумка',
       },
     ]);
@@ -84,7 +84,7 @@ function getOperators() {
 
 let myServices = [
   {
-    _id: 1,
+    _id: '1',
     name: 'Проезд',
     description: 'Проезд в городском транспорте г. Рязань',
     limits: {
@@ -93,14 +93,14 @@ let myServices = [
     },
     operators: [
       {
-        _id: 1,
+        _id: '1',
         startDate: +new Date('1 jan 2005'),
         isActive: true,
       },
     ],
   },
   {
-    _id: 2,
+    _id: '2',
     name: 'Кофе',
     description: 'Кофейные автоматы в г. Рязань',
     limits: {
@@ -109,7 +109,7 @@ let myServices = [
     },
     operators: [
       {
-        _id: 1,
+        _id: '1',
         startDate: +new Date('20 feb 2015'),
         isActive: false,
       },
@@ -140,7 +140,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
     myServices = [
       ...myServices,
       {
-        _id: Math.random(),
+        _id: `${Math.random()}`,
         name,
         description,
         limits: {
