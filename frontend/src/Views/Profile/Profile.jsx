@@ -1,29 +1,17 @@
 import React, { Component } from 'react';
+import DatePicker from 'react-bootstrap-date-picker';
 import {
   Grid, Row, Col,
   Panel,
   ListGroup, ListGroupItem,
-  Button,
 } from 'react-bootstrap';
-import DatePicker from 'react-bootstrap-date-picker';
+
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
-
-import 'react-datepicker/dist/react-datepicker.css';
-
+import DatePickerControl from './DatePickerControl';
 import './style.css';
 
-class CustomControl extends Component {
-  render() {
-    const { value, placeholder, ...rest } = this.props;
-    return (
-      <Button {...rest} className="select-date-button">
-        {value || placeholder}
-      </Button>
-    );
-  }
-}
 
 class Profile extends Component {
   static defaultDate() {
@@ -130,7 +118,18 @@ class Profile extends Component {
   }
 
   renderStat() {
-    const { date } = this.state;
+    const {
+      date,
+      profileData,
+    } = this.state;
+    // total transaction count
+    let totalCount = 0;
+    if (profileData) {
+      const { ownServicesOwnCards, ownServicesOtherCards, otherServicesOwnCards } = profileData;
+      totalCount = ownServicesOwnCards.count
+        + ownServicesOtherCards.count
+        + otherServicesOwnCards.count;
+    }
     return this.renderCardedContent(
       'Статистика',
       (
@@ -142,7 +141,7 @@ class Profile extends Component {
               </Col>
               <Col md={6}>
                 <DatePicker
-                  customControl={<CustomControl />}
+                  customControl={<DatePickerControl />}
                   value={date}
                   onChange={this.handleChange}
                 />
@@ -155,7 +154,7 @@ class Profile extends Component {
                 Количество транзакций:
               </Col>
               <Col sm={6}>
-                123
+                {totalCount}
               </Col>
             </Row>
           </ListGroupItem>
