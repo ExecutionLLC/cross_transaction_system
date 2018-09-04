@@ -128,6 +128,18 @@ class AddingServiceData extends Component {
     return true;
   }
 
+  renderFormGroup(content, groupError) {
+    return (
+      <FormGroup
+        validationState={groupError ? 'error' : null}
+      >
+        {content}
+        {groupError && <HelpBlock>{groupError}</HelpBlock>
+        }
+      </FormGroup>
+    );
+  }
+
   renderAddServiceControls() {
     const {
       data: {
@@ -156,22 +168,10 @@ class AddingServiceData extends Component {
       return event => f(event.target.value);
     }
 
-    function renderFormGroup(content, groupError) {
-      return (
-        <FormGroup
-          validationState={groupError ? 'error' : null}
-        >
-          {content}
-          {groupError && <HelpBlock>{groupError}</HelpBlock>
-          }
-        </FormGroup>
-      );
-    }
-
     /* eslint-disable no-shadow */
     return (
       <Form>
-        {renderFormGroup(
+        {this.renderFormGroup(
           <div>
             <ControlLabel>Название</ControlLabel>
             <FormControl
@@ -182,7 +182,7 @@ class AddingServiceData extends Component {
           </div>,
           error && error.name,
         )}
-        {renderFormGroup(
+        {this.renderFormGroup(
           <div>
             <ControlLabel>Описание</ControlLabel>
             <FormControl
@@ -193,7 +193,7 @@ class AddingServiceData extends Component {
           </div>,
           error && error.description,
         )}
-        {renderFormGroup(
+        {this.renderFormGroup(
           <div>
             <ControlLabel>Мининальный баланс</ControlLabel>
             <FormControl
@@ -204,7 +204,7 @@ class AddingServiceData extends Component {
           </div>,
           error && error.minBalance,
         )}
-        {renderFormGroup(
+        {this.renderFormGroup(
           <div>
             <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
             <FormControl
