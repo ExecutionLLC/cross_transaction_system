@@ -13,7 +13,7 @@ class MyServices extends Component {
       isLoading: false,
       loadingError: null,
       // addindOperatorToService: null, TODO uncomment and handle
-      // operators: null, TODO uncomment and handle
+      operators: null,
       myServices: null,
       expandedServicesHash: Object.create(null),
       // expandedServicesOperatorsHash: Object.create(null), TODO uncomment and handle
@@ -25,9 +25,9 @@ class MyServices extends Component {
       isLoading: true,
     });
     API.getOperators()
-      .then((/* operators TODO uncomment and handle */) => {
+      .then((operators) => {
         this.setState({
-          // operators, TODO uncomment and handle
+          operators,
         });
         return API.getMyServices()
           .then((myServices) => {
