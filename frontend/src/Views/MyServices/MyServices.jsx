@@ -89,9 +89,6 @@ class MyServices extends Component {
   }
 
   onServiceOperatorActiveToggle(serviceId, operatorId, isActive) {
-    // eslint-disable-next-line no-console
-    console.log('onServiceOperatorActiveToggle', serviceId, operatorId, isActive);
-
     const toggleChanging = (isChanging) => {
       const { changingServicesOperatorsHash } = this.state;
       this.setState({
