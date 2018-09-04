@@ -45,7 +45,9 @@ if (fs.existsSync(FILE_CONFIG_PATH)) {
 
 store.defaults({
   webserver: {
-    port: 6000,
+    port: 3001,
+    useTokens: true,
+    tokensSecret: 'cts',
   },
   logging: {
     console: {
@@ -71,9 +73,6 @@ store.defaults({
     peerUrl: 'grpc://localhost:7051',
     eventhubUrl: 'grpc://localhost:7053',
     username: 'user1',
-  },
-  tokens: {
-    secret: 'cts',
   },
 });
 
