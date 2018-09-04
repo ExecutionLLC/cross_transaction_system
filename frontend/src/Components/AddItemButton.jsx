@@ -24,10 +24,19 @@ class AddItemButton extends Component {
   onSubmit() {
     const { onSubmit } = this.props;
     const submitResult = onSubmit();
-    if (submitResult) {
-      this.setState({
-        isExpanded: false,
-      });
+
+    const closeIfNeed = (close) => {
+      if (close) {
+        this.setState({
+          isExpanded: false,
+        });
+      }
+    };
+
+    if (submitResult && submitResult.then) {
+      submitResult.then(closeIfNeed);
+    } else {
+      closeIfNeed(submitResult);
     }
   }
 
