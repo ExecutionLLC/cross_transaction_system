@@ -130,7 +130,7 @@ function getMyServices() {
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
   return TimeoutPromise(500, (resolve, reject) => {
     if (myServices.find(s => s.name === name)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS), 'service exists');
+      reject(new APIError(ERRORS.ALREADY_EXISTS, 'service exists'));
       return;
     }
     if (!name || !description) {
@@ -162,13 +162,13 @@ function addOperator(serviceId, operatorId) {
   return TimeoutPromise(500, (resolve, reject) => {
     const serviceIndex = utils.findIndexById(myServices, serviceId);
     if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
+      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
       return;
     }
     const service = myServices[serviceIndex];
     const { operators } = service;
     if (operators.find(o => o._id === operatorId)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS), 'operator exists');
+      reject(new APIError(ERRORS.ALREADY_EXISTS, 'operator exists'));
       return;
     }
     const newOperator = {
@@ -193,14 +193,14 @@ function setOperatorActive(serviceId, operatorId, isActive) {
   return TimeoutPromise(500, (resolve, reject) => {
     const serviceIndex = utils.findIndexById(myServices, serviceId);
     if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND), 'service not found');
+      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
       return;
     }
     const service = myServices[serviceIndex];
     const { operators } = service;
     const operatorIndex = utils.findIndexById(operators, operatorId);
     if (operatorIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND), 'operator not found');
+      reject(new APIError(ERRORS.NOT_FOUND, 'operator not found'));
       return;
     }
     const operator = operators[operatorIndex];
