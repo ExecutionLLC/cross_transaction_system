@@ -8,6 +8,7 @@ class AddItemButton extends Component {
     super(props);
     this.state = {
       isExpanded: false,
+      isDisabled: false,
     };
   }
 
@@ -34,19 +35,31 @@ class AddItemButton extends Component {
     };
 
     if (submitResult && submitResult.then) {
-      submitResult.then(closeIfNeed);
+      this.setState({
+        isDisabled: true,
+      });
+      submitResult
+        .then(closeIfNeed)
+        .then(() => {
+          this.setState({
+            isDisabled: false,
+          });
+        });
     } else {
       closeIfNeed(submitResult);
     }
   }
 
   render() {
-    const { isExpanded } = this.state;
+    const { isExpanded, isDisabled } = this.state;
     const { caption, children } = this.props;
     return (
       <div>
         <div>
-          <Button onClick={() => this.onExpandToggle(!isExpanded)}>
+          <Button
+            disabled={isDisabled}
+            onClick={() => this.onExpandToggle(!isExpanded)}
+          >
             {isExpanded ? 'X' : '+'}
           </Button>
           <h3 style={{ display: 'inline' }}>
@@ -59,7 +72,10 @@ class AddItemButton extends Component {
               {children}
             </div>
             <div>
-              <Button onClick={() => this.onSubmit()}>
+              <Button
+                disabled={isDisabled}
+                onClick={() => this.onSubmit()}
+              >
                 Добавить
               </Button>
             </div>

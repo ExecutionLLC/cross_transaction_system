@@ -150,6 +150,8 @@ class AddingServiceData extends Component {
       isLoading,
     } = this.state;
 
+    const disabled = isLoading;
+
     const setData = (newData) => {
       const { data } = this.state;
       this.setState(
@@ -177,6 +179,7 @@ class AddingServiceData extends Component {
             <FormControl
               type="text"
               value={name}
+              disabled={disabled}
               onChange={wrapOnChange(name => setData({ name }))}
             />
           </div>,
@@ -188,6 +191,7 @@ class AddingServiceData extends Component {
             <FormControl
               type="text"
               value={description}
+              disabled={disabled}
               onChange={wrapOnChange(description => setData({ description }))}
             />
           </div>,
@@ -199,6 +203,7 @@ class AddingServiceData extends Component {
             <FormControl
               type="number"
               value={minBalance}
+              disabled={disabled}
               onChange={wrapOnChange(minBalance => setData({ minBalance }))}
             />
           </div>,
@@ -210,6 +215,7 @@ class AddingServiceData extends Component {
             <FormControl
               type="number"
               value={maxTransfer}
+              disabled={disabled}
               onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
             />
           </div>,
