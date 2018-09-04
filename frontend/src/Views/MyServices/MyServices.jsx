@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Grid, Row, Col } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import API from '../../API/API';
 import ErrorPanel from '../../Components/ErrorPanel';
@@ -68,6 +69,32 @@ class MyServices extends Component {
     });
   }
 
+  renderServiceContent(service) {
+    return (
+      <Grid>
+        <Row>
+          <Col sm={12}>
+            {service.description}
+          </Col>
+        </Row>
+        <Row>
+          <Col sm={3}>
+            Минимальный баланс
+          </Col>
+          <Col sm={3}>
+            {service.limits.minBalance}
+          </Col>
+          <Col sm={3}>
+            Максимальное движение
+          </Col>
+          <Col sm={3}>
+            {service.limits.maxTransfer}
+          </Col>
+        </Row>
+      </Grid>
+    );
+  }
+
   renderService(service) {
     const id = service._id;
     const { expandedServicesHash } = this.state;
@@ -76,7 +103,7 @@ class MyServices extends Component {
       <ExpandableListItem
         key={id}
         header={service.name}
-        content={service.description}
+        content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
         onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
       />
