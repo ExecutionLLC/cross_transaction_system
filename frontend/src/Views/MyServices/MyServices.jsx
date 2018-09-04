@@ -96,7 +96,7 @@ class MyServices extends Component {
       <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
         <AddingServiceData
-          onServiceAdded={(services) => this.onServiceAdded(services)}
+          onServiceAdded={services => this.onServiceAdded(services)}
         />
         {myServices && this.renderServices()}
       </ViewBase>
