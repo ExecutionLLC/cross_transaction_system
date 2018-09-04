@@ -161,7 +161,7 @@ class MyServices extends Component {
       expandedServicesOperatorsHash, changingServicesOperatorsHash, errorServicesOperatorsHash,
     } = this.state;
     return (
-      <Grid>
+      <div>
         <Row>
           <Col sm={12}>
             {service.description}
@@ -182,15 +182,17 @@ class MyServices extends Component {
           </Col>
         </Row>
         <Row>
-          {this.renderServiceOperators(
-            service.operators,
-            service._id,
-            expandedServicesOperatorsHash[service._id] || Object.create(null),
-            changingServicesOperatorsHash[service._id] || Object.create(null),
-            errorServicesOperatorsHash[service._id] || Object.create(null),
-          )}
+          <Col sm={12}>
+            {this.renderServiceOperators(
+              service.operators,
+              service._id,
+              expandedServicesOperatorsHash[service._id] || Object.create(null),
+              changingServicesOperatorsHash[service._id] || Object.create(null),
+              errorServicesOperatorsHash[service._id] || Object.create(null),
+            )}
+          </Col>
         </Row>
-      </Grid>
+      </div>
     );
   }
 
