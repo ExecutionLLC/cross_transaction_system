@@ -5,22 +5,43 @@ import {
   Button,
 } from 'react-bootstrap';
 import ExpandableListItem from '../../Components/ExpandableListItem';
+import Loading from '../../Components/Loading';
 
 
 function Operator(props) {
   const {
     isExpanded,
-    name, startDate, isActive,
+    name, startDate, isActive, isChanging, error,
     onActivateToggle, onExpandToggle,
   } = props;
 
-  const toggleButton = isActive
-    ? <Button onClick={() => onActivateToggle(false)}>Приостановить</Button>
-    : <Button onClick={() => onActivateToggle(true)}>Продолжить</Button>;
+  function renderButton() {
+    if (isChanging) {
+      return <Loading />;
+    }
+    if (isActive) {
+      return <Button onClick={() => onActivateToggle(false)}>Приостановить</Button>;
+    }
+    return <Button onClick={() => onActivateToggle(true)}>Продолжить</Button>;
+  }
 
-  const activityCaption = isActive
-    ? 'Оператор активен'
-    : 'Оператор приостановлен';
+  function renderActivityCaption() {
+    if (error) {
+      return (
+        <span color="red">
+          {'Ошибка смены активности: '}
+          {error}
+        </span>
+      );
+    }
+    if (isChanging) {
+      return 'Смена статуса...';
+    }
+    if (isActive) {
+      return 'Оператор активен';
+    }
+    return 'Оператор приостановлен';
+  }
 
   const content = (
     <Grid>
@@ -30,10 +51,10 @@ function Operator(props) {
           {startDate}
         </Col>
         <Col sm={3}>
-          {toggleButton}
+          {renderButton()}
         </Col>
         <Col sm={3}>
-          {activityCaption}
+          {renderActivityCaption()}
         </Col>
       </Row>
     </Grid>
@@ -54,12 +75,16 @@ Operator.propTypes = {
   name: PropTypes.string.isRequired,
   startDate: PropTypes.string.isRequired,
   isActive: PropTypes.bool.isRequired,
+  isChanging: PropTypes.bool,
+  error: PropTypes.string,
   onExpandToggle: PropTypes.func.isRequired,
   onActivateToggle: PropTypes.func.isRequired,
 };
 
 Operator.defaultProps = {
   isExpanded: false,
+  isChanging: false,
+  error: null,
 };
 
 

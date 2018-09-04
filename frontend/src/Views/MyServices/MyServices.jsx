@@ -21,6 +21,8 @@ class MyServices extends Component {
       myServices: null,
       expandedServicesHash: Object.create(null),
       expandedServicesOperatorsHash: Object.create(null),
+      changingServicesOperatorsHash: Object.create(null),
+      errorServicesOperatorsHash: Object.create(null),
     };
   }
 
@@ -89,9 +91,49 @@ class MyServices extends Component {
   onServiceOperatorActiveToggle(serviceId, operatorId, isActive) {
     // eslint-disable-next-line no-console
     console.log('onServiceOperatorActiveToggle', serviceId, operatorId, isActive);
+
+    const toggleChanging = (isChanging) => {
+      const { changingServicesOperatorsHash } = this.state;
+      this.setState({
+        changingServicesOperatorsHash: {
+          ...changingServicesOperatorsHash,
+          [serviceId]: {
+            ...changingServicesOperatorsHash[serviceId],
+            [operatorId]: isChanging,
+          },
+        },
+      });
+    };
+
+    const toggleError = (error) => {
+      const { errorServicesOperatorsHash } = this.state;
+      this.setState({
+        errorServicesOperatorsHash: {
+          ...errorServicesOperatorsHash,
+          [serviceId]: {
+            ...errorServicesOperatorsHash[serviceId],
+            [operatorId]: error,
+          },
+        },
+      });
+    };
+
+    toggleChanging(true);
+    API.setOperatorActive(serviceId, operatorId, isActive)
+      .then((services) => {
+        toggleChanging(false);
+        toggleError(null);
+        this.setState({
+          myServices: services,
+        });
+      })
+      .catch((error) => {
+        toggleChanging(false);
+        toggleError(error.message);
+      });
   }
 
-  renderServiceOperators(serviceOperators, serviceId, expandedHash) {
+  renderServiceOperators(serviceOperators, serviceId, expandedHash, changingHash, errorsHash) {
     const { operatorsHash } = this.state;
     return serviceOperators.map(
       operator => (
@@ -101,6 +143,8 @@ class MyServices extends Component {
           isActive={operator.isActive}
           startDate={`${new Date(operator.startDate)}`}
           isExpanded={expandedHash[operator._id]}
+          isChanging={changingHash[operator._id]}
+          error={errorsHash[operator._id]}
           onExpandToggle={expanded => (
             this.onExpandServiceOperatorToggle(serviceId, operator._id, expanded)
           )}
@@ -113,7 +157,9 @@ class MyServices extends Component {
   }
 
   renderServiceContent(service) {
-    const { expandedServicesOperatorsHash } = this.state;
+    const {
+      expandedServicesOperatorsHash, changingServicesOperatorsHash, errorServicesOperatorsHash,
+    } = this.state;
     return (
       <Grid>
         <Row>
@@ -140,6 +186,8 @@ class MyServices extends Component {
             service.operators,
             service._id,
             expandedServicesOperatorsHash[service._id] || Object.create(null),
+            changingServicesOperatorsHash[service._id] || Object.create(null),
+            errorServicesOperatorsHash[service._id] || Object.create(null),
           )}
         </Row>
       </Grid>
