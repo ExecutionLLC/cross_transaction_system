@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Form, FormGroup, FormControl, ControlLabel, HelpBlock
 } from 'react-bootstrap';
@@ -67,7 +68,8 @@ class AddingServiceData extends Component {
             addingServiceLoading: false,
           },
           () => {
-            this.props.onServiceAdded(services);
+            const { onServiceAdded } = this.props;
+            onServiceAdded(services);
           },
         );
         return true;
@@ -241,6 +243,10 @@ class AddingServiceData extends Component {
     );
   }
 }
+
+AddingServiceData.propTypes = {
+  onServiceAdded: PropTypes.func.isRequired,
+};
 
 
 // eslint-disable-next-line react/no-multi-comp
