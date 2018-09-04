@@ -28,6 +28,7 @@ class MyServices extends Component {
       addingServiceData: MyServices.makeDefaultAddingServiceData(),
       addingServiceError: null,
       addingServiceLoading: false,
+      addingServiceLiveValidation: false,
       addindOperatorToService: null,
       operators: null,
       myServices: null,
@@ -81,11 +82,15 @@ class MyServices extends Component {
   onAddServiceOpen() {
     this.setState({
       addingServiceData: MyServices.makeDefaultAddingServiceData(),
+      addingServiceLiveValidation: false,
     });
   }
 
   onAddServiceSubmit() {
     if (!this.addServiceValidation()) {
+      this.setState({
+        addingServiceLiveValidation: true,
+      });
       return false;
     }
     this.setState({
@@ -193,13 +198,20 @@ class MyServices extends Component {
     } = this.state;
 
     const setData = (data) => {
-      const { addingServiceData } = this.state;
-      this.setState({
-        addingServiceData: {
-          ...addingServiceData,
-          ...data,
+      const { addingServiceData, addingServiceLiveValidation } = this.state;
+      this.setState(
+        {
+          addingServiceData: {
+            ...addingServiceData,
+            ...data,
+          },
         },
-      });
+        () => {
+          if (addingServiceLiveValidation) {
+            this.addServiceValidation();
+          }
+        },
+      );
     };
 
     function wrapOnChange(f) {
