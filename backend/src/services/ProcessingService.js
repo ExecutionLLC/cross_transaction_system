@@ -18,7 +18,18 @@ class ProcessingService extends BaseService {
     });
   }
 
+  static _checkObjProperties(obj, requaredProps) {
+    requaredProps.forEach((k) => {
+      const p = obj[k];
+      if (p === undefined) {
+        throw new Error(`Requared property is empty ${k}`);
+      }
+    });
+  }
+
   addProcessing(processing) {
+    ProcessingService._checkObjProperties(processing, ['name']);
+
     const { name } = processing;
     return this._processingModel.isProcessingExists(name).then((isExists) => {
       if (isExists) {
@@ -27,6 +38,57 @@ class ProcessingService extends BaseService {
 
       return this._processingModel.addProcessing(processing);
     });
+  }
+
+  addService(processingName, service) {
+    ProcessingService._checkObjProperties(
+      service,
+      [
+        'name',
+        'minBalanceLimit',
+        'maxPerDayLimit',
+        'isActive',
+      ],
+    );
+
+    const { name } = service;
+    const serviceInfo = Object.assign({}, service, { parentProcessingName: processingName });
+    return this._processingModel.isServiceExists(processingName, name).then((isExists) => {
+      if (isExists) {
+        throw new ConflictError('Service already exists');
+      }
+
+      return this._processingModel.addService(serviceInfo);
+    });
+  }
+
+  addOperator(processingName, serviceName, operator) {
+    ProcessingService._checkObjProperties(
+      operator,
+      [
+        'parentProcessingName',
+        'isActive',
+      ],
+    );
+
+    const { parentProcessingName } = operator;
+    const operatorInfo = Object.assign(
+      {},
+      operator,
+      {
+        serviceProcessingName: processingName,
+        serviceName,
+      },
+    );
+    return this._processingModel
+      .isOperatorExists(processingName, serviceName, parentProcessingName)
+      .then((isExists) => {
+        if (isExists) {
+          throw new ConflictError('Operator already exists');
+        }
+
+        return this._processingModel.addService(operatorInfo);
+      });
   }
 }
 
