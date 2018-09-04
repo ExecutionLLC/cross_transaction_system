@@ -45,7 +45,7 @@ class AuthTokenHelper {
       jwt.verify(token, secretPhrase, (err, decodedToken) => {
         if (err) {
           reject(err);
-        } else if (!AuthTokenHelper.isUserType(decodedToken.userType)) {
+        } else if (!AuthTokenHelper.isUserType(decodedToken.type)) {
           reject(new Error('Got unknown user type'));
         } else {
           resolve(decodedToken);
