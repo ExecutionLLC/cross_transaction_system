@@ -31,6 +31,7 @@ class AddingServiceData extends Component {
   onAddServiceOpen() {
     this.setState({
       data: AddingServiceData.makeDefaultData(),
+      error: null,
       isLiveValidation: false,
     });
   }
