@@ -96,16 +96,16 @@ class MyServices extends Component {
     return serviceOperators.map(
       operator => (
         <Operator
-          key={operator.id}
-          name={operatorsHash[operator.id].name}
+          key={operator._id}
+          name={operatorsHash[operator._id].name}
           isActive={operator.isActive}
           startDate={`${new Date(operator.startDate)}`}
-          isExpanded={expandedHash[operator.id]}
+          isExpanded={expandedHash[operator._id]}
           onExpandToggle={expanded => (
-            this.onExpandServiceOperatorToggle(serviceId, operator.id, expanded)
+            this.onExpandServiceOperatorToggle(serviceId, operator._id, expanded)
           )}
           onActivateToggle={active => (
-            this.onServiceOperatorActiveToggle(serviceId, operator.id, active)
+            this.onServiceOperatorActiveToggle(serviceId, operator._id, active)
           )}
         />
       ),

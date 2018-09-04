@@ -93,7 +93,7 @@ let myServices = [
     },
     operators: [
       {
-        id: 1,
+        _id: 1,
         startDate: +new Date('1 jan 2005'),
         isActive: true,
       },
@@ -109,7 +109,7 @@ let myServices = [
     },
     operators: [
       {
-        id: 1,
+        _id: 1,
         startDate: +new Date('20 feb 2015'),
         isActive: false,
       },
@@ -172,7 +172,7 @@ function addOperator(serviceId, operatorId) {
       return;
     }
     const newOperator = {
-      id: operatorId,
+      _id: operatorId,
       startDate: +new Date(),
       isActive: true,
     };
