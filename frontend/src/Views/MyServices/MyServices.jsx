@@ -136,6 +136,13 @@ class MyServices extends Component {
       });
   }
 
+  onAddingServiceDataChange() {
+    const { addingServiceLiveValidation } = this.state;
+    if (addingServiceLiveValidation) {
+      this.addServiceValidation();
+    }
+  }
+
   addServiceValidation() {
     const {
       addingServiceData: {
@@ -198,7 +205,7 @@ class MyServices extends Component {
     } = this.state;
 
     const setData = (data) => {
-      const { addingServiceData, addingServiceLiveValidation } = this.state;
+      const { addingServiceData } = this.state;
       this.setState(
         {
           addingServiceData: {
@@ -207,9 +214,7 @@ class MyServices extends Component {
           },
         },
         () => {
-          if (addingServiceLiveValidation) {
-            this.addServiceValidation();
-          }
+          this.onAddingServiceDataChange();
         },
       );
     };
