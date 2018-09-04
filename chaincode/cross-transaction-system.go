@@ -77,7 +77,7 @@ type CrossTransactionSystem struct {
 }
 
 func (cts *CrossTransactionSystem) Init(APIstub shim.ChaincodeStubInterface) pb.Response {
-	return shim.Success(nil)
+	return cts.addProcessing(APIstub, []string{"{\"name\": \"УМКА\", \"description\": \"Система оплаты проезда в общественном транспорте\"}"})
 }
 
 func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) pb.Response {
@@ -94,8 +94,14 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 //		return cts.addWallet(APIstub, functionArgs)
 //	case "addTransaction":
 //		return cts.addTransaction(APIstub, functionArgs)
+	case "isProcessingExists":
+		return cts.isProcessingExists1(APIstub, functionArgs)
+	case "isServiceExists":
+		return cts.isServiceExists1(APIstub, functionArgs)
+	case "isOperatorExists":
+		return cts.isOperatorExists1(APIstub, functionArgs)
 	case "getProcessing":
-		return cts.getProcessing(APIstub, functionArgs)
+		return cts.getProcessing(APIstub, functionArgs)	
 //	case "setServiceState":
 //		return cts.setServiceState(APIstub, functionArgs)
 //	case "setOperatorState":
@@ -113,7 +119,7 @@ func (cts *CrossTransactionSystem) isItemExists(APIstub shim.ChaincodeStubInterf
 	return value != nil, nil
 }
 
-func (cts *CrossTransactionSystem) isProcessingExists(APIstub shim.ChaincodeStubInterface, name string) (bool, error) {
+func (cts *CrossTransactionSystem) isProcessingExists0(APIstub shim.ChaincodeStubInterface, name string) (bool, error) {
 	key, err := APIstub.CreateCompositeKey(PROCESSING_INDX, []string{name})
 	if err != nil {
 		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
@@ -121,12 +127,72 @@ func (cts *CrossTransactionSystem) isProcessingExists(APIstub shim.ChaincodeStub
 	return cts.isItemExists(APIstub, key)
 }
 
-func (cts *CrossTransactionSystem) isServiceExists(APIstub shim.ChaincodeStubInterface, processingName string, serviceName string) (bool, error) {
+func boolToResponse(value bool) pb.Response {
+	if value {
+		return shim.Success([]byte("true"))
+	}
+	return shim.Success([]byte("false"))
+}
+
+func (cts *CrossTransactionSystem) isProcessingExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+	name := args[0]
+	
+	isExists, err := cts.isProcessingExists0(APIstub, name)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	
+	return boolToResponse(isExists)
+}
+
+func (cts *CrossTransactionSystem) isServiceExists0(APIstub shim.ChaincodeStubInterface, processingName string, serviceName string) (bool, error) {
 	key, err := APIstub.CreateCompositeKey(SERVICES_INDX, []string{processingName, serviceName})
 	if err != nil {
 		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
 	}
 	return cts.isItemExists(APIstub, key)
+}
+
+func (cts *CrossTransactionSystem) isServiceExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 2 parameters")
+	}
+	processingName := args[0]
+	serviceName := args[1]
+	
+	isExists, err := cts.isServiceExists0(APIstub, processingName, serviceName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	
+	return boolToResponse(isExists)
+}
+
+func (cts *CrossTransactionSystem) isOperatorExists0(APIstub shim.ChaincodeStubInterface, serviceProcessingName string, serviceName string, processingName string) (bool, error) {
+	key, err := APIstub.CreateCompositeKey(OPERATORS_INDX, []string{serviceProcessingName, serviceName, processingName})
+	if err != nil {
+		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
+	}
+	return cts.isItemExists(APIstub, key)
+}
+
+func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 3 parameters")
+	}
+	serviceProcessingName := args[0]
+	serviceName := args[1]
+	processingName := args[2]
+	
+	isExists, err := cts.isOperatorExists0(APIstub, serviceProcessingName, serviceName, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	
+	return boolToResponse(isExists)
 }
 
 func (cts *CrossTransactionSystem) putStateIfItemDoesNotExists(APIstub shim.ChaincodeStubInterface, key string, value []byte) error {
@@ -150,8 +216,8 @@ func (cts *CrossTransactionSystem) addProcessing(APIstub shim.ChaincodeStubInter
 	if len(args) != 1 {
 		return shim.Error("Expected 1 parameter")
 	}
-
 	processingInfoString := args[0]
+
 	var processingInfo ProcessingInfo
 	err := json.Unmarshal([]byte(processingInfoString), &processingInfo)
 	if err != nil {
@@ -180,7 +246,7 @@ func (cts *CrossTransactionSystem) addService(APIstub shim.ChaincodeStubInterfac
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot unmarshal service info: %s", err))
 	}
-	isExists, err := cts.isProcessingExists(APIstub, serviceInfo.ParentProcessingName)
+	isExists, err := cts.isProcessingExists0(APIstub, serviceInfo.ParentProcessingName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -210,14 +276,14 @@ func (cts *CrossTransactionSystem) addOperator(APIstub shim.ChaincodeStubInterfa
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot unmarshal operator info: %s", err))
 	}
-	isExists, err := cts.isProcessingExists(APIstub, operatorInfo.ParentProcessingName)
+	isExists, err := cts.isProcessingExists0(APIstub, operatorInfo.ParentProcessingName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
 	if !isExists {
 		return shim.Error("Cannot find parent processing")
 	}
-	isExists, err = cts.isServiceExists(APIstub, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName)
+	isExists, err = cts.isServiceExists0(APIstub, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
