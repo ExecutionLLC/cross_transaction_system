@@ -140,6 +140,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
     myServices = [
       ...myServices,
       {
+        _id: Math.random(),
         name,
         description,
         limits: {
