@@ -280,18 +280,6 @@ function addOperator(serviceId, operatorId) {
     .then(getMyServices);
 }
 
-getAuthName()
-  .then(res => console.log('name res', res))
-  .catch(err => console.log('name err', err));
-
-getProcessing()
-  .then(res => console.log('proc res', res))
-  .catch(err => console.log('proc err', err));
-
-getOperators()
-  .then(res => console.log('ops res', res))
-  .catch(err => console.log('ops err', err));
-
 
 export default {
   getProfile,
