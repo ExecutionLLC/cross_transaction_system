@@ -66,7 +66,7 @@ type ProcessingExtendedInfo struct{
 const (
 	PROCESSING_INDX = "processingName"
 	SERVICES_INDX = "serviceProcessingName~serviceName"
-	EXTERNAL_SERVICES_INDEX = "processingName~serviceProcessingName~serviceName"
+	EXTERNAL_SERVICES_INDX = "processingName~serviceProcessingName~serviceName"
 	OPERATORS_INDX = "serviceProcessingName~serviceName~processingName"
 	WALLETS_INDX = "processingName~walletID"
 
@@ -105,6 +105,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.isServiceExists1(APIstub, functionArgs)
 	case "isOperatorExists":
 		return cts.isOperatorExists1(APIstub, functionArgs)
+	case "isExternalServiceExists":
+		return cts.isExternalServiceExists1(APIstub, functionArgs)
 	case "getProcessing":
 		return cts.getProcessing(APIstub, functionArgs)	
 	case "setServiceState":
@@ -168,6 +170,26 @@ func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubI
 	processingName := args[2]
 	
 	isExists, err := cts.isOperatorExists0(APIstub, serviceProcessingName, serviceName, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	
+	return BoolToResponse(isExists)
+}
+
+func (cts *CrossTransactionSystem) isExternalServiceExists0(APIstub shim.ChaincodeStubInterface, serviceProcessingName string, serviceName string, processingName string) (bool, error) {
+	return CheckItemExistanceByCompositeKey(APIstub, EXTERNAL_SERVICES_INDX, []string{processingName, serviceProcessingName, serviceName})
+}
+
+func (cts *CrossTransactionSystem) isExternalServiceExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 3 {
+		return shim.Error("Expected 3 parameters")
+	}
+	serviceProcessingName := args[0]
+	serviceName := args[1]
+	processingName := args[2]
+	
+	isExists, err := cts.isExternalServiceExists0(APIstub, serviceProcessingName, serviceName, processingName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -280,7 +302,7 @@ func (cts *CrossTransactionSystem) addOperator(APIstub shim.ChaincodeStubInterfa
 		return shim.Error(err.Error())
 	}
 
-	externalServicesKey, err := APIstub.CreateCompositeKey(EXTERNAL_SERVICES_INDEX, []string{operatorInfo.ParentProcessingName, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName})
+	externalServicesKey, err := APIstub.CreateCompositeKey(EXTERNAL_SERVICES_INDX, []string{operatorInfo.ParentProcessingName, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName})
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot create composite key: %s", err))
 	}
@@ -365,7 +387,7 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 }
 
 func (cts *CrossTransactionSystem) getExternalServices(APIstub shim.ChaincodeStubInterface, processingName string) ([]*ExternalServiceExtendedInfo, error) {
-	externalServicesIter, err := APIstub.GetStateByPartialCompositeKey(EXTERNAL_SERVICES_INDEX, []string{processingName})
+	externalServicesIter, err := APIstub.GetStateByPartialCompositeKey(EXTERNAL_SERVICES_INDX, []string{processingName})
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("Cannot get external services index: %s", err))
 	}
@@ -507,7 +529,7 @@ func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.Chaincod
 
 	
 	var externalServiceInfo ExternalServiceInfo
-	err := GetItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDEX, []string{parentProcessingName, serviceProcessingName, serviceName}, &externalServiceInfo)
+	err := GetItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDX, []string{parentProcessingName, serviceProcessingName, serviceName}, &externalServiceInfo)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -517,7 +539,7 @@ func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.Chaincod
 	}
 
 	externalServiceInfo.IsActive = newState
-	err = PutItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDEX, []string{parentProcessingName, serviceProcessingName, serviceName}, externalServiceInfo)
+	err = PutItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDX, []string{parentProcessingName, serviceProcessingName, serviceName}, externalServiceInfo)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
