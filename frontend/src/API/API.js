@@ -93,34 +93,6 @@ let myServices = [
   },
 ];
 
-function addService({ name, description, limits: { minBalance, maxTransfer } }) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    if (myServices.find(s => s.name === name)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS, 'service exists'));
-      return;
-    }
-    if (!name || !description || description === '1') {
-      reject(new APIError(ERRORS.VALIDATION_FAILS, 'add service validation fails'));
-      return;
-    }
-    myServices = [
-      ...myServices,
-      {
-        _id: `${Math.random()}`,
-        name,
-        description,
-        isActive: true,
-        limits: {
-          minBalance,
-          maxTransfer,
-        },
-        operators: [],
-      },
-    ];
-    resolve(myServices);
-  });
-}
-
 function updateMyService(index, newService) {
   myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
 }
@@ -282,6 +254,29 @@ function getOperators() {
       ...operator,
       _id: operator.name,
     })));
+}
+
+
+function addService({ name, description, limits: { minBalance, maxTransfer } }) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.post(
+        `${getBaseUrl()}processing/${authName}/services`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            name,
+            description,
+            minBalanceLimit: minBalance,
+            maxPerDayLimit: maxTransfer,
+            isActive: true,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getMyServices);
 }
 
 getAuthName()
