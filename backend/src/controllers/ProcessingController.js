@@ -12,11 +12,14 @@ class ProcessingController extends BaseController {
 
     const { name } = request.params;
 
-    this._processingService.get(name).then((processing) => {
-      this._sendJsonAndWriteResponseLog(requestId, response, processing);
-    }).catch((error) => {
-      this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
-    });
+    this._processingService
+      .get(name)
+      .then((processing) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, processing);
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
   }
 
   getOperatorsList(request, response) {
@@ -39,11 +42,14 @@ class ProcessingController extends BaseController {
 
     const processing = request.body;
 
-    this._processingService.addProcessing(processing).then(() => {
-      this._sendOkAndWriteResponseLog(requestId, response);
-    }).catch((error) => {
-      this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
-    });
+    this._processingService
+      .addProcessing(processing)
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
   }
 
   addService(request, response) {
@@ -52,11 +58,14 @@ class ProcessingController extends BaseController {
     const { name } = request.params;
     const service = request.body;
 
-    this._processingService.addService(name, service).then(() => {
-      this._sendOkAndWriteResponseLog(requestId, response);
-    }).catch((error) => {
-      this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
-    });
+    this._processingService
+      .addService(name, service)
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
   }
 
   addOperator(request, response) {
@@ -65,11 +74,14 @@ class ProcessingController extends BaseController {
     const { name, serviceName } = request.params;
     const operator = request.body;
 
-    this._processingService.addOperator(name, serviceName, operator).then(() => {
-      this._sendOkAndWriteResponseLog(requestId, response);
-    }).catch((error) => {
-      this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
-    });
+    this._processingService
+      .addOperator(name, serviceName, operator)
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
   }
 
   setServiceState(request, response) {
@@ -78,11 +90,14 @@ class ProcessingController extends BaseController {
     const { name, serviceName } = request.params;
     const { isActive } = request.body;
 
-    this._processingService.setServiceState(name, serviceName, isActive).then(() => {
-      this._sendOkAndWriteResponseLog(requestId, response);
-    }).catch((error) => {
-      this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
-    });
+    this._processingService
+      .setServiceState(name, serviceName, isActive)
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
   }
 
   setOperatorState(request, response) {
@@ -93,9 +108,10 @@ class ProcessingController extends BaseController {
 
     this._processingService
       .setOperatorState(name, serviceName, parentProcessingName, isActive)
-      .then(() => {
-        this._sendOkAndWriteResponseLog(requestId, response);
-      }).catch((error) => {
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
         this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
       });
   }
@@ -108,9 +124,10 @@ class ProcessingController extends BaseController {
 
     this._processingService
       .setExternalServiceState(serviceProcessingName, serviceName, name, isActive)
-      .then(() => {
-        this._sendOkAndWriteResponseLog(requestId, response);
-      }).catch((error) => {
+      .then((transactionId) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, { transactionId });
+      })
+      .catch((error) => {
         this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
       });
   }
