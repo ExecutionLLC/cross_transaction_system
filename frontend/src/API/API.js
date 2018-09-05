@@ -93,16 +93,6 @@ let myServices = [
   },
 ];
 
-function getMyServices() {
-  return TimeoutPromise(1000, (resolve, reject) => {
-    if (Math.random() < 0.3) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get my services'));
-      return;
-    }
-    resolve(myServices);
-  });
-}
-
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
   return TimeoutPromise(500, (resolve, reject) => {
     if (myServices.find(s => s.name === name)) {
@@ -255,6 +245,23 @@ function getProcessing() {
           json: true,
         },
       )
+    ));
+}
+
+function getMyServices() {
+  return getProcessing()
+    .then(processing => processing.services.map(
+      service => ({
+        _id: service.serviceName,
+        name: service.serviceName,
+        description: service.description,
+        limits: {
+          minBalance: service.minBalanceLimit,
+          maxTransfer: service.maxPerDayLimit,
+        },
+        isActive: service.isActive,
+        operators: service.operators || [],
+      }),
     ));
 }
 
