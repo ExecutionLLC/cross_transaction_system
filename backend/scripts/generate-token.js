@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const { ADMIN_USER_TYPE, PROCESSING_USER_TYPE, AuthTokenHelper } = require('../src/common/AuthTokenHelper');
 
 const { argv } = process;

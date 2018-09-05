@@ -102,7 +102,9 @@ class ProcessingService extends BaseService {
         }
 
         return this._processingModel.isOperatorExists(
-          processingName, serviceName, parentProcessingName
+          processingName,
+          serviceName,
+          parentProcessingName,
         );
       })
       .then((isExists) => {

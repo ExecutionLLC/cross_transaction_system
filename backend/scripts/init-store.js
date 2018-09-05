@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const FabricClient = require('fabric-client');
 const FabricCAClient = require('fabric-ca-client');
 
@@ -53,7 +54,10 @@ class KeyStoreInitializer {
         };
 
         this._fabricCAClient = new FabricCAClient(
-          CA_SERVER_URL, tlsOptions, CA_SERVER_NAME, cryptoSuite
+          CA_SERVER_URL,
+          tlsOptions,
+          CA_SERVER_NAME,
+          cryptoSuite,
         );
       });
   }
