@@ -4,5 +4,10 @@
     "class-methods-use-this": "off",
     "react/prefer-stateless-function": "off",
     "no-underscore-dangle": "off"
+  },
+  "env": {
+    "browser": true,
+    "node": true,
+    "jest": true
   }
 }
