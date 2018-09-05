@@ -44,6 +44,7 @@ type OperatorExtendedInfo struct{
 
 type ServiceExtendedInfo struct{
 	ServiceName string `json:"serviceName"`
+	Description string `json:"description"`
 	IsActive bool `json:"isActive"`
 	MinBalanceLimit float32 `json:"minBalanceLimit"`
 	MaxPerDayLimit float32 `json:"maxPerDayLimit"`
@@ -344,6 +345,7 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 
 		servicesMap[serviceInfo.Name] = &ServiceExtendedInfo{
 			ServiceName: serviceInfo.Name,
+			Description: serviceInfo.Description,
 			IsActive: serviceInfo.IsActive,
 			MinBalanceLimit: serviceInfo.MinBalanceLimit,
 			MaxPerDayLimit: serviceInfo.MaxPerDayLimit,
