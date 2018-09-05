@@ -115,6 +115,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.setOperatorState(APIstub, functionArgs)
 	case "setExternalServiceState":
 		return cts.setExternalServiceState(APIstub, functionArgs)
+	case "getOperatorsList":
+		return cts.getOperatorsList(APIstub, functionArgs)	
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
@@ -425,7 +427,7 @@ func (cts *CrossTransactionSystem) getProcessing(APIstub shim.ChaincodeStubInter
 	processingName := args[0]
 
 	var processingInfo ProcessingInfo
-	err := GetItemByCompositeKey(APIstub, PROCESSING_INDX, []string{processingName}, processingInfo)
+	err := GetItemByCompositeKey(APIstub, PROCESSING_INDX, []string{processingName}, &processingInfo)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -545,6 +547,48 @@ func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.Chaincod
 	}
 
 	return shim.Success(nil)
+}
+
+func getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+
+	processingName := args[0]
+
+	processingIter, err := APIstub.GetStateByPartialCompositeKey(PROCESSING_INDX, []string{})
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("Cannot get processing index: %s", err))
+	}
+	defer processingIter.Close()
+
+	result := make([]*ProcessingInfo, 0)
+	for processingIter.HasNext() {
+		processingKV, err := processingIter.Next()
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot read next processing index value: %s", err))
+		}
+		if processingName == processingKV.GetKey() {
+			continue
+		}
+		
+		processingInfoBytes := processingKV.GetValue()
+
+		var processingInfo ProcessingInfo
+		err = json.Unmarshal(processingInfoBytes, &processingInfo)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("Cannot unmarshal processing info: %s", err))
+		}
+
+		result = append(result, &processingInfo)
+	}
+
+	resultAsBytes, err := json.Marshal(result)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot marshal list of processings: %s", err))		
+	}
+
+	return shim.Success(resultAsBytes)
 }
 
 func main() {

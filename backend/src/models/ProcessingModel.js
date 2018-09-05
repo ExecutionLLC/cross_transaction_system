@@ -1,8 +1,13 @@
 const BaseModel = require('./BaseModel');
 
 class ProcessingModel extends BaseModel {
-  get(name) {
-    const request = this._chaincodeApi.createQueryRequest('getProcessing', [name]);
+  get(processingName) {
+    const request = this._chaincodeApi.createQueryRequest('getProcessing', [processingName]);
+    return this._chaincodeApi.sendQueryRequest(request);
+  }
+
+  getOperatorsList(processingName) {
+    const request = this._chaincodeApi.createQueryRequest('getOperatorsList', [processingName]);
     return this._chaincodeApi.sendQueryRequest(request);
   }
 
