@@ -8,14 +8,18 @@ class ProcessingService extends BaseService {
     this._processingModel = this._models.processingModel;
   }
 
-  get(name) {
-    return this._processingModel.isProcessingExists(name).then((isExists) => {
+  get(processingName) {
+    return this._processingModel.isProcessingExists(processingName).then((isExists) => {
       if (!isExists) {
         throw new NotFoundError('Processing not found');
       }
 
-      return this._processingModel.get(name);
+      return this._processingModel.get(processingName);
     });
+  }
+
+  getOperatorsList(processingName) {
+    return this._processingModel.getOperatorsList(processingName);
   }
 
   static _checkObjProperties(obj, requaredProps) {
@@ -60,8 +64,8 @@ class ProcessingService extends BaseService {
         if (!isExists) {
           throw new NotFoundError('Processing not found');
         }
+        return this._processingModel.isServiceExists(processingName, name);
       })
-      .isServiceExists(processingName, name)
       .then((isExists) => {
         if (isExists) {
           throw new ConflictError('Service already exists');
@@ -96,8 +100,11 @@ class ProcessingService extends BaseService {
         if (!isExists) {
           throw new NotFoundError('Service not found');
         }
+
+        return this._processingModel.isOperatorExists(
+          processingName, serviceName, parentProcessingName
+        );
       })
-      .isOperatorExists(processingName, serviceName, parentProcessingName)
       .then((isExists) => {
         if (isExists) {
           throw new ConflictError('Operator already exists');
@@ -114,8 +121,14 @@ class ProcessingService extends BaseService {
         if (!isExists) {
           throw new NotFoundError('Service not found');
         }
-      })
-      .setServiceState(processingName, serviceName, isActive);
+
+        return this._processingModel
+          .setServiceState(
+            processingName,
+            serviceName,
+            isActive,
+          );
+      });
   }
 
   setOperatorState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
@@ -125,8 +138,15 @@ class ProcessingService extends BaseService {
         if (!isExists) {
           throw new NotFoundError('Operator not found');
         }
-      })
-      .setOperatorState(serviceProcessingName, serviceName, parentProcessingName, isActive);
+
+        return this._processingModel
+          .setOperatorState(
+            serviceProcessingName,
+            serviceName,
+            parentProcessingName,
+            isActive,
+          );
+      });
   }
 
   setExternalServiceState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
@@ -136,8 +156,15 @@ class ProcessingService extends BaseService {
         if (!isExists) {
           throw new NotFoundError('External service not found');
         }
-      })
-      .setExternalServiceState(serviceProcessingName, serviceName, parentProcessingName, isActive);
+
+        return this._processingModel
+          .setExternalServiceState(
+            serviceProcessingName,
+            serviceName,
+            parentProcessingName,
+            isActive,
+          );
+      });
   }
 }
 
