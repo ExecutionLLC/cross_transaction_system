@@ -9,71 +9,71 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
-type ProcessingInfo struct{
-	Name string `json:"name"`
+type ProcessingInfo struct {
+	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
-type ServiceInfo struct{
-	ParentProcessingName string `json:"parentProcessingName"`
-	Name string `json:"name"`
-	Description string `json:"description"`
-	MinBalanceLimit float32 `json:"minBalanceLimit"`
-	MaxPerDayLimit float32 `json:"maxPerDayLimit"`
-	IsActive bool `json:"isActive"`
+type ServiceInfo struct {
+	ParentProcessingName string  `json:"parentProcessingName"`
+	Name                 string  `json:"name"`
+	Description          string  `json:"description"`
+	MinBalanceLimit      float32 `json:"minBalanceLimit"`
+	MaxPerDayLimit       float32 `json:"maxPerDayLimit"`
+	IsActive             bool    `json:"isActive"`
 }
 
-type OperatorInfo struct{
+type OperatorInfo struct {
 	ServiceProcessingName string `json:"serviceProcessingName"`
-	ServiceName string `json:"serviceName"`
-	ParentProcessingName string `json:"parentProcessingName"`
-	IsActive bool `json:"isActive"`
+	ServiceName           string `json:"serviceName"`
+	ParentProcessingName  string `json:"parentProcessingName"`
+	IsActive              bool   `json:"isActive"`
 }
 
 type ExternalServiceInfo OperatorInfo
 
-type WalletInfo struct{
-	ID string `json:"id"`
+type WalletInfo struct {
+	ID      string  `json:"id"`
 	Balance float32 `json:"balance"`
 }
 
-type OperatorExtendedInfo struct{
+type OperatorExtendedInfo struct {
 	ProcessingName string `json:"processingName"`
-	IsActive bool `json:"isActive"`
+	IsActive       bool   `json:"isActive"`
 }
 
-type ServiceExtendedInfo struct{
-	ServiceName string `json:"serviceName"`
-	Description string `json:"description"`
-	IsActive bool `json:"isActive"`
-	MinBalanceLimit float32 `json:"minBalanceLimit"`
-	MaxPerDayLimit float32 `json:"maxPerDayLimit"`
-	Operators []*OperatorExtendedInfo `json:"operators"`
+type ServiceExtendedInfo struct {
+	ServiceName     string                  `json:"serviceName"`
+	Description     string                  `json:"description"`
+	IsActive        bool                    `json:"isActive"`
+	MinBalanceLimit float32                 `json:"minBalanceLimit"`
+	MaxPerDayLimit  float32                 `json:"maxPerDayLimit"`
+	Operators       []*OperatorExtendedInfo `json:"operators"`
 }
 
-type ExternalServiceExtendedInfo struct{
+type ExternalServiceExtendedInfo struct {
 	ServiceProcessingName string `json:"serviceProcessingName"`
-	ServiceName string `json:"serviceName"`
-	IsActive bool `json:"isActive"`	
+	ServiceName           string `json:"serviceName"`
+	IsActive              bool   `json:"isActive"`
 }
 
-type ProcessingExtendedInfo struct{
-	Name string `json:"name"`
-	Description string `json:"description"`
-	Services []*ServiceExtendedInfo `json:"services"`
+type ProcessingExtendedInfo struct {
+	Name             string                         `json:"name"`
+	Description      string                         `json:"description"`
+	Services         []*ServiceExtendedInfo         `json:"services"`
 	ExternalServices []*ExternalServiceExtendedInfo `json:"externalServices"`
 }
 
 const (
-	PROCESSING_INDX = "processingName"
-	SERVICES_INDX = "serviceProcessingName~serviceName"
+	PROCESSING_INDX        = "processingName"
+	SERVICES_INDX          = "serviceProcessingName~serviceName"
 	EXTERNAL_SERVICES_INDX = "processingName~serviceProcessingName~serviceName"
-	OPERATORS_INDX = "serviceProcessingName~serviceName~processingName"
-	WALLETS_INDX = "processingName~walletID"
+	OPERATORS_INDX         = "serviceProcessingName~serviceName~processingName"
+	WALLETS_INDX           = "processingName~walletID"
 
-	WALLET_TRANSACTIONS_INDX = "processingName~walletID~transactionID"
+	WALLET_TRANSACTIONS_INDX           = "processingName~walletID~transactionID"
 	CROSS_PROCESSING_TRANSACTIONS_INDX = "sourceProcessingName~destinationProcessingName~transactionID"
-	SERVICE_TRANSACTIONS_INDX = "processingName~serviceName~transactionID"
+	SERVICE_TRANSACTIONS_INDX          = "processingName~serviceName~transactionID"
 )
 
 type CrossTransactionSystem struct {
@@ -96,10 +96,10 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.addService(APIstub, functionArgs)
 	case "addOperator":
 		return cts.addOperator(APIstub, functionArgs)
-//	case "addWallet":
-//		return cts.addWallet(APIstub, functionArgs)
-//	case "addTransaction":
-//		return cts.addTransaction(APIstub, functionArgs)
+		//	case "addWallet":
+		//		return cts.addWallet(APIstub, functionArgs)
+		//	case "addTransaction":
+		//		return cts.addTransaction(APIstub, functionArgs)
 	case "isProcessingExists":
 		return cts.isProcessingExists1(APIstub, functionArgs)
 	case "isServiceExists":
@@ -109,7 +109,7 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 	case "isExternalServiceExists":
 		return cts.isExternalServiceExists1(APIstub, functionArgs)
 	case "getProcessing":
-		return cts.getProcessing(APIstub, functionArgs)	
+		return cts.getProcessing(APIstub, functionArgs)
 	case "setServiceState":
 		return cts.setServiceState(APIstub, functionArgs)
 	case "setOperatorState":
@@ -117,7 +117,7 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 	case "setExternalServiceState":
 		return cts.setExternalServiceState(APIstub, functionArgs)
 	case "getOperatorsList":
-		return cts.getOperatorsList(APIstub, functionArgs)	
+		return cts.getOperatorsList(APIstub, functionArgs)
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
@@ -132,12 +132,12 @@ func (cts *CrossTransactionSystem) isProcessingExists1(APIstub shim.ChaincodeStu
 		return shim.Error("Expected 1 parameter")
 	}
 	name := args[0]
-	
+
 	isExists, err := cts.isProcessingExists0(APIstub, name)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return BoolToResponse(isExists)
 }
 
@@ -151,12 +151,12 @@ func (cts *CrossTransactionSystem) isServiceExists1(APIstub shim.ChaincodeStubIn
 	}
 	processingName := args[0]
 	serviceName := args[1]
-	
+
 	isExists, err := cts.isServiceExists0(APIstub, processingName, serviceName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return BoolToResponse(isExists)
 }
 
@@ -171,12 +171,12 @@ func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubI
 	serviceProcessingName := args[0]
 	serviceName := args[1]
 	processingName := args[2]
-	
+
 	isExists, err := cts.isOperatorExists0(APIstub, serviceProcessingName, serviceName, processingName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return BoolToResponse(isExists)
 }
 
@@ -191,12 +191,12 @@ func (cts *CrossTransactionSystem) isExternalServiceExists1(APIstub shim.Chainco
 	serviceProcessingName := args[0]
 	serviceName := args[1]
 	processingName := args[2]
-	
+
 	isExists, err := cts.isExternalServiceExists0(APIstub, serviceProcessingName, serviceName, processingName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return BoolToResponse(isExists)
 }
 
@@ -208,7 +208,7 @@ func (cts *CrossTransactionSystem) putStateIfItemDoesNotExists(APIstub shim.Chai
 	if isExists {
 		return errors.New("Item already exists")
 	}
-	
+
 	err = APIstub.PutState(key, value)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Cannot put state: %s", err))
@@ -236,7 +236,7 @@ func (cts *CrossTransactionSystem) addProcessing(APIstub shim.ChaincodeStubInter
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return shim.Success(nil)
 }
 
@@ -266,7 +266,7 @@ func (cts *CrossTransactionSystem) addService(APIstub shim.ChaincodeStubInterfac
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return shim.Success(nil)
 }
 
@@ -312,13 +312,13 @@ func (cts *CrossTransactionSystem) addOperator(APIstub shim.ChaincodeStubInterfa
 	operatorInfo.IsActive = false
 	externalServiceInfoBytes, err := json.Marshal(operatorInfo)
 	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot marshal external service info: %s", err))		
+		return shim.Error(fmt.Sprintf("Cannot marshal external service info: %s", err))
 	}
 	err = cts.putStateIfItemDoesNotExists(APIstub, externalServicesKey, externalServiceInfoBytes)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
-	
+
 	return shim.Success(nil)
 }
 
@@ -344,12 +344,12 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 		}
 
 		servicesMap[serviceInfo.Name] = &ServiceExtendedInfo{
-			ServiceName: serviceInfo.Name,
-			Description: serviceInfo.Description,
-			IsActive: serviceInfo.IsActive,
+			ServiceName:     serviceInfo.Name,
+			Description:     serviceInfo.Description,
+			IsActive:        serviceInfo.IsActive,
 			MinBalanceLimit: serviceInfo.MinBalanceLimit,
-			MaxPerDayLimit: serviceInfo.MaxPerDayLimit,
-			Operators: make([]*OperatorExtendedInfo, 0),
+			MaxPerDayLimit:  serviceInfo.MaxPerDayLimit,
+			Operators:       make([]*OperatorExtendedInfo, 0),
 		}
 	}
 
@@ -372,8 +372,8 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 			return nil, errors.New(fmt.Sprintf("Cannot unmarshal operator info: %s", err))
 		}
 		operatorExtendedInfo := OperatorExtendedInfo{
-			ProcessingName: operatorInfo.ParentProcessingName, 
-			IsActive: operatorInfo.IsActive,
+			ProcessingName: operatorInfo.ParentProcessingName,
+			IsActive:       operatorInfo.IsActive,
 		}
 		service, hasItem := servicesMap[operatorInfo.ServiceName]
 		if !hasItem {
@@ -381,12 +381,12 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 		}
 		service.Operators = append(service.Operators, &operatorExtendedInfo)
 	}
-	
+
 	result := make([]*ServiceExtendedInfo, 0, len(servicesMap))
 	for _, service := range servicesMap {
 		result = append(result, service)
 	}
-	
+
 	return result, nil
 }
 
@@ -412,8 +412,8 @@ func (cts *CrossTransactionSystem) getExternalServices(APIstub shim.ChaincodeStu
 		}
 		externalServiceExtendedInfo := &ExternalServiceExtendedInfo{
 			ServiceProcessingName: externalServiceInfo.ServiceProcessingName,
-			ServiceName: externalServiceInfo.ServiceName,
-			IsActive: externalServiceInfo.IsActive,
+			ServiceName:           externalServiceInfo.ServiceName,
+			IsActive:              externalServiceInfo.IsActive,
 		}
 		result = append(result, externalServiceExtendedInfo)
 	}
@@ -443,14 +443,14 @@ func (cts *CrossTransactionSystem) getProcessing(APIstub shim.ChaincodeStubInter
 	}
 
 	processingExtendedInfo := ProcessingExtendedInfo{
-		Name: processingName,
-		Description: processingInfo.Description,
-		Services: services,
+		Name:             processingName,
+		Description:      processingInfo.Description,
+		Services:         services,
 		ExternalServices: externalServices,
 	}
 	processingExtendedInfoBytes, err := json.Marshal(processingExtendedInfo)
 	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot marshal processing info: %s", err))		
+		return shim.Error(fmt.Sprintf("Cannot marshal processing info: %s", err))
 	}
 
 	return shim.Success(processingExtendedInfoBytes)
@@ -467,7 +467,6 @@ func (cts *CrossTransactionSystem) setServiceState(APIstub shim.ChaincodeStubInt
 
 	newState := StringToBool(newStateString)
 
-	
 	var serviceInfo ServiceInfo
 	err := GetItemByCompositeKey(APIstub, SERVICES_INDX, []string{processingName, serviceName}, &serviceInfo)
 	if err != nil {
@@ -499,7 +498,6 @@ func (cts *CrossTransactionSystem) setOperatorState(APIstub shim.ChaincodeStubIn
 
 	newState := StringToBool(newStateString)
 
-	
 	var operatorInfo OperatorInfo
 	err := GetItemByCompositeKey(APIstub, OPERATORS_INDX, []string{serviceProcessingName, serviceName, parentProcessingName}, &operatorInfo)
 	if err != nil {
@@ -531,7 +529,6 @@ func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.Chaincod
 
 	newState := StringToBool(newStateString)
 
-	
 	var externalServiceInfo ExternalServiceInfo
 	err := GetItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDX, []string{parentProcessingName, serviceProcessingName, serviceName}, &externalServiceInfo)
 	if err != nil {
@@ -570,7 +567,7 @@ func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubIn
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot read next processing index value: %s", err))
 		}
-	
+
 		processingInfoBytes := processingKV.GetValue()
 
 		var processingInfo ProcessingInfo
@@ -586,7 +583,7 @@ func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubIn
 
 	resultAsBytes, err := json.Marshal(result)
 	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot marshal list of processings: %s", err))		
+		return shim.Error(fmt.Sprintf("Cannot marshal list of processings: %s", err))
 	}
 
 	return shim.Success(resultAsBytes)

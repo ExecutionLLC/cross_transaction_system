@@ -17,7 +17,7 @@ func GetItemByKey(APIstub shim.ChaincodeStubInterface, key string, item interfac
 	if itemAsBytes == nil {
 		return errors.New("Cannot find item")
 	}
-	
+
 	err = json.Unmarshal(itemAsBytes, item)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Cannot unmarshal item: %s", err))
@@ -63,7 +63,7 @@ func CheckItemExistanceByKey(APIstub shim.ChaincodeStubInterface, key string) (b
 	if err != nil {
 		return false, errors.New(fmt.Sprintf("Cannot get state: %s", err))
 	}
-	
+
 	return value != nil, nil
 }
 
