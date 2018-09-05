@@ -97,27 +97,6 @@ function updateMyService(index, newService) {
   myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
 }
 
-function setServiceActive(serviceId, isActive) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    if (Math.random() < 0.7) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not set service active'));
-      return;
-    }
-    const serviceIndex = utils.findIndexById(myServices, serviceId);
-    if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
-      return;
-    }
-    const service = myServices[serviceIndex];
-    const newService = {
-      ...service,
-      isActive,
-    };
-    updateMyService(serviceIndex, newService);
-    resolve(myServices);
-  });
-}
-
 function setOperatorActive(serviceId, operatorId, isActive) {
   return TimeoutPromise(500, (resolve, reject) => {
     const serviceIndex = utils.findIndexById(myServices, serviceId);
@@ -272,6 +251,24 @@ function addOperator(serviceId, operatorId) {
           body: {
             parentProcessingName: operatorId,
             isActive: true,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getMyServices);
+}
+
+function setServiceActive(serviceId, isActive) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.put(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            isActive,
           },
           json: true,
         },
