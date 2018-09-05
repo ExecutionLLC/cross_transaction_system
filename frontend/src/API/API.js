@@ -1,5 +1,4 @@
 import request from 'request-promise';
-import utils from '../utils/utils';
 
 
 class APIError extends Error {
@@ -55,43 +54,6 @@ function getProfile() {
     });
   });
 }
-
-let myServices = [
-  {
-    _id: '1',
-    name: 'Проезд',
-    description: 'Проезд в городском транспорте г. Рязань',
-    isActive: true,
-    limits: {
-      minBalance: 50,
-      maxTransfer: 1500,
-    },
-    operators: [
-      {
-        _id: '1',
-        startDate: +new Date('1 jan 2005'),
-        isActive: true,
-      },
-    ],
-  },
-  {
-    _id: '2',
-    name: 'Кофе',
-    description: 'Кофейные автоматы в г. Рязань',
-    isActive: false,
-    limits: {
-      minBalance: 100,
-      maxTransfer: 1000,
-    },
-    operators: [
-      {
-        _id: '1',
-        startDate: +new Date('20 feb 2015'),
-        isActive: false,
-      },
-    ],
-  },
-];
 
 function getBaseUrl() {
   return 'http://192.168.1.101:3001/';
