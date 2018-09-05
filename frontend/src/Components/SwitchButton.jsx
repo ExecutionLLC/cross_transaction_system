@@ -43,13 +43,17 @@ class SwitchButton extends Component {
     const { isLoading, errorText } = this.state;
     return (
       <div>
-        <Button
-          onClick={() => this.onClick()}
-          disabled={isLoading}
-        >
-          {isActive ? activeButtonText : inactiveButtonText}
-        </Button>
-        { isLoading && <Loading /> }
+        {isLoading
+          ? <Loading />
+          : (
+            <Button
+              onClick={() => this.onClick()}
+              disabled={isLoading}
+            >
+              {isActive ? activeButtonText : inactiveButtonText}
+            </Button>
+          )
+        }
         {errorText || (isActive ? activeStatusText : inactiveStatusText)}
       </div>
     );
