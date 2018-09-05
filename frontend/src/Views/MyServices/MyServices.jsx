@@ -7,6 +7,7 @@ import ExpandableListItem from '../../Components/ExpandableListItem';
 import AddingServiceData from './AddingServiceData';
 import Operator from './Operator';
 import utils from '../../utils/utils';
+import AddingOperator from './AddingOperator';
 
 
 class MyServices extends Component {
@@ -130,6 +131,12 @@ class MyServices extends Component {
       });
   }
 
+  onServiceOperatorAdded(services) {
+    this.setState({
+      myServices: services,
+    });
+  }
+
   renderServiceOperators(serviceOperators, serviceId, expandedHash, changingHash, errorsHash) {
     const { operatorsHash } = this.state;
     return serviceOperators.map(
@@ -156,7 +163,12 @@ class MyServices extends Component {
   renderServiceContent(service) {
     const {
       expandedServicesOperatorsHash, changingServicesOperatorsHash, errorServicesOperatorsHash,
+      operators,
     } = this.state;
+    const addedOperatorsHash = utils.makeHashById(service.operators);
+    const operatorsToAdd = operators.filter(
+      operator => !addedOperatorsHash[operator._id],
+    );
     return (
       <div>
         <Row>
@@ -180,6 +192,15 @@ class MyServices extends Component {
         </Row>
         <Row>
           <Col sm={12}>
+            {operatorsToAdd.length > 0
+              && (
+                <AddingOperator
+                  operators={operatorsToAdd}
+                  serviceId={service._id}
+                  onOperatorAdded={services => this.onServiceOperatorAdded(services)}
+                />
+              )
+            }
             {this.renderServiceOperators(
               service.operators,
               service._id,
