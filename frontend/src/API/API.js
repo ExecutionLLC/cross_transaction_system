@@ -222,18 +222,22 @@ function getProcessing() {
 
 function getMyServices() {
   return getProcessing()
-    .then(processing => processing.services.map(
-      service => ({
-        _id: service.serviceName,
-        name: service.serviceName,
-        description: service.description,
-        limits: {
-          minBalance: service.minBalanceLimit,
-          maxTransfer: service.maxPerDayLimit,
-        },
-        isActive: service.isActive,
-        operators: service.operators || [],
-      }),
+    .then(processing => (
+      processing.services
+        .map(
+          service => ({
+            _id: service.serviceName,
+            name: service.serviceName,
+            description: service.description,
+            limits: {
+              minBalance: service.minBalanceLimit,
+              maxTransfer: service.maxPerDayLimit,
+            },
+            isActive: service.isActive,
+            operators: service.operators || [],
+          }),
+        )
+        .sort((s1, s2) => s1.name > s2.name)
     ));
 }
 
