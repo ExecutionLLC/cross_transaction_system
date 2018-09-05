@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import Loading from './Loading';
 
 
@@ -42,20 +42,24 @@ class SwitchButton extends Component {
     } = this.props;
     const { isLoading, errorText } = this.state;
     return (
-      <div>
-        {isLoading
-          ? <Loading />
-          : (
-            <Button
-              onClick={() => this.onClick()}
-              disabled={isLoading}
-            >
-              {isActive ? activeButtonText : inactiveButtonText}
-            </Button>
-          )
-        }
-        {errorText || (isActive ? activeStatusText : inactiveStatusText)}
-      </div>
+      <Row>
+        <Col sm={3}>
+          {isLoading
+            ? <Loading />
+            : (
+              <Button
+                onClick={() => this.onClick()}
+                disabled={isLoading}
+              >
+                {isActive ? activeButtonText : inactiveButtonText}
+              </Button>
+            )
+          }
+        </Col>
+        <Col sm={9}>
+          {errorText || (isActive ? activeStatusText : inactiveStatusText)}
+        </Col>
+      </Row>
     );
   }
 }
