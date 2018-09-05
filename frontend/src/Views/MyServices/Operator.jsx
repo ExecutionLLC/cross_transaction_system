@@ -2,45 +2,41 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Grid, Row, Col,
-  Button,
 } from 'react-bootstrap';
 import ExpandableListItem from '../../Components/ExpandableListItem';
-import Loading from '../../Components/Loading';
+import SwitchButton from '../../Components/SwitchButton';
+import API from '../../API/API';
 
 
 function Operator(props) {
   const {
+    serviceId, operatorId,
     isExpanded,
-    name, startDate, isActive, isChanging, error,
+    name, startDate, isActive,
     onActivateToggle, onExpandToggle,
   } = props;
 
-  function renderButton() {
-    if (isChanging) {
-      return <Loading />;
-    }
-    if (isActive) {
-      return <Button onClick={() => onActivateToggle(false)}>Приостановить</Button>;
-    }
-    return <Button onClick={() => onActivateToggle(true)}>Продолжить</Button>;
+  function onSwitch() {
+    return API.setOperatorActive(serviceId, operatorId, !isActive)
+      .then((services) => {
+        onActivateToggle(services);
+      })
+      .catch((apiError) => {
+        throw apiError.message;
+      });
   }
 
-  function renderActivityCaption() {
-    if (error) {
-      return (
-        <span color="red">
-          {'Ошибка смены активности: '}
-          {error}
-        </span>
-      );
-    }
-    if (isChanging) {
-      return 'Смена статуса...';
-    }
-    if (isActive) {
-      return 'Оператор активен';
-    }
-    return 'Оператор приостановлен';
+  function renderSwitch() {
+    return (
+      <SwitchButton
+        isActive={isActive}
+        activeButtonText="Приостановить"
+        inactiveButtonText="Продолжить"
+        activeStatusText="Оператор активен"
+        inactiveStatusText="Оператор приостановлен"
+        onClick={onSwitch}
+      />
+    );
   }
 
   const content = (
@@ -50,11 +46,8 @@ function Operator(props) {
           {'Подключен с '}
           {startDate}
         </Col>
-        <Col sm={3}>
-          {renderButton()}
-        </Col>
-        <Col sm={3}>
-          {renderActivityCaption()}
+        <Col sm={6}>
+          {renderSwitch()}
         </Col>
       </Row>
     </Grid>
@@ -71,20 +64,18 @@ function Operator(props) {
 }
 
 Operator.propTypes = {
+  serviceId: PropTypes.string.isRequired,
+  operatorId: PropTypes.string.isRequired,
   isExpanded: PropTypes.bool,
   name: PropTypes.string.isRequired,
   startDate: PropTypes.string.isRequired,
   isActive: PropTypes.bool.isRequired,
-  isChanging: PropTypes.bool,
-  error: PropTypes.string,
   onExpandToggle: PropTypes.func.isRequired,
   onActivateToggle: PropTypes.func.isRequired,
 };
 
 Operator.defaultProps = {
   isExpanded: false,
-  isChanging: false,
-  error: null,
 };
 
 
