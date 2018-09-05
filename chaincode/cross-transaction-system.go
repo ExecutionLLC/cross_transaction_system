@@ -79,7 +79,10 @@ type CrossTransactionSystem struct {
 }
 
 func (cts *CrossTransactionSystem) Init(APIstub shim.ChaincodeStubInterface) pb.Response {
-	return cts.addProcessing(APIstub, []string{"{\"name\": \"УМКА\", \"description\": \"Система оплаты проезда в общественном транспорте\"}"})
+	cts.addProcessing(APIstub, []string{"{\"name\": \"УМКА\", \"description\": \"Система оплаты проезда в общественном транспорте\"}"})
+	cts.addProcessing(APIstub, []string{"{\"name\": \"Кофеман\", \"description\": \"Сеть венденговых кофемашин г. Рязань\"}"})
+
+	return shim.Success(nil)
 }
 
 func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) pb.Response {
@@ -104,36 +107,19 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.isOperatorExists1(APIstub, functionArgs)
 	case "getProcessing":
 		return cts.getProcessing(APIstub, functionArgs)	
-//	case "setServiceState":
-//		return cts.setServiceState(APIstub, functionArgs)
-//	case "setOperatorState":
-//		return cts.setOperatorState(APIstub, functionArgs)
+	case "setServiceState":
+		return cts.setServiceState(APIstub, functionArgs)
+	case "setOperatorState":
+		return cts.setOperatorState(APIstub, functionArgs)
+	case "setExternalServiceState":
+		return cts.setExternalServiceState(APIstub, functionArgs)
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
 }
 
-func (cts *CrossTransactionSystem) isItemExists(APIstub shim.ChaincodeStubInterface, key string) (bool, error) {
-	value, err := APIstub.GetState(key)
-	if err != nil {
-		return false, errors.New(fmt.Sprintf("Cannot get state: %s", err))
-	}
-	return value != nil, nil
-}
-
 func (cts *CrossTransactionSystem) isProcessingExists0(APIstub shim.ChaincodeStubInterface, name string) (bool, error) {
-	key, err := APIstub.CreateCompositeKey(PROCESSING_INDX, []string{name})
-	if err != nil {
-		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
-	}
-	return cts.isItemExists(APIstub, key)
-}
-
-func boolToResponse(value bool) pb.Response {
-	if value {
-		return shim.Success([]byte("true"))
-	}
-	return shim.Success([]byte("false"))
+	return CheckItemExistanceByCompositeKey(APIstub, PROCESSING_INDX, []string{name})
 }
 
 func (cts *CrossTransactionSystem) isProcessingExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -147,15 +133,11 @@ func (cts *CrossTransactionSystem) isProcessingExists1(APIstub shim.ChaincodeStu
 		return shim.Error(err.Error())
 	}
 	
-	return boolToResponse(isExists)
+	return BoolToResponse(isExists)
 }
 
 func (cts *CrossTransactionSystem) isServiceExists0(APIstub shim.ChaincodeStubInterface, processingName string, serviceName string) (bool, error) {
-	key, err := APIstub.CreateCompositeKey(SERVICES_INDX, []string{processingName, serviceName})
-	if err != nil {
-		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
-	}
-	return cts.isItemExists(APIstub, key)
+	return CheckItemExistanceByCompositeKey(APIstub, SERVICES_INDX, []string{processingName, serviceName})
 }
 
 func (cts *CrossTransactionSystem) isServiceExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -170,15 +152,11 @@ func (cts *CrossTransactionSystem) isServiceExists1(APIstub shim.ChaincodeStubIn
 		return shim.Error(err.Error())
 	}
 	
-	return boolToResponse(isExists)
+	return BoolToResponse(isExists)
 }
 
 func (cts *CrossTransactionSystem) isOperatorExists0(APIstub shim.ChaincodeStubInterface, serviceProcessingName string, serviceName string, processingName string) (bool, error) {
-	key, err := APIstub.CreateCompositeKey(OPERATORS_INDX, []string{serviceProcessingName, serviceName, processingName})
-	if err != nil {
-		return false, errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
-	}
-	return cts.isItemExists(APIstub, key)
+	return CheckItemExistanceByCompositeKey(APIstub, OPERATORS_INDX, []string{serviceProcessingName, serviceName, processingName})
 }
 
 func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
@@ -194,11 +172,11 @@ func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubI
 		return shim.Error(err.Error())
 	}
 	
-	return boolToResponse(isExists)
+	return BoolToResponse(isExists)
 }
 
 func (cts *CrossTransactionSystem) putStateIfItemDoesNotExists(APIstub shim.ChaincodeStubInterface, key string, value []byte) error {
-	isExists, err := cts.isItemExists(APIstub, key)
+	isExists, err := CheckItemExistanceByKey(APIstub, key)
 	if err != nil {
 		return err
 	}
@@ -423,23 +401,12 @@ func (cts *CrossTransactionSystem) getProcessing(APIstub shim.ChaincodeStubInter
 	}
 
 	processingName := args[0]
-	key, err := APIstub.CreateCompositeKey(PROCESSING_INDX, []string{processingName})
-	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot create composite key: %s", err))
-	}
-	processingInfoBytes, err := APIstub.GetState(key)
-	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot get state: %s", err))
-	}
-	if processingInfoBytes == nil {
-		return shim.Error("Cannot find processing")
-	}
-	var processingInfo ProcessingInfo
-	err = json.Unmarshal([]byte(processingInfoBytes), &processingInfo)
-	if err != nil {
-		return shim.Error("Cannot unmarshal processing")
-	}
 
+	var processingInfo ProcessingInfo
+	err := GetItemByCompositeKey(APIstub, PROCESSING_INDX, []string{processingName}, processingInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
 	services, err := cts.getServices(APIstub, processingName)
 	if err != nil {
 		return shim.Error(err.Error())
@@ -461,6 +428,101 @@ func (cts *CrossTransactionSystem) getProcessing(APIstub shim.ChaincodeStubInter
 	}
 
 	return shim.Success(processingExtendedInfoBytes)
+}
+
+func (cts *CrossTransactionSystem) setServiceState(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 3 {
+		return shim.Error("Expected 3 parameter")
+	}
+
+	processingName := args[0]
+	serviceName := args[1]
+	newStateString := args[2]
+
+	newState := StringToBool(newStateString)
+
+	
+	var serviceInfo ServiceInfo
+	err := GetItemByCompositeKey(APIstub, SERVICES_INDX, []string{processingName, serviceName}, &serviceInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if serviceInfo.IsActive == newState {
+		return shim.Success(nil)
+	}
+
+	serviceInfo.IsActive = newState
+	err = PutItemByCompositeKey(APIstub, SERVICES_INDX, []string{processingName, serviceName}, serviceInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (cts *CrossTransactionSystem) setOperatorState(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 4 {
+		return shim.Error("Expected 4 parameter")
+	}
+
+	serviceProcessingName := args[0]
+	serviceName := args[1]
+	parentProcessingName := args[2]
+	newStateString := args[3]
+
+	newState := StringToBool(newStateString)
+
+	
+	var operatorInfo OperatorInfo
+	err := GetItemByCompositeKey(APIstub, OPERATORS_INDX, []string{serviceProcessingName, serviceName, parentProcessingName}, &operatorInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if operatorInfo.IsActive == newState {
+		return shim.Success(nil)
+	}
+
+	operatorInfo.IsActive = newState
+	err = PutItemByCompositeKey(APIstub, OPERATORS_INDX, []string{serviceProcessingName, serviceName, parentProcessingName}, operatorInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 4 {
+		return shim.Error("Expected 4 parameter")
+	}
+
+	serviceProcessingName := args[0]
+	serviceName := args[1]
+	parentProcessingName := args[2]
+	newStateString := args[3]
+
+	newState := StringToBool(newStateString)
+
+	
+	var externalServiceInfo ExternalServiceInfo
+	err := GetItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDEX, []string{parentProcessingName, serviceProcessingName, serviceName}, &externalServiceInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if externalServiceInfo.IsActive == newState {
+		return shim.Success(nil)
+	}
+
+	externalServiceInfo.IsActive = newState
+	err = PutItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDEX, []string{parentProcessingName, serviceProcessingName, serviceName}, externalServiceInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
 }
 
 func main() {
