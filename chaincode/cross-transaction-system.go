@@ -549,7 +549,7 @@ func (cts *CrossTransactionSystem) setExternalServiceState(APIstub shim.Chaincod
 	return shim.Success(nil)
 }
 
-func getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 1 {
 		return shim.Error("Expected 1 parameter")
 	}
@@ -558,7 +558,7 @@ func getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Res
 
 	processingIter, err := APIstub.GetStateByPartialCompositeKey(PROCESSING_INDX, []string{})
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Cannot get processing index: %s", err))
+		return shim.Error(fmt.Sprintf("Cannot get processing index: %s", err))
 	}
 	defer processingIter.Close()
 
@@ -566,7 +566,7 @@ func getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Res
 	for processingIter.HasNext() {
 		processingKV, err := processingIter.Next()
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Cannot read next processing index value: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot read next processing index value: %s", err))
 		}
 		if processingName == processingKV.GetKey() {
 			continue
@@ -577,7 +577,7 @@ func getOperatorsList(APIstub shim.ChaincodeStubInterface, args []string) pb.Res
 		var processingInfo ProcessingInfo
 		err = json.Unmarshal(processingInfoBytes, &processingInfo)
 		if err != nil {
-			return nil, errors.New(fmt.Sprintf("Cannot unmarshal processing info: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot unmarshal processing info: %s", err))
 		}
 
 		result = append(result, &processingInfo)
