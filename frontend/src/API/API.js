@@ -220,6 +220,15 @@ function getProcessing() {
     ));
 }
 
+function translateAPIOperators(apiOperators) {
+  return apiOperators.map(operator => ({
+    _id: operator.processingName,
+    name: operator.processingName,
+    startDate: +new Date('1 jan 2005'),
+    isActive: operator.isActive,
+  }));
+}
+
 function getMyServices() {
   return getProcessing()
     .then(processing => (
@@ -234,7 +243,7 @@ function getMyServices() {
               maxTransfer: service.maxPerDayLimit,
             },
             isActive: service.isActive,
-            operators: service.operators || [],
+            operators: translateAPIOperators(service.operators || []),
           }),
         )
         .sort((s1, s2) => s1.name > s2.name)
