@@ -45,6 +45,8 @@ type OperatorExtendedInfo struct{
 type ServiceExtendedInfo struct{
 	ServiceName string `json:"serviceName"`
 	IsActive bool `json:"isActive"`
+	MinBalanceLimit float32 `json:"minBalanceLimit"`
+	MaxPerDayLimit float32 `json:"maxPerDayLimit"`
 	Operators []*OperatorExtendedInfo `json:"operators"`
 }
 
@@ -157,7 +159,7 @@ func (cts *CrossTransactionSystem) isServiceExists0(APIstub shim.ChaincodeStubIn
 }
 
 func (cts *CrossTransactionSystem) isServiceExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
+	if len(args) != 2 {
 		return shim.Error("Expected 2 parameters")
 	}
 	processingName := args[0]
@@ -180,7 +182,7 @@ func (cts *CrossTransactionSystem) isOperatorExists0(APIstub shim.ChaincodeStubI
 }
 
 func (cts *CrossTransactionSystem) isOperatorExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 1 {
+	if len(args) != 3 {
 		return shim.Error("Expected 3 parameters")
 	}
 	serviceProcessingName := args[0]
@@ -341,6 +343,8 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 		servicesMap[serviceInfo.Name] = &ServiceExtendedInfo{
 			ServiceName: serviceInfo.Name,
 			IsActive: serviceInfo.IsActive,
+			MinBalanceLimit: serviceInfo.MinBalanceLimit,
+			MaxPerDayLimit: serviceInfo.MaxPerDayLimit,
 			Operators: make([]*OperatorExtendedInfo, 0),
 		}
 	}
