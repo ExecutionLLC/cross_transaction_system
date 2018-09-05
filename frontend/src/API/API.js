@@ -1,4 +1,7 @@
+import request from 'request-promise';
 import utils from '../utils/utils';
+import config from '../config';
+
 
 
 class APIError extends Error {
@@ -29,6 +32,21 @@ function TimeoutPromise(time, f) {
   });
 }
 
+function getBaseUrl() {
+  return config.API_BASE_URL;
+}
+
+function auth(token) {
+  return request.get(
+    `${getBaseUrl()}auth`,
+    {
+      headers: {
+        'X-Access-Token': token, // Base64.encode(JSON.stringify(idPart))
+      },
+      json: true,
+    },
+  );
+}
 
 function getProfile(date) {
   return TimeoutPromise(500, (resolve, reject) => {
@@ -220,6 +238,7 @@ function setOperatorActive(serviceId, operatorId, isActive) {
 
 
 export default {
+  auth,
   getProfile,
   getOperators,
   getMyServices,
