@@ -53,13 +53,16 @@ class ProcessingService extends BaseService {
 
     const { name } = service;
     const serviceInfo = Object.assign({}, service, { parentProcessingName: processingName });
-    return this._processingModel.isServiceExists(processingName, name).then((isExists) => {
-      if (isExists) {
-        throw new ConflictError('Service already exists');
-      }
 
-      return this._processingModel.addService(serviceInfo);
-    });
+    return this._processingModel
+      .isServiceExists(processingName, name)
+      .then((isExists) => {
+        if (isExists) {
+          throw new ConflictError('Service already exists');
+        }
+
+        return this._processingModel.addService(serviceInfo);
+      });
   }
 
   addOperator(processingName, serviceName, operator) {
@@ -80,6 +83,7 @@ class ProcessingService extends BaseService {
         serviceName,
       },
     );
+
     return this._processingModel
       .isOperatorExists(processingName, serviceName, parentProcessingName)
       .then((isExists) => {
@@ -87,7 +91,7 @@ class ProcessingService extends BaseService {
           throw new ConflictError('Operator already exists');
         }
 
-        return this._processingModel.addService(operatorInfo);
+        return this._processingModel.addOperator(operatorInfo);
       });
   }
 }
