@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Nav, Navbar, NavItem } from 'react-bootstrap';
+import { Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
 
 function Navigation(props) {
@@ -35,6 +35,11 @@ function Navigation(props) {
             {tab.title}
           </NavItem>
         ))}
+      </Nav>
+      <Nav pullRight>
+        <NavDropdown eventKey={3} title="User name" id="basic-nav-dropdown">
+          <MenuItem eventKey={3.1}>Logout</MenuItem>
+        </NavDropdown>
       </Nav>
     </Navbar>
   );
