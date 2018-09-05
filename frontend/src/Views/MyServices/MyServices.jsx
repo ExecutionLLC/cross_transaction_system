@@ -203,7 +203,6 @@ class MyServices extends Component {
 
   renderServices() {
     const { myServices } = this.state;
-    console.log('state', this.state);
     return myServices.map(service => this.renderService(service));
   }
 
