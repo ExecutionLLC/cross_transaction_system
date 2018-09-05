@@ -93,39 +93,6 @@ let myServices = [
   },
 ];
 
-function updateMyService(index, newService) {
-  myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
-}
-
-function setOperatorActive(serviceId, operatorId, isActive) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = utils.findIndexById(myServices, serviceId);
-    if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
-      return;
-    }
-    const service = myServices[serviceIndex];
-    const { operators } = service;
-    const operatorIndex = utils.findIndexById(operators, operatorId);
-    if (operatorIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'operator not found'));
-      return;
-    }
-    const operator = operators[operatorIndex];
-    const newOperator = {
-      ...operator,
-      isActive,
-    };
-    const newOperators = utils.immutableReplaceArrayItem(operators, operatorIndex, newOperator);
-    const newService = {
-      ...service,
-      operators: newOperators,
-    };
-    updateMyService(serviceIndex, newService);
-    resolve(myServices);
-  });
-}
-
 function getBaseUrl() {
   return 'http://192.168.1.101:3001/';
 }
@@ -265,6 +232,24 @@ function setServiceActive(serviceId, isActive) {
     .then(authName => (
       request.put(
         `${getBaseUrl()}processing/${authName}/services/${serviceId}`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            isActive,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getMyServices);
+}
+
+function setOperatorActive(serviceId, operatorId, isActive) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.put(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators/${operatorId}`,
         {
           headers: { ...getAuthHeader() },
           body: {
