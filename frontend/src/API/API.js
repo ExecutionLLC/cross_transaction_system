@@ -118,37 +118,6 @@ function setServiceActive(serviceId, isActive) {
   });
 }
 
-function addOperator(serviceId, operatorId) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = utils.findIndexById(myServices, serviceId);
-    if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
-      return;
-    }
-    const service = myServices[serviceIndex];
-    const { operators } = service;
-    if (operators.find(o => o._id === operatorId)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS, 'operator exists'));
-      return;
-    }
-    const newOperator = {
-      _id: operatorId,
-      startDate: +new Date(),
-      isActive: true,
-    };
-    const newOperators = [
-      ...operators,
-      newOperator,
-    ];
-    const newService = {
-      ...service,
-      operators: newOperators,
-    };
-    updateMyService(serviceIndex, newService);
-    resolve(myServices);
-  });
-}
-
 function setOperatorActive(serviceId, operatorId, isActive) {
   return TimeoutPromise(500, (resolve, reject) => {
     const serviceIndex = utils.findIndexById(myServices, serviceId);
@@ -283,6 +252,25 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
             description,
             minBalanceLimit: minBalance,
             maxPerDayLimit: maxTransfer,
+            isActive: true,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getMyServices);
+}
+
+function addOperator(serviceId, operatorId) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.post(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            parentProcessingName: operatorId,
             isActive: true,
           },
           json: true,
