@@ -40,6 +40,8 @@ class WebServer {
     return new Promise((resolve) => {
       const app = new Express();
 
+      app.use(cors());
+
       if (this._config.useTokens) {
         app.use((request, response, next) => {
           const token = request.header('x-access-token');
@@ -58,7 +60,6 @@ class WebServer {
       }
 
       app.use(bodyParser.json());
-      app.use(cors());
       app.use('/', apiRouter);
       app.use(this._handleErrors.bind(this));
 
