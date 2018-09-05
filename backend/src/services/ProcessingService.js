@@ -26,7 +26,7 @@ class ProcessingService extends BaseService {
     requaredProps.forEach((k) => {
       const p = obj[k];
       if (p === undefined) {
-        throw new Error(`Requared property is empty ${k}`);
+        throw new Error(`Required property (${k}) is empty`);
       }
     });
   }
