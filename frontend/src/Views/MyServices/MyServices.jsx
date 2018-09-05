@@ -109,21 +109,24 @@ class MyServices extends Component {
   renderServiceOperators(serviceOperators, serviceId, expandedHash) {
     const { operatorsHash } = this.state;
     return serviceOperators.map(
-      operator => (
-        <Operator
-          key={operator._id}
-          serviceId={serviceId}
-          operatorId={operator._id}
-          name={operatorsHash[operator._id].name}
-          isActive={operator.isActive}
-          startDate={`${new Date(operator.startDate)}`}
-          isExpanded={expandedHash[operator._id]}
-          onExpandToggle={expanded => (
-            this.onExpandServiceOperatorToggle(serviceId, operator._id, expanded)
-          )}
-          onActivateToggle={services => this.onToggleServiceOperatorActive(services)}
-        />
-      ),
+      (operator) => {
+        const operatorId = operator._id;
+        return (
+          <Operator
+            key={operatorId}
+            serviceId={serviceId}
+            operatorId={operatorId}
+            name={operatorsHash[operatorId].name}
+            isActive={operator.isActive}
+            startDate={`${new Date(operator.startDate)}`}
+            isExpanded={expandedHash[operatorId]}
+            onExpandToggle={expanded => (
+              this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
+            )}
+            onActivateToggle={services => this.onToggleServiceOperatorActive(services)}
+          />
+        );
+      },
     );
   }
 
