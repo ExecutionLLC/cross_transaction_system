@@ -568,10 +568,7 @@ func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubIn
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot read next processing index value: %s", err))
 		}
-		if processingName == processingKV.GetKey() {
-			continue
-		}
-		
+	
 		processingInfoBytes := processingKV.GetValue()
 
 		var processingInfo ProcessingInfo
@@ -580,7 +577,9 @@ func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubIn
 			return shim.Error(fmt.Sprintf("Cannot unmarshal processing info: %s", err))
 		}
 
-		result = append(result, &processingInfo)
+		if processingName != processingInfo.Name {
+			result = append(result, &processingInfo)
+		}
 	}
 
 	resultAsBytes, err := json.Marshal(result)
