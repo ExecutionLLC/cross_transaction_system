@@ -56,33 +56,6 @@ function getProfile() {
   });
 }
 
-function getOperators() {
-  return TimeoutPromise(300, (resolve, reject) => {
-    if (Math.random() < 0.3) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get operators list'));
-      return;
-    }
-    resolve([
-      {
-        _id: '1',
-        name: 'Тройка',
-      },
-      {
-        _id: '2',
-        name: 'Умка',
-      },
-      {
-        _id: '3',
-        name: 'Червёрка',
-      },
-      {
-        _id: '4',
-        name: 'Хрумка',
-      },
-    ]);
-  });
-}
-
 let myServices = [
   {
     _id: '1',
@@ -285,6 +258,25 @@ function getProcessing() {
     ));
 }
 
+function getOperators() {
+  return getAuthName()
+    .then(name => (
+      request.get(
+        `${getBaseUrl()}processing/${name}/operatorsList`,
+        {
+          headers: {
+            ...getAuthHeader(),
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(operators => operators.map(operator => ({
+      ...operator,
+      _id: operator.name,
+    })));
+}
+
 getAuthName()
   .then(res => console.log('name res', res))
   .catch(err => console.log('name err', err));
@@ -292,6 +284,10 @@ getAuthName()
 getProcessing()
   .then(res => console.log('proc res', res))
   .catch(err => console.log('proc err', err));
+
+getOperators()
+  .then(res => console.log('ops res', res))
+  .catch(err => console.log('ops err', err));
 
 
 export default {
