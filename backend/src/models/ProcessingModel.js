@@ -36,6 +36,44 @@ class ProcessingModel extends BaseModel {
     const request = this._chaincodeApi.createQueryRequest('isOperatorExists', requestArgs);
     return this._chaincodeApi.sendQueryRequest(request);
   }
+
+  isExternalServiceExists(serviceProcessingName, serviceName, parentProcessingName) {
+    const requestArgs = [serviceProcessingName, serviceName, parentProcessingName];
+    const request = this._chaincodeApi.createQueryRequest('isExternalServiceExists', requestArgs);
+    return this._chaincodeApi.sendQueryRequest(request);
+  }
+
+  setServiceState(processingName, serviceName, isActive) {
+    const requestArgs = [
+      processingName,
+      serviceName,
+      isActive.toString(),
+    ];
+    const request = this._chaincodeApi.createInvokeRequest('setServiceState', requestArgs);
+    return this._chaincodeApi.sendInvokeRequest(request, true);
+  }
+
+  setOperatorState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
+    const requestArgs = [
+      serviceProcessingName,
+      serviceName,
+      parentProcessingName,
+      isActive.toString(),
+    ];
+    const request = this._chaincodeApi.createInvokeRequest('setOperatorState', requestArgs);
+    return this._chaincodeApi.sendInvokeRequest(request, true);
+  }
+
+  setExternalServiceState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
+    const requestArgs = [
+      serviceProcessingName,
+      serviceName,
+      parentProcessingName,
+      isActive.toString(),
+    ];
+    const request = this._chaincodeApi.createInvokeRequest('setExternalServiceState', requestArgs);
+    return this._chaincodeApi.sendInvokeRequest(request, true);
+  }
 }
 
 module.exports = ProcessingModel;

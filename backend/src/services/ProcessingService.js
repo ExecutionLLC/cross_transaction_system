@@ -55,6 +55,12 @@ class ProcessingService extends BaseService {
     const serviceInfo = Object.assign({}, service, { parentProcessingName: processingName });
 
     return this._processingModel
+      .isProcessingExists(processingName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('Processing not found');
+        }
+      })
       .isServiceExists(processingName, name)
       .then((isExists) => {
         if (isExists) {
@@ -85,6 +91,12 @@ class ProcessingService extends BaseService {
     );
 
     return this._processingModel
+      .isServiceExists(processingName, serviceName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('Service not found');
+        }
+      })
       .isOperatorExists(processingName, serviceName, parentProcessingName)
       .then((isExists) => {
         if (isExists) {
@@ -93,6 +105,39 @@ class ProcessingService extends BaseService {
 
         return this._processingModel.addOperator(operatorInfo);
       });
+  }
+
+  setServiceState(processingName, serviceName, isActive) {
+    return this._processingModel
+      .isServiceExists(processingName, serviceName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('Service not found');
+        }
+      })
+      .setServiceState(processingName, serviceName, isActive);
+  }
+
+  setOperatorState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
+    return this._processingModel
+      .isOperatorExists(serviceProcessingName, serviceName, parentProcessingName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('Operator not found');
+        }
+      })
+      .setOperatorState(serviceProcessingName, serviceName, parentProcessingName, isActive);
+  }
+
+  setExternalServiceState(serviceProcessingName, serviceName, parentProcessingName, isActive) {
+    return this._processingModel
+      .isExternalServiceExists(serviceProcessingName, serviceName, parentProcessingName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('External service not found');
+        }
+      })
+      .setExternalServiceState(serviceProcessingName, serviceName, parentProcessingName, isActive);
   }
 }
 
