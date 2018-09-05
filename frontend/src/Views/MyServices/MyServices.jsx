@@ -179,10 +179,10 @@ class MyServices extends Component {
     return (
       <div>
         <Row>
-          <Col sm={10}>
+          <Col sm={6}>
             {service.description}
           </Col>
-          <Col sm={2}>
+          <Col sm={6}>
             <ToggleActive
               isActive={service.isActive}
               serviceId={service._id}
