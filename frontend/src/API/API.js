@@ -1,3 +1,4 @@
+import request from 'request-promise';
 import utils from '../utils/utils';
 
 
@@ -241,6 +242,56 @@ function setOperatorActive(serviceId, operatorId, isActive) {
     resolve(myServices);
   });
 }
+
+function getBaseUrl() {
+  return 'http://192.168.1.101:3001/';
+}
+
+function getAccessToken() {
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDZiN2U3YjgtN2VmOS00NDcwLWE4NGUtYzIyMzc0ZmEyOTQxIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0KPQnNCa0JAifQ.TAj78PFZ1qBmbTOQ6qLQKRNI3bjwqz23VAvK1SgQKvA';
+}
+
+function getAuthHeader() {
+  return {
+    'X-Access-Token': getAccessToken(),
+  };
+}
+
+function getAuthName() {
+  return request.get(
+    `${getBaseUrl()}auth/`,
+    {
+      headers: {
+        ...getAuthHeader(),
+      },
+      json: true,
+    },
+  )
+    .then(res => res.name);
+}
+
+function getProcessing() {
+  return getAuthName()
+    .then(name => (
+      request.get(
+        `${getBaseUrl()}processing/${name}`,
+        {
+          headers: {
+            ...getAuthHeader(),
+          },
+          json: true,
+        },
+      )
+    ));
+}
+
+getAuthName()
+  .then(res => console.log('name res', res))
+  .catch(err => console.log('name err', err));
+
+getProcessing()
+  .then(res => console.log('proc res', res))
+  .catch(err => console.log('proc err', err));
 
 
 export default {
