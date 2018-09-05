@@ -163,6 +163,10 @@ function updateMyService(index, newService) {
 
 function setServiceActive(serviceId, isActive) {
   return TimeoutPromise(500, (resolve, reject) => {
+    if (Math.random() < 0.7) {
+      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not set service active'));
+      return;
+    }
     const serviceIndex = utils.findIndexById(myServices, serviceId);
     if (serviceIndex < 0) {
       reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
