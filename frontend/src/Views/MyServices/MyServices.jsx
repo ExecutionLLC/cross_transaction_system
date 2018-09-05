@@ -8,6 +8,7 @@ import AddingServiceData from './AddingServiceData';
 import Operator from './Operator';
 import utils from '../../utils/utils';
 import AddingOperator from './AddingOperator';
+import ToggleActive from './ToggleActive';
 
 
 class MyServices extends Component {
@@ -137,6 +138,12 @@ class MyServices extends Component {
     });
   }
 
+  onToggleServiceActive(services) {
+    this.setState({
+      myServices: services,
+    });
+  }
+
   renderServiceOperators(serviceOperators, serviceId, expandedHash, changingHash, errorsHash) {
     const { operatorsHash } = this.state;
     return serviceOperators.map(
@@ -172,8 +179,15 @@ class MyServices extends Component {
     return (
       <div>
         <Row>
-          <Col sm={12}>
+          <Col sm={10}>
             {service.description}
+          </Col>
+          <Col sm={2}>
+            <ToggleActive
+              isActive={service.isActive}
+              serviceId={service._id}
+              onSwitch={services => this.onToggleServiceActive(services)}
+            />
           </Col>
         </Row>
         <Row>
