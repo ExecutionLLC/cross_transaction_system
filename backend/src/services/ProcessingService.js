@@ -3,8 +3,8 @@ const ConflictError = require('../common/errors/ConflictError');
 const NotFoundError = require('../common/errors/NotFoundError');
 
 class ProcessingService extends BaseService {
-  constructor(models) {
-    super(models);
+  constructor(models, services) {
+    super(models, services);
     this._processingModel = this._models.processingModel;
   }
 
@@ -22,8 +22,8 @@ class ProcessingService extends BaseService {
     return this._processingModel.getOperatorsList(processingName);
   }
 
-  static _checkObjProperties(obj, requaredProps) {
-    requaredProps.forEach((k) => {
+  static _checkObjProperties(obj, requiredProps) {
+    requiredProps.forEach((k) => {
       const p = obj[k];
       if (p === undefined) {
         throw new Error(`Required property (${k}) is empty`);

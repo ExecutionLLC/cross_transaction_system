@@ -1,9 +1,10 @@
 const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 
 class BaseService extends AsyncInitializedObject {
-  constructor(models) {
+  constructor(models, services) {
     super();
     this._models = models;
+    this._services = services;
   }
 
   start() {

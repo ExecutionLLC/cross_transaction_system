@@ -58,6 +58,9 @@ store.defaults({
       loglevel: 'debug',
     },
   },
+  services: {
+    useUmkaAggregator: true,
+  },
   mongodb: {
     host: 'localhost',
     port: 27017,
@@ -73,6 +76,11 @@ store.defaults({
     peerUrl: 'grpc://localhost:7051',
     eventhubUrl: 'grpc://localhost:7053',
     username: 'user1',
+  },
+  umkaAggregator: {
+    dbConnectionString: '192.168.10.4:1521/MAGICASH',
+    dbUser: 'Cptt',
+    dbPassword: '1',
   },
 });
 
