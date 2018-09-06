@@ -84,25 +84,51 @@ function translateAPIOperators(apiOperators) {
   }));
 }
 
+function translateMyServices(apiServices) {
+  return apiServices
+    .map(
+      service => ({
+        _id: service.serviceName,
+        name: service.serviceName,
+        description: service.description,
+        limits: {
+          minBalance: service.minBalanceLimit,
+          maxTransfer: service.maxPerDayLimit,
+        },
+        isActive: service.isActive,
+        operators: translateAPIOperators(service.operators || []),
+      }),
+    )
+    .sort((s1, s2) => s1.name > s2.name);
+}
+
+function translateExternalServices(apiServices) {
+  return apiServices
+    .map(
+      service => ({
+        _id: JSON.stringify([service.serviceProcessingName, service.serviceName]),
+        processingName: service.serviceProcessingName,
+        processingDescription: service.serviceDescription,
+        name: service.serviceName,
+        serviceLimits: {
+          minBalance: service.serviceMinBalanceLimit,
+          maxTransfer: service.serviceMaxPerDayLimit,
+        },
+        processingIsAllowed: service.serviceIsActive,
+        serviceIsActive: service.isActive,
+      }),
+    )
+    .sort((s1, s2) => `${s1.processingName}${s1.name}` > `${s2.processingName}${s2.name}`);
+}
+
 function getMyServices() {
   return getProcessing()
-    .then(processing => (
-      processing.services
-        .map(
-          service => ({
-            _id: service.serviceName,
-            name: service.serviceName,
-            description: service.description,
-            limits: {
-              minBalance: service.minBalanceLimit,
-              maxTransfer: service.maxPerDayLimit,
-            },
-            isActive: service.isActive,
-            operators: translateAPIOperators(service.operators || []),
-          }),
-        )
-        .sort((s1, s2) => s1.name > s2.name)
-    ));
+    .then(processing => translateMyServices(processing.services));
+}
+
+function getExternalServices() {
+  return getProcessing()
+    .then(processing => translateExternalServices(processing.externalServices));
 }
 
 function getOperators() {
@@ -122,9 +148,18 @@ function getOperators() {
 }
 
 
-function getTransactionAndServices(result) {
+function getTransactionAndMyServices(result) {
   const { transactionId } = result;
   return getMyServices()
+    .then(services => ({
+      services,
+      transactionId,
+    }));
+}
+
+function getTransactionAndExternalServices(result) {
+  const { transactionId } = result;
+  return getExternalServices()
     .then(services => ({
       services,
       transactionId,
@@ -146,7 +181,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
       json: true,
     },
   )
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function addOperator(serviceId, operatorId) {
@@ -161,7 +196,7 @@ function addOperator(serviceId, operatorId) {
       json: true,
     },
   )
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function setServiceActive(serviceId, isActive) {
@@ -175,7 +210,7 @@ function setServiceActive(serviceId, isActive) {
       json: true,
     },
   )
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
@@ -189,7 +224,21 @@ function setOperatorActive(serviceId, operatorId, isActive) {
       json: true,
     },
   )
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
+}
+
+function setExternalServiceState(operatorId, serviceId, isActive) {
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/externalServices/${operatorId}/${serviceId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
+    .then(getTransactionAndExternalServices);
 }
 
 
@@ -197,9 +246,11 @@ export default {
   getProfile,
   getOperators,
   getMyServices,
+  getExternalServices,
   addService,
   setServiceActive,
   addOperator,
   setOperatorActive,
+  setExternalServiceState,
   ERRORS,
 };
