@@ -1,9 +1,12 @@
 package main
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -58,6 +61,15 @@ func PutItemByCompositeKey(APIstub shim.ChaincodeStubInterface, objectType strin
 	return PutItemByKey(APIstub, key, item)
 }
 
+func PutStateByCompositeKey(APIstub shim.ChaincodeStubInterface, objectType string, attributes []string, value []byte) error {
+	key, err := APIstub.CreateCompositeKey(objectType, attributes)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Cannot create composite key: %s", err))
+	}
+
+	return APIstub.PutState(key, value)
+}
+
 func CheckItemExistanceByKey(APIstub shim.ChaincodeStubInterface, key string) (bool, error) {
 	value, err := APIstub.GetState(key)
 	if err != nil {
@@ -88,4 +100,23 @@ func BoolToResponse(value bool) pb.Response {
 		return shim.Success([]byte("true"))
 	}
 	return shim.Success([]byte("false"))
+}
+
+func Float32frombytes(bytes []byte) float32 {
+	bits := binary.LittleEndian.Uint32(bytes)
+	float := math.Float32frombits(bits)
+	return float
+}
+
+func Float32bytes(float float64) []byte {
+	bits := math.Float64bits(float)
+	bytes := make([]byte, 4)
+	binary.LittleEndian.PutUint32(bytes, bits)
+	return bytes
+}
+
+func TimestampToDateAndTimeStrings(timestamp int64) (date string, time string) {
+	timestampSec := timestamp / 1000
+	unixTime := time.Unix(timestampSec, 0)
+	return unixTime.Format("2006-01-02"), unixTime.Format("15:04:05")
 }
