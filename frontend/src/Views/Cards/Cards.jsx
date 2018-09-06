@@ -32,7 +32,7 @@ class Cards extends Component {
     this.setState({
       isLoading: true,
     });
-    API.getCards(cardNumber)
+    API.getCards(cardNumber, 0, 10)
       .then((card) => {
         this.setState({
           isLoading: false,
