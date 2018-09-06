@@ -81,6 +81,7 @@ type WalletExtendedInfo struct {
 }
 
 type Transaction struct {
+	ID                    string  `json:"id"`
 	ProcessingName        string  `json:"processingName"`
 	ServiceName           string  `json:"serviceName"`
 	OperatorName          string  `json:"operatorName"`
@@ -314,14 +315,7 @@ func (cts *CrossTransactionSystem) addOperator(APIstub shim.ChaincodeStubInterfa
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot unmarshal operator info: %s", err))
 	}
-	isExists, err := cts.isProcessingExists0(APIstub, operatorInfo.ParentProcessingName)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-	if !isExists {
-		return shim.Error("Cannot find parent processing")
-	}
-	isExists, err = cts.isServiceExists0(APIstub, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName)
+	isExists, err := cts.isServiceExists0(APIstub, operatorInfo.ServiceProcessingName, operatorInfo.ServiceName)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -725,6 +719,8 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 	transactionID := APIstub.GetTxID()
 	amountAsBytes := Float32bytes(transaction.Amount)
 
+	transaction.ID = transactionID
+
 	if transaction.ProcessingName != transaction.OperatorName {
 		var serviceInfo ServiceInfo
 		var operatorInfo OperatorInfo
@@ -771,13 +767,13 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 			return shim.Error(fmt.Sprintf("Cannot update dst src transactions index: %s", err))
 		}
 	} else {
-		err := APIstub.PutStateByCompositeKey(APIstub, DST_SRC_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
+		err := APIstub.PutStateByCompositeKey(APIstub, INTERNAL_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot update dst src transactions index: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot update internal transactions index: %s", err))
 		}
 	}
 
-	err := APIstub.PutStateByCompositeKey(APIstub, INTERNAL_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, nil)
+	err := APIstub.PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, nil)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot update wallet transactions index: %s", err))
 	}
