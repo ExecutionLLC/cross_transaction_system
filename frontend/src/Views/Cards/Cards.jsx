@@ -83,7 +83,7 @@ class Cards extends Component {
 
     return (
       <SelfExpandableListItem
-        ke={operation.transactionId}
+        key={operation.transactionId}
         header={renderHeader()}
         content={renderContent()}
       />
