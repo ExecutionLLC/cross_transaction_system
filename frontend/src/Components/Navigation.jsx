@@ -37,8 +37,8 @@ function Navigation(props) {
         ))}
       </Nav>
       <Nav pullRight>
-        <NavDropdown eventKey={3} title="User name" id="basic-nav-dropdown">
-          <MenuItem eventKey={3.1}>Logout</MenuItem>
+        <NavDropdown title="User name" id="basic-nav-dropdown">
+          <MenuItem href="/login">Logout</MenuItem>
         </NavDropdown>
       </Nav>
     </Navbar>

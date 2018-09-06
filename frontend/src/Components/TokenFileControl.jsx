@@ -3,6 +3,7 @@ import {
   FormGroup,
   ControlLabel,
   FormControl,
+  Glyphicon,
 } from 'react-bootstrap';
 
 
@@ -26,7 +27,11 @@ class TokenFileControl extends Component {
         >
           <h3>
             <span className="file-input-wrapper btn btn-default btn-primary login-form-btn">
-              Select token file
+              Выберите файл с токеном
+              <Glyphicon
+                glyph="floppy-disk"
+                style={{ paddingLeft: '10px' }}
+              />
             </span>
           </h3>
           <FormControl

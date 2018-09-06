@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { Router, Switch, Route } from 'react-router-dom';
+import PrivateRoute from './Components/PrivateRoute';
 import Profile from './Views/Profile/Profile';
 import MyServices from './Views/MyServices/MyServices';
 import OtherServices from './Views/OtherServices/OtherServices';
 import Cards from './Views/Cards/Cards';
 import Login from './Views/Login/Login';
-
-/* global document */
+import { history } from './API/history';
 
 
 class App extends Component {
@@ -16,14 +16,14 @@ class App extends Component {
 
   render() {
     return (
-      <Router>
+      <Router history={history}>
         <Switch>
-          <Route path="/profile" component={Profile} />
-          <Route path="/myservices" component={MyServices} />
-          <Route path="/otherservices" component={OtherServices} />
-          <Route path="/cards" component={Cards} />
+          <PrivateRoute exact path="/profile" component={Profile} />
+          <PrivateRoute exact path="/myservices" component={MyServices} />
+          <PrivateRoute exact path="/otherservices" component={OtherServices} />
+          <PrivateRoute exact path="/cards" component={Cards} />
           <Route path="/auth" component={Login} />
-          <Route component={Profile} />
+          <Route component={Login} />
         </Switch>
       </Router>
     );
