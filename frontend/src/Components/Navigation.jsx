@@ -7,19 +7,19 @@ function Navigation(props) {
   const tabs = [
     {
       url: '/profile',
-      title: 'Profile',
+      title: 'Профиль',
     },
     {
       url: '/myservices',
-      title: 'My services',
+      title: 'Мои сервисы',
     },
     {
       url: '/otherservices',
-      title: 'Other services',
+      title: 'Внешние сервисы',
     },
     {
       url: '/cards',
-      title: 'Cards',
+      title: 'Карты',
     },
   ];
 

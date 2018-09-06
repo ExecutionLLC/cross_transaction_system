@@ -4,6 +4,6 @@ import ViewBase from '../ViewBase';
 
 export default function (props) {
   return (
-    <ViewBase {...props} pageHeader="Cards" />
+    <ViewBase {...props} pageHeader="Карты" />
   );
 }
