@@ -135,10 +135,21 @@ class MyServices extends Component {
     }
   }
 
-  onToggleServiceOperatorActive(services) {
-    this.setState({
-      myServices: services,
-    });
+  onToggleServiceOperatorActiveResult(result) {
+    if (result) {
+      const { services, transactionId } = result;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Состояние оператора изменено',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   renderServiceOperators(serviceOperators, serviceId, expandedHash) {
@@ -158,7 +169,9 @@ class MyServices extends Component {
             onExpandToggle={expanded => (
               this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
             )}
-            onActivateToggle={services => this.onToggleServiceOperatorActive(services)}
+            onActivateToggleResult={oepratorToggleResult => (
+              this.onToggleServiceOperatorActiveResult(oepratorToggleResult)
+            )}
           />
         );
       },

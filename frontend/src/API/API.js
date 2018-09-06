@@ -230,7 +230,7 @@ function setOperatorActive(serviceId, operatorId, isActive) {
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 

@@ -13,15 +13,16 @@ function Operator(props) {
     serviceId, operatorId,
     isExpanded,
     name, startDate, isActive,
-    onActivateToggle, onExpandToggle,
+    onActivateToggleResult, onExpandToggle,
   } = props;
 
   function onSwitch() {
     return API.setOperatorActive(serviceId, operatorId, !isActive)
-      .then((services) => {
-        onActivateToggle(services);
+      .then((setOperatorActiveResult) => {
+        onActivateToggleResult(setOperatorActiveResult);
       })
       .catch((apiError) => {
+        onActivateToggleResult();
         throw apiError.message;
       });
   }
@@ -71,7 +72,7 @@ Operator.propTypes = {
   startDate: PropTypes.string.isRequired,
   isActive: PropTypes.bool.isRequired,
   onExpandToggle: PropTypes.func.isRequired,
-  onActivateToggle: PropTypes.func.isRequired,
+  onActivateToggleResult: PropTypes.func.isRequired,
 };
 
 Operator.defaultProps = {
