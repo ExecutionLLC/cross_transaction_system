@@ -20,21 +20,24 @@ class ExpandableListItem extends Component {
     const {
       header, content,
       isExpanded,
+      status,
     } = this.props;
 
+    // TODO: render bsStyle in accordance with the status property
     return (
-      <Panel expanded={isExpanded} onToggle={() => {}}>
-        <Panel.Heading>
-          <Button
-            onClick={this.onExpandToggle}
-            bsStyle="link"
-          >
-            {isExpanded
-              ? <Glyphicon glyph="triangle-bottom" />
-              : <Glyphicon glyph="triangle-right" />
-            }
-          </Button>
-          {header}
+      <Panel
+        expanded={isExpanded}
+        bsStyle="success"
+      >
+        <Panel.Heading onClick={this.onExpandToggle}>
+          <div style={{ margin: '5px 5px' }}>
+          {isExpanded
+            ? <Glyphicon glyph="triangle-bottom" />
+            : <Glyphicon glyph="triangle-right" />
+          }
+            <span style={{ paddingLeft: '10px' }}>{header}</span>
+          </div>
+
         </Panel.Heading>
         <Panel.Collapse>
           <Panel.Body>
@@ -51,6 +54,7 @@ ExpandableListItem.propTypes = {
   content: PropTypes.node.isRequired,
   isExpanded: PropTypes.bool,
   onExpandToggle: PropTypes.func,
+  status: PropTypes.bool.isRequired,
 };
 
 ExpandableListItem.defaultProps = {
