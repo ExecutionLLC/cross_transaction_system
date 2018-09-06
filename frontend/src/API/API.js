@@ -87,6 +87,7 @@ let myServices = [
     _id: '1',
     name: 'Проезд',
     description: 'Проезд в городском транспорте г. Рязань',
+    isActive: true,
     limits: {
       minBalance: 50,
       maxTransfer: 1500,
@@ -103,6 +104,7 @@ let myServices = [
     _id: '2',
     name: 'Кофе',
     description: 'Кофейные автоматы в г. Рязань',
+    isActive: false,
     limits: {
       minBalance: 100,
       maxTransfer: 1000,
@@ -143,6 +145,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
         _id: `${Math.random()}`,
         name,
         description,
+        isActive: true,
         limits: {
           minBalance,
           maxTransfer,
@@ -156,6 +159,27 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
 
 function updateMyService(index, newService) {
   myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
+}
+
+function setServiceActive(serviceId, isActive) {
+  return TimeoutPromise(500, (resolve, reject) => {
+    if (Math.random() < 0.7) {
+      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not set service active'));
+      return;
+    }
+    const serviceIndex = utils.findIndexById(myServices, serviceId);
+    if (serviceIndex < 0) {
+      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
+      return;
+    }
+    const service = myServices[serviceIndex];
+    const newService = {
+      ...service,
+      isActive,
+    };
+    updateMyService(serviceIndex, newService);
+    resolve(myServices);
+  });
 }
 
 function addOperator(serviceId, operatorId) {
@@ -224,6 +248,7 @@ export default {
   getOperators,
   getMyServices,
   addService,
+  setServiceActive,
   addOperator,
   setOperatorActive,
   ERRORS,
