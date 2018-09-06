@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import {
   Form, FormGroup,
   ControlLabel, FormControl,
-  Button,
+  Button, Glyphicon,
+  Grid, Row, Col,
 } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import Loading from '../../Components/Loading';
 import ErrorPanel from '../../Components/ErrorPanel';
 import API from '../../API/API';
+import ExpandableListItem from '../../Components/ExpandableListItem';
 
 
 class Cards extends Component {
@@ -49,9 +51,72 @@ class Cards extends Component {
       });
   }
 
+  renderOperation(operation) {
+    function renderHeader() {
+      return (
+        <Row>
+          <Col sm={1}>
+            {operation.date}
+          </Col>
+          <Col sm={1}>
+            {operation.operation}
+          </Col>
+          <Col sm={1}>
+            {operation.serviceId}
+          </Col>
+          <Col sm={1}>
+            {operation.contragent}
+          </Col>
+          <Col sm={1}>
+            {operation.amount}
+          </Col>
+          <Col sm={1}>
+            <Glyphicon glyph={operation.isActive ? 'ok-sign' : 'remove-sign'} />
+          </Col>
+        </Row>
+      );
+    }
+
+    function renderContent() {
+      return operation.transactionId;
+    }
+
+    return (
+      <ExpandableListItem
+        header={renderHeader}
+        content={renderContent}
+      />
+    );
+  }
+
+  renderOperations() {
+    const { card: { operations } } = this.state;
+    return operations.map(operation => this.renderOperation(operation));
+  }
+
   renderCard() {
-    const { card } = this.state;
-    return JSON.stringify(card);
+    const { card: { cardNumber, balance } } = this.state;
+    return (
+      <Grid>
+        <Row>
+          <Col sm={4}>
+            Карта:
+          </Col>
+          <Col sm={4}>
+            {cardNumber}
+          </Col>
+          <Col sm={4}>
+            Баланс:
+          </Col>
+          <Col sm={4}>
+            {balance}
+          </Col>
+        </Row>
+        <Row>
+          {this.renderOperations()}
+        </Row>
+      </Grid>
+    );
   }
 
   render() {

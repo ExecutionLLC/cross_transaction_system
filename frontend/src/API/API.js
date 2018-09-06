@@ -255,6 +255,7 @@ function getCards(cardNumber, offset, limit) {
         contragent: `contragent-${ch.toUpperCase()}`,
         amount: ch.charCodeAt(0),
         isActive: ch.charCodeAt(0) % 2,
+        transactionId: `${Math.random()}`,
       }),
     );
     resolve(
