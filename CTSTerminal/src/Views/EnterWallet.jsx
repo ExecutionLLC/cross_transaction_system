@@ -3,7 +3,6 @@ import { Text } from 'react-native';
 import {
   Container,
   Header,
-  Left,
   Form,
   Item,
   Input,
@@ -11,7 +10,6 @@ import {
   Body,
   Title,
   Button,
-  Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
