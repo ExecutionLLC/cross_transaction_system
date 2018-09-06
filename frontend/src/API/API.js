@@ -1,7 +1,7 @@
 import request from 'request-promise';
 import utils from '../utils/utils';
 import config from '../config';
-
+import { getAuthHeader } from './auth_header';
 
 
 class APIError extends Error {
@@ -41,7 +41,7 @@ function auth(token) {
     `${getBaseUrl()}auth`,
     {
       headers: {
-        'X-Access-Token': token, // Base64.encode(JSON.stringify(idPart))
+        'X-Access-Token': token,
       },
       json: true,
     },
@@ -71,20 +71,6 @@ function getProfile(date) {
       },
     });
   });
-}
-
-function getBaseUrl() {
-  return 'http://192.168.1.101:3001/';
-}
-
-function getAccessToken() {
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDZiN2U3YjgtN2VmOS00NDcwLWE4NGUtYzIyMzc0ZmEyOTQxIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0KPQnNCa0JAifQ.TAj78PFZ1qBmbTOQ6qLQKRNI3bjwqz23VAvK1SgQKvA';
-}
-
-function getAuthHeader() {
-  return {
-    'X-Access-Token': getAccessToken(),
-  };
 }
 
 function getAuthName() {

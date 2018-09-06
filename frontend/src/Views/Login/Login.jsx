@@ -14,14 +14,6 @@ class Login extends Component {
   }
 
   onText(contents) {
-    console.log('Token file contents:', contents);
-
-    this.setState({
-      isLoading: true,
-      authError: null,
-      authResponseData: null,
-    });
-
     const { dispatch } = this.props;
     dispatch(userActions.login(contents));
   }
@@ -34,7 +26,7 @@ class Login extends Component {
         <div className="container-login100">
           <div className="wrap-login100">
             <div className="login100-pic js-tilt" data-tilt>
-              <Image src={logo} alt="IMG" />
+              <Image src={logo} alt="logo" />
             </div>
             <form className="login100-form validate-form">
               <span className="login100-form-title">

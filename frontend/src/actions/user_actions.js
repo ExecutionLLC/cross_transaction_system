@@ -1,6 +1,5 @@
 import { userConstants } from '../constants/user_constants';
 import { userService } from '../API/user_service';
-import { alertActions } from './alert_actions';
 import { history } from '../API/history';
 
 
@@ -21,7 +20,6 @@ function login(token) {
         },
         (error) => {
           dispatch(failure(error.toString()));
-          dispatch(alertActions.error(error.toString()));
         },
       );
   };
