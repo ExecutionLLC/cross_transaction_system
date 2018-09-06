@@ -285,7 +285,28 @@ function setExternalServiceState(operatorId, serviceId, isActive) {
       )
     ))
     .then(getTransactionAndExternalServices);
+}
 
+function getCards(cardNumber) {
+  return TimeoutPromise(2000, (resolve, reject) => {
+    if (cardNumber.length < 3) {
+      reject(new APIError(ERRORS.UNKNOWN, 'Card search error'));
+      return;
+    }
+    console.log('eededd', cardNumber.split());
+    resolve(
+      cardNumber.split('').slice(0, cardNumber.length - 3).map(
+        ch => ({
+          date: +new Date(),
+          operation: `op-${ch.toUpperCase()}`,
+          serviceId: `service-${ch.toUpperCase()}`,
+          contragent: `contragent-${ch.toUpperCase()}`,
+          amount: ch.charCodeAt(0),
+          isActive: ch.charCodeAt(0) % 2,
+        }),
+      ),
+    );
+  });
 }
 
 
@@ -299,5 +320,6 @@ export default {
   addOperator,
   setOperatorActive,
   setExternalServiceState,
+  getCards,
   ERRORS,
 };
