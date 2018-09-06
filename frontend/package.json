@@ -9,7 +9,8 @@
     "react-bootstrap-date-picker": "github:pushtell/react-bootstrap-date-picker#f622dc8872dd180324ba5d3c295d009848f5814b",
     "react-dom": "^16.4.2",
     "react-router-dom": "^4.3.1",
-    "react-scripts": "1.1.5"
+    "react-scripts": "1.1.5",
+    "request-promise": "^4.2.2"
   },
   "scripts": {
     "start": "react-scripts start",

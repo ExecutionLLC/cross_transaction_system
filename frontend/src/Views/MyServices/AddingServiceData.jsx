@@ -206,7 +206,7 @@ class AddingServiceData extends Component {
               type="number"
               value={minBalance}
               disabled={disabled}
-              onChange={wrapOnChange(minBalance => setData({ minBalance }))}
+              onChange={wrapOnChange(minBalance => setData({ minBalance: +minBalance }))}
             />
           </div>,
           error && error.minBalance,
@@ -218,7 +218,7 @@ class AddingServiceData extends Component {
               type="number"
               value={maxTransfer}
               disabled={disabled}
-              onChange={wrapOnChange(maxTransfer => setData({ maxTransfer }))}
+              onChange={wrapOnChange(maxTransfer => setData({ maxTransfer: +maxTransfer }))}
             />
           </div>,
           error && error.maxTransfer,
