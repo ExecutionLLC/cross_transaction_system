@@ -9,6 +9,7 @@ import Operator from './Operator';
 import utils from '../../utils/utils';
 import AddingOperator from './AddingOperator';
 import ToggleActive from './ToggleActive';
+import LastSuccessTransaction from '../../Components/LastSuccesTransaction';
 
 
 class MyServices extends Component {
@@ -23,6 +24,7 @@ class MyServices extends Component {
       myServices: null,
       expandedServicesHash: Object.create(null),
       expandedServicesOperatorsHash: Object.create(null),
+      lastSuccessTransaction: null,
     };
   }
 
@@ -69,10 +71,21 @@ class MyServices extends Component {
     });
   }
 
-  onServiceAdded(services) {
-    this.setState({
-      myServices: services,
-    });
+  onServiceAddResult(serviceAddResult) {
+    if (serviceAddResult) {
+      const { services, transactionId } = serviceAddResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Сервис добавлен',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   onExpandServiceOperatorToggle(serviceId, operatorId, isExpanded) {
@@ -209,14 +222,21 @@ class MyServices extends Component {
   render() {
     const {
       isLoading, loadingError, myServices,
+      lastSuccessTransaction,
     } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
+        {lastSuccessTransaction && (
+          <LastSuccessTransaction
+            title={lastSuccessTransaction.title}
+            transactionId={lastSuccessTransaction.id}
+          />
+        )}
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
         {!loadingError && (
           <div>
             <AddingServiceData
-              onServiceAdded={services => this.onServiceAdded(services)}
+              onServiceAddResult={serviceAddResult => this.onServiceAddResult(serviceAddResult)}
             />
             {myServices && this.renderServices()}
           </div>

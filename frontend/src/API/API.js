@@ -147,6 +147,15 @@ function getOperators() {
 }
 
 
+function getTransactionAndServices(result) {
+  const { transactionId } = result;
+  return getMyServices()
+    .then(services => ({
+      services,
+      transactionId,
+    }));
+}
+
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
   return Promise.resolve()
     .then(getAuthName)
@@ -166,7 +175,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 function addOperator(serviceId, operatorId) {
