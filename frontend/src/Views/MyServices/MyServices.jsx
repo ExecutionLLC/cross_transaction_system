@@ -118,10 +118,21 @@ class MyServices extends Component {
     }
   }
 
-  onToggleServiceActive(services) {
-    this.setState({
-      myServices: services,
-    });
+  onToggleServiceActiveResult(toggleServiceActiveResult) {
+    if (toggleServiceActiveResult) {
+      const { services, transactionId } = toggleServiceActiveResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Состояние сервиса изменено',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   onToggleServiceOperatorActive(services) {
@@ -170,7 +181,7 @@ class MyServices extends Component {
             <ToggleActive
               isActive={service.isActive}
               serviceId={service._id}
-              onSwitch={services => this.onToggleServiceActive(services)}
+              onSwitchResult={switchResult => this.onToggleServiceActiveResult(switchResult)}
             />
           </Col>
         </Row>
