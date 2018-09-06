@@ -9,7 +9,7 @@ import ViewBase from '../ViewBase';
 import Loading from '../../Components/Loading';
 import ErrorPanel from '../../Components/ErrorPanel';
 import API from '../../API/API';
-import ExpandableListItem from '../../Components/ExpandableListItem';
+import SelfExpandableListItem from '../../Components/SelfExpandableListItem';
 
 
 class Cards extends Component {
@@ -55,16 +55,16 @@ class Cards extends Component {
     function renderHeader() {
       return (
         <Row>
-          <Col sm={1}>
-            {operation.date}
+          <Col sm={2}>
+            {`${operation.date}`}
           </Col>
-          <Col sm={1}>
+          <Col sm={2}>
             {operation.operation}
           </Col>
-          <Col sm={1}>
+          <Col sm={3}>
             {operation.serviceId}
           </Col>
-          <Col sm={1}>
+          <Col sm={3}>
             {operation.contragent}
           </Col>
           <Col sm={1}>
@@ -82,9 +82,10 @@ class Cards extends Component {
     }
 
     return (
-      <ExpandableListItem
-        header={renderHeader}
-        content={renderContent}
+      <SelfExpandableListItem
+        ke={operation.transactionId}
+        header={renderHeader()}
+        content={renderContent()}
       />
     );
   }
@@ -99,16 +100,16 @@ class Cards extends Component {
     return (
       <Grid>
         <Row>
-          <Col sm={4}>
+          <Col sm={3}>
             Карта:
           </Col>
-          <Col sm={4}>
+          <Col sm={3}>
             {cardNumber}
           </Col>
-          <Col sm={4}>
+          <Col sm={3}>
             Баланс:
           </Col>
-          <Col sm={4}>
+          <Col sm={3}>
             {balance}
           </Col>
         </Row>
