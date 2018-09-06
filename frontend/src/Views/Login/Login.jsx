@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Image } from 'react-bootstrap';
 
@@ -10,7 +11,8 @@ import userActions from '../../actions/user_actions';
 class Login extends Component {
   constructor(props) {
     super(props);
-    this.props.dispatch(userActions.logout());
+    const { dispatch } = props;
+    dispatch(userActions.logout());
   }
 
   onText(contents) {
@@ -66,6 +68,17 @@ class Login extends Component {
     );
   }
 }
+
+Login.propTypes = {
+  dispatch: PropTypes.func.isRequired,
+  loggingIn: PropTypes.bool,
+  error: PropTypes.string,
+};
+
+Login.defaultProps = {
+  loggingIn: false,
+  error: null,
+};
 
 function mapStateToProps(state) {
   const { loggingIn, error } = state.authentication;
