@@ -6,12 +6,13 @@ import API from '../../API/API';
 
 class ToggleActive extends Component {
   onClick() {
-    const { serviceId, isActive, onSwitch } = this.props;
+    const { serviceId, isActive, onSwitchResult } = this.props;
     return API.setServiceActive(serviceId, !isActive)
       .then((services) => {
-        onSwitch(services);
+        onSwitchResult(services);
       })
       .catch((error) => {
+        onSwitchResult();
         throw error.message;
       });
   }
@@ -36,7 +37,7 @@ class ToggleActive extends Component {
 ToggleActive.propTypes = {
   isActive: PropTypes.bool.isRequired,
   serviceId: PropTypes.string.isRequired,
-  onSwitch: PropTypes.func.isRequired,
+  onSwitchResult: PropTypes.func.isRequired,
 };
 
 

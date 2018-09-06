@@ -61,14 +61,14 @@ class AddingServiceData extends Component {
         maxTransfer,
       },
     })
-      .then((services) => {
+      .then((serviceAddResult) => {
         this.setState(
           {
             isLoading: false,
           },
           () => {
-            const { onServiceAdded } = this.props;
-            onServiceAdded(services);
+            const { onServiceAddResult } = this.props;
+            onServiceAddResult(serviceAddResult);
           },
         );
         return true;
@@ -84,10 +84,16 @@ class AddingServiceData extends Component {
             message: `Ошибка добавления сервиса: ${apiError.message}`,
           };
         }
-        this.setState({
-          isLoading: false,
-          error,
-        });
+        this.setState(
+          {
+            isLoading: false,
+            error,
+          },
+          () => {
+            const { onServiceAddResult } = this.props;
+            onServiceAddResult();
+          },
+        );
         return false;
       });
   }
@@ -250,7 +256,7 @@ class AddingServiceData extends Component {
 }
 
 AddingServiceData.propTypes = {
-  onServiceAdded: PropTypes.func.isRequired,
+  onServiceAddResult: PropTypes.func.isRequired,
 };
 
 

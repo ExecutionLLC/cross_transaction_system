@@ -9,6 +9,7 @@ import Operator from './Operator';
 import utils from '../../utils/utils';
 import AddingOperator from './AddingOperator';
 import ToggleActive from './ToggleActive';
+import LastSuccessTransaction from '../../Components/LastSuccesTransaction';
 
 
 class MyServices extends Component {
@@ -22,6 +23,7 @@ class MyServices extends Component {
       myServices: null,
       expandedServicesHash: Object.create(null),
       expandedServicesOperatorsHash: Object.create(null),
+      lastSuccessTransaction: null,
     };
   }
 
@@ -68,10 +70,21 @@ class MyServices extends Component {
     });
   }
 
-  onServiceAdded(services) {
-    this.setState({
-      myServices: services,
-    });
+  onServiceAddResult(serviceAddResult) {
+    if (serviceAddResult) {
+      const { services, transactionId } = serviceAddResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Сервис добавлен',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   onExpandServiceOperatorToggle(serviceId, operatorId, isExpanded) {
@@ -87,22 +100,55 @@ class MyServices extends Component {
     });
   }
 
-  onServiceOperatorAdded(services) {
-    this.setState({
-      myServices: services,
-    });
+  onServiceOperatorAddResult(operatorAddResult) {
+    if (operatorAddResult) {
+      const { services, transactionId } = operatorAddResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Оператор добавлен',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
-  onToggleServiceActive(services) {
-    this.setState({
-      myServices: services,
-    });
+  onToggleServiceActiveResult(toggleServiceActiveResult) {
+    if (toggleServiceActiveResult) {
+      const { services, transactionId } = toggleServiceActiveResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Состояние сервиса изменено',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
-  onToggleServiceOperatorActive(services) {
-    this.setState({
-      myServices: services,
-    });
+  onToggleServiceOperatorActiveResult(result) {
+    if (result) {
+      const { services, transactionId } = result;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Состояние оператора изменено',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   renderServiceOperators(serviceOperators, serviceId, expandedHash) {
@@ -122,7 +168,9 @@ class MyServices extends Component {
             onExpandToggle={expanded => (
               this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
             )}
-            onActivateToggle={services => this.onToggleServiceOperatorActive(services)}
+            onActivateToggleResult={oepratorToggleResult => (
+              this.onToggleServiceOperatorActiveResult(oepratorToggleResult)
+            )}
           />
         );
       },
@@ -145,7 +193,7 @@ class MyServices extends Component {
             <ToggleActive
               isActive={service.isActive}
               serviceId={service._id}
-              onSwitch={services => this.onToggleServiceActive(services)}
+              onSwitchResult={switchResult => this.onToggleServiceActiveResult(switchResult)}
             />
           </Col>
         </Row>
@@ -170,7 +218,9 @@ class MyServices extends Component {
                 <AddingOperator
                   operators={operatorsToAdd}
                   serviceId={service._id}
-                  onOperatorAdded={services => this.onServiceOperatorAdded(services)}
+                  onOperatorAddResult={operatorAddResult => (
+                    this.onServiceOperatorAddResult(operatorAddResult)
+                  )}
                 />
               )
             }
@@ -208,14 +258,21 @@ class MyServices extends Component {
   render() {
     const {
       isLoading, loadingError, myServices,
+      lastSuccessTransaction,
     } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Мои сервисы" isLoading={isLoading}>
+        {lastSuccessTransaction && (
+          <LastSuccessTransaction
+            title={lastSuccessTransaction.title}
+            transactionId={lastSuccessTransaction.id}
+          />
+        )}
         {loadingError && <ErrorPanel title="Ошибка загрузки" content={loadingError} />}
         {!loadingError && (
           <div>
             <AddingServiceData
-              onServiceAdded={services => this.onServiceAdded(services)}
+              onServiceAddResult={serviceAddResult => this.onServiceAddResult(serviceAddResult)}
             />
             {myServices && this.renderServices()}
           </div>

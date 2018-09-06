@@ -147,6 +147,15 @@ function getOperators() {
 }
 
 
+function getTransactionAndServices(result) {
+  const { transactionId } = result;
+  return getMyServices()
+    .then(services => ({
+      services,
+      transactionId,
+    }));
+}
+
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
   return Promise.resolve()
     .then(getAuthName)
@@ -166,7 +175,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 function addOperator(serviceId, operatorId) {
@@ -185,7 +194,7 @@ function addOperator(serviceId, operatorId) {
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 function setServiceActive(serviceId, isActive) {
@@ -203,7 +212,7 @@ function setServiceActive(serviceId, isActive) {
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
@@ -221,7 +230,7 @@ function setOperatorActive(serviceId, operatorId, isActive) {
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 
