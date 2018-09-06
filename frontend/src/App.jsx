@@ -6,7 +6,7 @@ import MyServices from './Views/MyServices/MyServices';
 import OtherServices from './Views/OtherServices/OtherServices';
 import Cards from './Views/Cards/Cards';
 import Login from './Views/Login/Login';
-import { history } from './API/history';
+import history from './API/history';
 
 
 class App extends Component {
