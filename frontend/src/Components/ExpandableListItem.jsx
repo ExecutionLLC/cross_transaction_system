@@ -25,7 +25,10 @@ class ExpandableListItem extends Component {
     return (
       <Panel expanded={isExpanded} onToggle={() => {}}>
         <Panel.Heading>
-          <Button onClick={this.onExpandToggle}>
+          <Button
+            onClick={this.onExpandToggle}
+            bsStyle="link"
+          >
             {isExpanded
               ? <Glyphicon glyph="triangle-bottom" />
               : <Glyphicon glyph="triangle-right" />
