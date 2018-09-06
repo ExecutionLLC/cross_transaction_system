@@ -163,7 +163,7 @@ class MyServices extends Component {
             operatorId={operatorId}
             name={operatorsHash[operatorId].name}
             isActive={operator.isActive}
-            startDate={`${new Date(operator.startDate)}`}
+            startDate={`${(new Date(operator.startDate)).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })}`}
             isExpanded={expandedHash[operatorId]}
             onExpandToggle={expanded => (
               this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
@@ -253,10 +253,11 @@ class MyServices extends Component {
     return (
       <ExpandableListItem
         key={id}
-        header={`Сервис: ${service.name}`}
+        header={`СЕРВИС: ${service.name}`}
         content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
         onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
+        status={service.isActive}
       />
     );
   }
