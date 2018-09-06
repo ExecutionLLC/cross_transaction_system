@@ -194,7 +194,7 @@ function addOperator(serviceId, operatorId) {
         },
       )
     ))
-    .then(getMyServices);
+    .then(getTransactionAndServices);
 }
 
 function setServiceActive(serviceId, isActive) {

@@ -32,25 +32,28 @@ class AddingOperator extends Component {
       isLoading: true,
       error: null,
     });
-    const { serviceId, onOperatorAdded } = this.props;
+    const { serviceId, onOperatorAddResult } = this.props;
     const { currentOperatorId } = this.state;
     return API.addOperator(serviceId, currentOperatorId)
-      .then((services) => {
+      .then((operatorAddResult) => {
         this.setState(
           {
             isLoading: false,
           },
           () => {
-            onOperatorAdded(services);
+            onOperatorAddResult(operatorAddResult);
           },
         );
         return true;
       })
       .catch((apiError) => {
-        this.setState({
-          isLoading: false,
-          error: `Ошибка добавления сервиса: ${apiError.message}`,
-        });
+        this.setState(
+          {
+            isLoading: false,
+            error: `Ошибка добавления сервиса: ${apiError.message}`,
+          },
+          () => onOperatorAddResult(),
+        );
         return false;
       });
   }
@@ -98,7 +101,7 @@ AddingOperator.propTypes = {
     }).isRequired,
   ).isRequired,
   serviceId: PropTypes.string.isRequired,
-  onOperatorAdded: PropTypes.func.isRequired,
+  onOperatorAddResult: PropTypes.func.isRequired,
 };
 
 

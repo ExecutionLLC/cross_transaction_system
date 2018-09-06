@@ -101,10 +101,21 @@ class MyServices extends Component {
     });
   }
 
-  onServiceOperatorAdded(services) {
-    this.setState({
-      myServices: services,
-    });
+  onServiceOperatorAddResult(operatorAddResult) {
+    if (operatorAddResult) {
+      const { services, transactionId } = operatorAddResult;
+      this.setState({
+        myServices: services,
+        lastSuccessTransaction: {
+          title: 'Оператор добавлен',
+          id: transactionId,
+        },
+      });
+    } else {
+      this.setState({
+        lastSuccessTransaction: null,
+      });
+    }
   }
 
   onToggleServiceActive(services) {
@@ -184,7 +195,9 @@ class MyServices extends Component {
                 <AddingOperator
                   operators={operatorsToAdd}
                   serviceId={service._id}
-                  onOperatorAdded={services => this.onServiceOperatorAdded(services)}
+                  onOperatorAddResult={operatorAddResult => (
+                    this.onServiceOperatorAddResult(operatorAddResult)
+                  )}
                 />
               )
             }
