@@ -247,18 +247,21 @@ function getCards(cardNumber) {
       reject(new APIError(ERRORS.UNKNOWN, 'Card search error'));
       return;
     }
-    console.log('eededd', cardNumber.split());
     resolve(
-      cardNumber.split('').slice(0, cardNumber.length - 3).map(
-        ch => ({
-          date: +new Date(),
-          operation: `op-${ch.toUpperCase()}`,
-          serviceId: `service-${ch.toUpperCase()}`,
-          contragent: `contragent-${ch.toUpperCase()}`,
-          amount: ch.charCodeAt(0),
-          isActive: ch.charCodeAt(0) % 2,
-        }),
-      ),
+      {
+        cardNumber,
+        balance: 214534,
+        operations: cardNumber.split('').slice(0, cardNumber.length - 3).map(
+          ch => ({
+            date: +new Date(),
+            operation: `op-${ch.toUpperCase()}`,
+            serviceId: `service-${ch.toUpperCase()}`,
+            contragent: `contragent-${ch.toUpperCase()}`,
+            amount: ch.charCodeAt(0),
+            isActive: ch.charCodeAt(0) % 2,
+          }),
+        ),
+      },
     );
   });
 }

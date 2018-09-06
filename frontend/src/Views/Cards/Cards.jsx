@@ -17,7 +17,7 @@ class Cards extends Component {
       cardNumber: '',
       isLoading: false,
       error: null,
-      cards: null,
+      card: null,
     };
   }
 
@@ -33,30 +33,30 @@ class Cards extends Component {
       isLoading: true,
     });
     API.getCards(cardNumber)
-      .then((cards) => {
+      .then((card) => {
         this.setState({
           isLoading: false,
           error: null,
-          cards,
+          card,
         });
       })
       .catch((error) => {
         this.setState({
           isLoading: false,
           error: error.message,
-          cards: null,
+          card: null,
         });
       });
   }
 
-  renderCards() {
-    const { cards } = this.state;
-    return JSON.stringify(cards);
+  renderCard() {
+    const { card } = this.state;
+    return JSON.stringify(card);
   }
 
   render() {
     const {
-      cardNumber, isLoading, error, cards,
+      cardNumber, isLoading, error, card,
     } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Карты">
@@ -76,7 +76,7 @@ class Cards extends Component {
         </Form>
         {isLoading && <Loading />}
         {error && <ErrorPanel title="Ошибка поиска" content={error} />}
-        {cards && this.renderCards()}
+        {card && this.renderCard()}
       </ViewBase>
     );
   }
