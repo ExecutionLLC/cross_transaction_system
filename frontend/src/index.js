@@ -6,6 +6,8 @@ import './index.css';
 import App from './App';
 import store from './store';
 
+import './style.css'; // глобальные стили для элементов бутстрапа
+
 /* global document */
 
 ReactDOM.render(
