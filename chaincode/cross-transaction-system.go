@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -146,6 +147,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.isWalletExists1(APIstub, functionArgs)
 	case "getProcessing":
 		return cts.getProcessing(APIstub, functionArgs)
+	case "getWallet":
+		return cts.getWallet(APIstub, functionArgs)
 	case "setServiceState":
 		return cts.setServiceState(APIstub, functionArgs)
 	case "setOperatorState":
@@ -154,6 +157,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.setExternalServiceState(APIstub, functionArgs)
 	case "getOperatorsList":
 		return cts.getOperatorsList(APIstub, functionArgs)
+	case "updateWalletBalance":
+		return cts.updateWalletBalance(APIstub, functionArgs)
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
@@ -683,7 +688,7 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 	for virtualBalanceIter.HasNext() {
 		virtualBalanceKV, err := virtualBalanceIter.Next()
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot read next virtual balance index value: %s", err))
+			return result, errors.New(fmt.Sprintf("Cannot read next virtual balance index value: %s", err))
 		}
 		virtualBalanceBytes := virtualBalanceKV.GetValue()
 		result.BalanceVirtualDiff += Float32frombytes(virtualBalanceBytes)
@@ -852,6 +857,80 @@ func (cts *CrossTransactionSystem) addWallet(APIstub shim.ChaincodeStubInterface
 
 	return shim.Success(nil)
 }
+
+func (cts *CrossTransactionSystem) getWallet(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 4 {
+		return shim.Error("Expected 4 parameter")
+	}
+
+	processingName := args[0]
+	walletID := args[1]
+	offsetString := args[2]
+	limitString := args[3]
+
+	offset, err := strconv.ParseUint(offsetString, 10, 32)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot parse offset: %s", err))
+	}
+	limit, err := strconv.ParseUint(limitString, 10, 32)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot parse limit: %s", err))
+	}
+
+	walletExtendedInfo, err := cts.getWalletExtendedInfo(APIstub, processingName, walletID, uint32(offset), uint32(limit))
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	result, err := json.Marshal(walletExtendedInfo)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot marshal wallet info: %s", err))
+	}
+
+	return shim.Success(result)
+}
+
+func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 3 {
+		return shim.Error("Expected 3 parameter")
+	}
+
+	processingName := args[0]
+	walletID := args[1]
+	balanceString := args[2]
+
+	balance, err := strconv.ParseFloat(balanceString, 32)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot parse balance: %s", err))
+	}
+
+	var walletInfo WalletInfo
+	err = GetItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, &walletInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	walletInfo.Balance = float32(balance)
+
+	err = PutItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, walletInfo)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
+}
+
+/*
+func (cts *CrossTransactionSystem) getProcessingStats(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 2 {
+		return shim.Error("Expected 2 parameter")
+	}
+
+	processingName := args[0]
+	dateString := args[1]
+
+	return shim.Success(result)
+}
+*/
 
 func main() {
 	err := shim.Start(&CrossTransactionSystem{})
