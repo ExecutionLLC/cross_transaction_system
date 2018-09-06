@@ -17,7 +17,7 @@ function OperatorsSelect(props) {
           key={operator._id}
           value={operator._id}
         >
-          {operator.name}
+          {`${operator.name}, ${operator.description}`}
         </option>
       ))}
     </FormControl>
