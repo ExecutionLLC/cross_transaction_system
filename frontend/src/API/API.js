@@ -229,7 +229,7 @@ function setOperatorActive(serviceId, operatorId, isActive) {
 
 function setExternalServiceState(operatorId, serviceId, isActive) {
   return request.put(
-    `${getBaseUrl()}processing/${authName}/externalServices/${operatorId}/${serviceId}`,
+    `${getBaseUrl()}processing/${getUserName()}/externalServices/${operatorId}/${serviceId}`,
     {
       headers: { ...getAuthHeader() },
       body: {
