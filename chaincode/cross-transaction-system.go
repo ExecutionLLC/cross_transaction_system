@@ -64,6 +64,23 @@ type ProcessingExtendedInfo struct {
 	ExternalServices []*ExternalServiceExtendedInfo `json:"externalServices"`
 }
 
+type WalletInfo struct {
+	ProcessingName string  `json:"processingName"`
+	ID             string  `json:"id"`
+	Balance        float32 `json:"balance"`
+}
+
+type Transaction struct {
+	ProcessingName        string  `json:"processingName"`
+	ServiceName           string  `json:"serviceName"`
+	OperatorName          string  `json:"operatorName"`
+	WalletID              string  `json:"walletId"`
+	Timestamp             int64   `json:"timestamp"`
+	ExternalTransactionID string  `json:"externalTransactionId"`
+	Amount                float32 `json:"amount"`
+	Comment               string  `json:"comment"`
+}
+
 const (
 	PROCESSING_INDX        = "processingName"
 	SERVICES_INDX          = "serviceProcessingName~serviceName"
@@ -379,7 +396,7 @@ func (cts *CrossTransactionSystem) getServices(APIstub shim.ChaincodeStubInterfa
 
 		var externalServiceInfo ExternalServiceInfo
 		externalServiceKeyArgs := []string{operatorInfo.ParentProcessingName, processingName, operatorInfo.ServiceName}
-		err = GetItemByCompositeKey(APIstub, OPERATORS_INDX, externalServiceKeyArgs, &externalServiceInfo)
+		err = GetItemByCompositeKey(APIstub, EXTERNAL_SERVICES_INDX, externalServiceKeyArgs, &externalServiceInfo)
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Cannot get external service: %s", err))
 		}
@@ -618,6 +635,21 @@ func (cts *CrossTransactionSystem) getOperatorsList(APIstub shim.ChaincodeStubIn
 	return shim.Success(resultAsBytes)
 }
 
+func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+
+	transactionAsString := args[0]
+
+	var transaction Transaction
+	err := json.Unmarshal([]byte(transactionAsString), &transaction)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot unmarshal transaction: %s", err))
+	}
+
+	return shim.Success(nil)
+}
 
 func main() {
 	err := shim.Start(&CrossTransactionSystem{})
