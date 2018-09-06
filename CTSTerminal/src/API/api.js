@@ -9,8 +9,8 @@ function enterWallet(walletId) {
   } else {
     req = fetchival('https://httpbin.org/status/500').get({ walletId });
   }
-  req
-    .then(json => console.log('qqq', json))
+  return req
+    .then(balance => ({ balance }))
     .catch(err => console.log('eee', err));
 }
 

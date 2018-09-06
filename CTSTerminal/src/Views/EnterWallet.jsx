@@ -22,6 +22,7 @@ class EnterWallet extends Component {
     super(props);
     this.state = {
       walletId: '',
+      balance: null,
       isLoading: false,
       error: null,
     };
@@ -34,7 +35,26 @@ class EnterWallet extends Component {
   }
 
   onSubmit() {
-    api.enterWallet(this.state.walletId);
+    this.setState({
+      isLoading: true,
+      balance: null,
+      error: null,
+    });
+    api.enterWallet(this.state.walletId)
+      .then(walletInfo => {
+        this.setState({
+          isLoading: false,
+          error: null,
+          balance: walletInfo.balance,
+        });
+      })
+      .catch(error => {
+        this.setState({
+          isLoading: false,
+          error,
+          balance: null,
+        });
+      });
   }
 
   render() {
@@ -42,6 +62,7 @@ class EnterWallet extends Component {
       walletId,
       isLoading,
       error,
+      balance,
     } = this.state;
     return (
       <Container>
@@ -65,9 +86,10 @@ class EnterWallet extends Component {
             {error && (
               <Text>
                 Error:
-                {error.message}
+                {`${error}`}
               </Text>
             )}
+            {balance != null && <Text>{`${balance}`}</Text>}
             {isLoading ? (
               <SmallSpinner />
             ) : (
