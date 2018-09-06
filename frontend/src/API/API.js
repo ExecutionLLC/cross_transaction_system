@@ -55,7 +55,7 @@ function getProfile(date) {
       return;
     }
     resolve({
-      _id: 4,
+      _id: '4',
       dateRange: [new Date('01/01/2017'), new Date()],
       ownServicesOwnCards: {
         count: 10,
@@ -73,167 +73,182 @@ function getProfile(date) {
   });
 }
 
-function getOperators() {
-  return TimeoutPromise(300, (resolve, reject) => {
-    if (Math.random() < 0.3) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get operators list'));
-      return;
-    }
-    resolve([
-      {
-        _id: 1,
-        name: 'Тройка',
-      },
-      {
-        _id: 2,
-        name: 'Умка',
-      },
-      {
-        _id: 3,
-        name: 'Червёрка',
-      },
-      {
-        _id: 4,
-        name: 'Хрумка',
-      },
-    ]);
-  });
+function getBaseUrl() {
+  return 'http://192.168.1.101:3001/';
 }
 
-let myServices = [
-  {
-    _id: 1,
-    name: 'Проезд',
-    description: 'Проезд в городском транспорте г. Рязань',
-    limits: {
-      minBalance: 50,
-      maxTransfer: 1500,
-    },
-    operators: [
-      {
-        id: 1,
-        startDate: +new Date('1 jan 2005'),
-        isActive: true,
+function getAccessToken() {
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDZiN2U3YjgtN2VmOS00NDcwLWE4NGUtYzIyMzc0ZmEyOTQxIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0KPQnNCa0JAifQ.TAj78PFZ1qBmbTOQ6qLQKRNI3bjwqz23VAvK1SgQKvA';
+}
+
+function getAuthHeader() {
+  return {
+    'X-Access-Token': getAccessToken(),
+  };
+}
+
+function getAuthName() {
+  return request.get(
+    `${getBaseUrl()}auth/`,
+    {
+      headers: {
+        ...getAuthHeader(),
       },
-    ],
-  },
-  {
-    _id: 2,
-    name: 'Кофе',
-    description: 'Кофейные автоматы в г. Рязань',
-    limits: {
-      minBalance: 100,
-      maxTransfer: 1000,
+      json: true,
     },
-    operators: [
-      {
-        id: 1,
-        startDate: +new Date('20 feb 2015'),
-        isActive: false,
-      },
-    ],
-  },
-];
+  )
+    .then(res => res.name);
+}
+
+function getProcessing() {
+  return getAuthName()
+    .then(name => (
+      request.get(
+        `${getBaseUrl()}processing/${name}`,
+        {
+          headers: {
+            ...getAuthHeader(),
+          },
+          json: true,
+        },
+      )
+    ));
+}
+
+function translateAPIOperators(apiOperators) {
+  return apiOperators.map(operator => ({
+    _id: operator.processingName,
+    name: operator.processingName,
+    startDate: +new Date('1 jan 2005'),
+    isActive: operator.isActive,
+  }));
+}
 
 function getMyServices() {
-  return TimeoutPromise(1000, (resolve, reject) => {
-    if (Math.random() < 0.3) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get my services'));
-      return;
-    }
-    resolve(myServices);
-  });
+  return getProcessing()
+    .then(processing => (
+      processing.services
+        .map(
+          service => ({
+            _id: service.serviceName,
+            name: service.serviceName,
+            description: service.description,
+            limits: {
+              minBalance: service.minBalanceLimit,
+              maxTransfer: service.maxPerDayLimit,
+            },
+            isActive: service.isActive,
+            operators: translateAPIOperators(service.operators || []),
+          }),
+        )
+        .sort((s1, s2) => s1.name > s2.name)
+    ));
+}
+
+function getOperators() {
+  return getAuthName()
+    .then(name => (
+      request.get(
+        `${getBaseUrl()}processing/${name}/operatorsList`,
+        {
+          headers: {
+            ...getAuthHeader(),
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(operators => operators.map(operator => ({
+      ...operator,
+      _id: operator.name,
+    })));
+}
+
+
+function getTransactionAndServices(result) {
+  const { transactionId } = result;
+  return getMyServices()
+    .then(services => ({
+      services,
+      transactionId,
+    }));
 }
 
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    if (myServices.find(s => s.name === name)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS, 'service exists'));
-      return;
-    }
-    if (!name || !description || description === '1') {
-      reject(new APIError(ERRORS.VALIDATION_FAILS, 'add service validation fails'));
-      return;
-    }
-    myServices = [
-      ...myServices,
-      {
-        _id: Math.random(),
-        name,
-        description,
-        limits: {
-          minBalance,
-          maxTransfer,
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.post(
+        `${getBaseUrl()}processing/${authName}/services`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            name,
+            description,
+            minBalanceLimit: minBalance,
+            maxPerDayLimit: maxTransfer,
+            isActive: true,
+          },
+          json: true,
         },
-        operators: [],
-      },
-    ];
-    resolve(myServices);
-  });
-}
-
-function updateMyService(index, newService) {
-  myServices = utils.immutableReplaceArrayItem(myServices, index, newService);
+      )
+    ))
+    .then(getTransactionAndServices);
 }
 
 function addOperator(serviceId, operatorId) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = utils.findIndexById(myServices, serviceId);
-    if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
-      return;
-    }
-    const service = myServices[serviceIndex];
-    const { operators } = service;
-    if (operators.find(o => o._id === operatorId)) {
-      reject(new APIError(ERRORS.ALREADY_EXISTS, 'operator exists'));
-      return;
-    }
-    const newOperator = {
-      id: operatorId,
-      startDate: +new Date(),
-      isActive: true,
-    };
-    const newOperators = [
-      ...operators,
-      newOperator,
-    ];
-    const newService = {
-      ...service,
-      operators: newOperators,
-    };
-    updateMyService(serviceIndex, newService);
-    resolve(myServices);
-  });
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.post(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            parentProcessingName: operatorId,
+            isActive: true,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getTransactionAndServices);
+}
+
+function setServiceActive(serviceId, isActive) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.put(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            isActive,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getTransactionAndServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    const serviceIndex = utils.findIndexById(myServices, serviceId);
-    if (serviceIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'service not found'));
-      return;
-    }
-    const service = myServices[serviceIndex];
-    const { operators } = service;
-    const operatorIndex = utils.findIndexById(operators, operatorId);
-    if (operatorIndex < 0) {
-      reject(new APIError(ERRORS.NOT_FOUND, 'operator not found'));
-      return;
-    }
-    const operator = operators[operatorIndex];
-    const newOperator = {
-      ...operator,
-      isActive,
-    };
-    const newOperators = utils.immutableReplaceArrayItem(operators, operatorIndex, newOperator);
-    const newService = {
-      ...service,
-      operators: newOperators,
-    };
-    updateMyService(serviceIndex, newService);
-    resolve(myServices);
-  });
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.put(
+        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators/${operatorId}`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            isActive,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getTransactionAndServices);
 }
 
 
@@ -243,6 +258,7 @@ export default {
   getOperators,
   getMyServices,
   addService,
+  setServiceActive,
   addOperator,
   setOperatorActive,
   ERRORS,
