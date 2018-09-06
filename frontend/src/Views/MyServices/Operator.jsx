@@ -49,9 +49,7 @@ function Operator(props) {
           {startDate}
         </Col>
         <Col sm={4}>
-          {'ВНЕШНИЙ СЕРВИС АКТИВЕН {'}
-          {externalServiceIsActive}
-          {'}'}
+          {`ВНЕШНИЙ СЕРВИС АКТИВЕН: ${externalServiceIsActive ? 'ДА' : 'НЕТ'}`}
         </Col>
         <Col sm={4}>
           {renderSwitch()}

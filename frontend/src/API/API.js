@@ -81,6 +81,7 @@ function translateAPIOperators(apiOperators) {
     name: operator.processingName,
     startDate: +new Date('1 jan 2005'),
     isActive: operator.isActive,
+    externalServiceIsActive: operator.externalServiceIsActive,
   }));
 }
 
@@ -96,7 +97,6 @@ function translateMyServices(apiServices) {
           maxTransfer: service.maxPerDayLimit,
         },
         isActive: service.isActive,
-        externalServiceIsActive: service.externalServiceIsActive,
         operators: translateAPIOperators(service.operators || []),
       }),
     )
