@@ -27,7 +27,7 @@ class ExpandableListItem extends Component {
     return (
       <Panel
         expanded={isExpanded}
-        bsStyle="success"
+        bsStyle={status ? 'success' : 'default' }
       >
         <Panel.Heading onClick={this.onExpandToggle}>
           <div style={{ margin: '5px 5px' }}>
