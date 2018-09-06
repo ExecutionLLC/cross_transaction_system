@@ -682,6 +682,9 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 
 	for virtualBalanceIter.HasNext() {
 		virtualBalanceKV, err := virtualBalanceIter.Next()
+		if err != nil {
+			return shim.Error(fmt.Sprintf("Cannot read next virtual balance index value: %s", err))
+		}
 		virtualBalanceBytes := virtualBalanceKV.GetValue()
 		result.BalanceVirtualDiff += Float32frombytes(virtualBalanceBytes)
 	}
