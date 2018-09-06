@@ -9,10 +9,12 @@ import {
 
 class TokenFileControl extends Component {
   onFile(file, input) {
+    // eslint-disable-next-line no-param-reassign
     input.value = '';
     const reader = new FileReader();
     reader.onload = () => {
       const contents = reader.result;
+      // eslint-disable-next-line react/destructuring-assignment,react/prop-types
       this.props.onText(contents);
     };
     reader.readAsText(file);

@@ -1,6 +1,6 @@
-import { userConstants } from '../constants/user_constants';
-import { userService } from '../API/user_service';
-import { history } from '../API/history';
+import userConstants from '../constants/user_constants';
+import userService from '../API/user_service';
+import history from '../API/history';
 
 
 function login(token) {
