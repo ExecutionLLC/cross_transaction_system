@@ -18,7 +18,6 @@ class MyServices extends Component {
     this.state = {
       isLoading: false,
       loadingError: null,
-      // addindOperatorToService: null, TODO uncomment and handle
       operators: null,
       operatorsHash: null,
       myServices: null,
