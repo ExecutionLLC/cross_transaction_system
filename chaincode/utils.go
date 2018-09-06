@@ -108,14 +108,14 @@ func Float32frombytes(bytes []byte) float32 {
 	return float
 }
 
-func Float32bytes(float float64) []byte {
-	bits := math.Float64bits(float)
+func Float32bytes(float float32) []byte {
+	bits := math.Float32bits(float)
 	bytes := make([]byte, 4)
 	binary.LittleEndian.PutUint32(bytes, bits)
 	return bytes
 }
 
-func TimestampToDateAndTimeStrings(timestamp int64) (date string, time string) {
+func TimestampToDateAndTimeStrings(timestamp int64) (string, string) {
 	timestampSec := timestamp / 1000
 	unixTime := time.Unix(timestampSec, 0)
 	return unixTime.Format("2006-01-02"), unixTime.Format("15:04:05")

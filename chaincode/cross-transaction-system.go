@@ -130,8 +130,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.addService(APIstub, functionArgs)
 	case "addOperator":
 		return cts.addOperator(APIstub, functionArgs)
-		//	case "addWallet":
-		//		return cts.addWallet(APIstub, functionArgs)
+	case "addWallet":
+		return cts.addWallet(APIstub, functionArgs)
 	case "addTransaction":
 		return cts.addTransaction(APIstub, functionArgs)
 	case "isProcessingExists":
@@ -142,6 +142,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.isOperatorExists1(APIstub, functionArgs)
 	case "isExternalServiceExists":
 		return cts.isExternalServiceExists1(APIstub, functionArgs)
+	case "isWalletExists":
+		return cts.isWalletExists1(APIstub, functionArgs)
 	case "getProcessing":
 		return cts.getProcessing(APIstub, functionArgs)
 	case "setServiceState":
@@ -227,6 +229,25 @@ func (cts *CrossTransactionSystem) isExternalServiceExists1(APIstub shim.Chainco
 	processingName := args[2]
 
 	isExists, err := cts.isExternalServiceExists0(APIstub, serviceProcessingName, serviceName, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return BoolToResponse(isExists)
+}
+
+func (cts *CrossTransactionSystem) isWalletExists0(APIstub shim.ChaincodeStubInterface, processingName string, walletID string) (bool, error) {
+	return CheckItemExistanceByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID})
+}
+
+func (cts *CrossTransactionSystem) isWalletExists1(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 2 {
+		return shim.Error("Expected 2 parameters")
+	}
+	processingName := args[0]
+	walletID := args[1]
+
+	isExists, err := cts.isWalletExists0(APIstub, processingName, walletID)
 	if err != nil {
 		return shim.Error(err.Error())
 	}
@@ -648,14 +669,14 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 	if err != nil {
 		return result, errors.New(fmt.Sprintf("Cannot get wallet: %s", err))
 	}
-	result.WalletID = walletInfo.WalletID
+	result.ID = walletInfo.ID
 	result.Balance = walletInfo.Balance
 	result.BalanceVirtualDiff = 0
 	result.Transactions = make([]*Transaction, 0)
 
 	virtualBalanceIter, err := APIstub.GetStateByPartialCompositeKey(WALLET_VIRTUAL_BALANCE_INDX, []string{processingName, walletID})
 	if err != nil {
-		return shim.Error(fmt.Sprintf("Cannot get virtual balance index: %s", err))
+		return result, errors.New(fmt.Sprintf("Cannot get virtual balance index: %s", err))
 	}
 	defer virtualBalanceIter.Close()
 
@@ -668,29 +689,34 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 	if limit != 0 {
 		transactionsIter, err := APIstub.GetStateByPartialCompositeKey(WALLET_TRANSACTIONS_INDX, []string{processingName, walletID})
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot get virtual balance index: %s", err))
+			return result, errors.New(fmt.Sprintf("Cannot get virtual balance index: %s", err))
 		}
 		defer transactionsIter.Close()
 
+		var position uint32
+		position = 0
 		for transactionsIter.HasNext() {
 			transactionKV, err := transactionsIter.Next()
-			if position < offset {
+
+			position += 1
+			if position <= offset {
 				continue
 			}
+
 			key := transactionKV.GetKey()
-			_, keyParts, err := SplitCompositeKey(key)
+			_, keyParts, err := APIstub.SplitCompositeKey(key)
 			if err != nil {
 				return result, errors.New(fmt.Sprintf("Cannot split composite key: %s", err))
 			}
 			transactionID := keyParts[4]
 
 			var transaction Transaction
-			err := GetItemByCompositeKey(APIstub, TRANSACTIONS_INDX, []string{transactionID}, &transaction)
+			err = GetItemByCompositeKey(APIstub, TRANSACTIONS_INDX, []string{transactionID}, &transaction)
 			if err != nil {
 				return result, errors.New(fmt.Sprintf("Cannot get transaction: %s", err))
 			}
-			result.Transactions = append(result.Transactions, transaction)
-			if len(result.Transactions) >= limit {
+			result.Transactions = append(result.Transactions, &transaction)
+			if uint32(len(result.Transactions)) >= limit {
 				break
 			}
 		}
@@ -715,9 +741,10 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 	processingName := transaction.OperatorName
 	serviceProcessingName := transaction.ProcessingName
 	serviceName := transaction.ServiceName
-	dateString, timeString := TimestampToDateAndTimeStrings(transaction.timestamp)
+	dateString, timeString := TimestampToDateAndTimeStrings(transaction.Timestamp)
 	transactionID := APIstub.GetTxID()
 	amountAsBytes := Float32bytes(transaction.Amount)
+	walletID := transaction.WalletID
 
 	transaction.ID = transactionID
 
@@ -743,44 +770,81 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 			return shim.Error("Transaction blocked (service, operator and external service must be active)")
 		}
 
-		walletExtendedInfo, err := getWalletExtendedInfo(APIstub, serviceProcessingName, transaction.WalletID, 0, 0)
+		walletExtendedInfo, err := cts.getWalletExtendedInfo(APIstub, serviceProcessingName, walletID, 0, 0)
 		if err != nil {
 			return shim.Error(err.Error())
 		}
 		currentBalance := walletExtendedInfo.Balance
-		currentBalance += BalanceVirtualDiff
+		currentBalance += walletExtendedInfo.BalanceVirtualDiff
 		if currentBalance < serviceInfo.MinBalanceLimit {
 			return shim.Error("Transaction blocked (currentBalance < MinBalanceLimit)")
 		}
 
-		err := APIstub.PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, transactionID}, amountAsBytes)
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot put virtual balance: %s", err))
 		}
 
-		err := APIstub.PutStateByCompositeKey(APIstub, SRC_DST_TRANSACTIONS_INDX, []string{processingName, serviceProcessingName, dateString, timeString, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, SRC_DST_TRANSACTIONS_INDX, []string{processingName, serviceProcessingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot update src dst transactions index: %s", err))
 		}
-		err := APIstub.PutStateByCompositeKey(APIstub, DST_SRC_TRANSACTIONS_INDX, []string{serviceProcessingName, processingName, dateString, timeString, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, DST_SRC_TRANSACTIONS_INDX, []string{serviceProcessingName, processingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot update dst src transactions index: %s", err))
 		}
 	} else {
-		err := APIstub.PutStateByCompositeKey(APIstub, INTERNAL_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, INTERNAL_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
 			return shim.Error(fmt.Sprintf("Cannot update internal transactions index: %s", err))
 		}
 	}
 
-	err := APIstub.PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, nil)
+	err = PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, nil)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot update wallet transactions index: %s", err))
 	}
 
-	err = PutItemByCompositeKey(TRANSACTIONS_INDX, []string{transactionID}, transaction)
+	err = PutItemByCompositeKey(APIstub, TRANSACTIONS_INDX, []string{transactionID}, transaction)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot put transaction info: %s", err))
+	}
+
+	return shim.Success(nil)
+}
+
+func (cts *CrossTransactionSystem) addWallet(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+
+	walletAsString := args[0]
+	var walletInfo WalletInfo
+	err := json.Unmarshal([]byte(walletAsString), &walletInfo)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot unmarshal wallet: %s", err))
+	}
+	processingName := walletInfo.ProcessingName
+	walletID := walletInfo.ID
+
+	isExists, err := cts.isProcessingExists0(APIstub, processingName)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	if !isExists {
+		return shim.Error("Processing does not exist")
+	}
+	isExists, err = cts.isWalletExists0(APIstub, processingName, walletID)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	if isExists {
+		return shim.Error("Wallet already exists")
+	}
+
+	err = PutItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, walletInfo)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot put wallet: %s", err))
 	}
 
 	return shim.Success(nil)
