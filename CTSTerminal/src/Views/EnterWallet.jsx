@@ -14,6 +14,7 @@ import {
   Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
+import api from '../API/api';
 
 
 class EnterWallet extends Component {
@@ -33,7 +34,7 @@ class EnterWallet extends Component {
   }
 
   onSubmit() {
-
+    api.enterWallet(this.state.walletId);
   }
 
   render() {
