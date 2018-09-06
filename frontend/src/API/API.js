@@ -60,6 +60,7 @@ function getBaseUrl() {
 }
 
 function getAccessToken() {
+  //return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDUxMGNlNzEtY2U5NS00NTZkLWI1YjUtNGQwZjljYzY5ZmJiIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0JrQvtGE0LXQvNCw0L0ifQ.Ec3JzmSGaeBkps4uolaOpxgslvyhpL6iiT8QRsFNlW8';
   return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDZiN2U3YjgtN2VmOS00NDcwLWE4NGUtYzIyMzc0ZmEyOTQxIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0KPQnNCa0JAifQ.TAj78PFZ1qBmbTOQ6qLQKRNI3bjwqz23VAvK1SgQKvA';
 }
 
@@ -106,25 +107,51 @@ function translateAPIOperators(apiOperators) {
   }));
 }
 
+function translateMyServices(apiServices) {
+  return apiServices
+    .map(
+      service => ({
+        _id: service.serviceName,
+        name: service.serviceName,
+        description: service.description,
+        limits: {
+          minBalance: service.minBalanceLimit,
+          maxTransfer: service.maxPerDayLimit,
+        },
+        isActive: service.isActive,
+        operators: translateAPIOperators(service.operators || []),
+      }),
+    )
+    .sort((s1, s2) => s1.name > s2.name);
+}
+
+function translateExternalServices(apiServices) {
+  return apiServices
+    .map(
+      service => ({
+        _id: JSON.stringify([service.serviceProcessingName, service.serviceName]),
+        processingName: service.serviceProcessingName,
+        processingDescription: service.serviceDescription,
+        name: service.serviceName,
+        serviceLimits: {
+          minBalance: service.serviceMinBalanceLimit,
+          maxTransfer: service.serviceMaxPerDayLimit,
+        },
+        processingIsAllowed: service.serviceIsActive,
+        serviceIsActive: service.isActive,
+      }),
+    )
+    .sort((s1, s2) => `${s1.processingName}${s1.name}` > `${s2.processingName}${s2.name}`);
+}
+
 function getMyServices() {
   return getProcessing()
-    .then(processing => (
-      processing.services
-        .map(
-          service => ({
-            _id: service.serviceName,
-            name: service.serviceName,
-            description: service.description,
-            limits: {
-              minBalance: service.minBalanceLimit,
-              maxTransfer: service.maxPerDayLimit,
-            },
-            isActive: service.isActive,
-            operators: translateAPIOperators(service.operators || []),
-          }),
-        )
-        .sort((s1, s2) => s1.name > s2.name)
-    ));
+    .then(processing => translateMyServices(processing.services));
+}
+
+function getExternalServices() {
+  return getProcessing()
+    .then(processing => translateExternalServices(processing.externalServices));
 }
 
 function getOperators() {
@@ -147,9 +174,18 @@ function getOperators() {
 }
 
 
-function getTransactionAndServices(result) {
+function getTransactionAndMyServices(result) {
   const { transactionId } = result;
   return getMyServices()
+    .then(services => ({
+      services,
+      transactionId,
+    }));
+}
+
+function getTransactionAndExternalServices(result) {
+  const { transactionId } = result;
+  return getExternalServices()
     .then(services => ({
       services,
       transactionId,
@@ -175,7 +211,7 @@ function addService({ name, description, limits: { minBalance, maxTransfer } }) 
         },
       )
     ))
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function addOperator(serviceId, operatorId) {
@@ -194,7 +230,7 @@ function addOperator(serviceId, operatorId) {
         },
       )
     ))
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function setServiceActive(serviceId, isActive) {
@@ -212,7 +248,7 @@ function setServiceActive(serviceId, isActive) {
         },
       )
     ))
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
@@ -230,7 +266,26 @@ function setOperatorActive(serviceId, operatorId, isActive) {
         },
       )
     ))
-    .then(getTransactionAndServices);
+    .then(getTransactionAndMyServices);
+}
+
+function setExternalServiceState(operatorId, serviceId, isActive) {
+  return Promise.resolve()
+    .then(getAuthName)
+    .then(authName => (
+      request.put(
+        `${getBaseUrl()}processing/${authName}/externalServices/${operatorId}/${serviceId}`,
+        {
+          headers: { ...getAuthHeader() },
+          body: {
+            isActive,
+          },
+          json: true,
+        },
+      )
+    ))
+    .then(getTransactionAndExternalServices);
+
 }
 
 
@@ -238,9 +293,11 @@ export default {
   getProfile,
   getOperators,
   getMyServices,
+  getExternalServices,
   addService,
   setServiceActive,
   addOperator,
   setOperatorActive,
+  setExternalServiceState,
   ERRORS,
 };
