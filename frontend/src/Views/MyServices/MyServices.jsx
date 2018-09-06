@@ -168,9 +168,10 @@ class MyServices extends Component {
             onExpandToggle={expanded => (
               this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
             )}
-            onActivateToggleResult={oepratorToggleResult => (
-              this.onToggleServiceOperatorActiveResult(oepratorToggleResult)
+            onActivateToggleResult={operatorToggleResult => (
+              this.onToggleServiceOperatorActiveResult(operatorToggleResult)
             )}
+            externalServiceIsActive={operator.externalServiceIsActive}
           />
         );
       },
@@ -186,17 +187,13 @@ class MyServices extends Component {
     return (
       <div>
         <Row>
-          <Col sm={6}>
+          <Col sm={10}>
+            {'Описание: '}
             {service.description}
           </Col>
-          <Col sm={6}>
-            <ToggleActive
-              isActive={service.isActive}
-              serviceId={service._id}
-              onSwitchResult={switchResult => this.onToggleServiceActiveResult(switchResult)}
-            />
-          </Col>
+
         </Row>
+
         <Row>
           <Col sm={3}>
             Минимальный баланс
@@ -204,6 +201,9 @@ class MyServices extends Component {
           <Col sm={3}>
             {service.limits.minBalance}
           </Col>
+        </Row>
+
+        <Row>
           <Col sm={3}>
             Максимальное движение
           </Col>
@@ -211,6 +211,17 @@ class MyServices extends Component {
             {service.limits.maxTransfer}
           </Col>
         </Row>
+
+        <Row>
+          <Col sm={12}>
+            <ToggleActive
+              isActive={service.isActive}
+              serviceId={service._id}
+              onSwitchResult={switchResult => this.onToggleServiceActiveResult(switchResult)}
+            />
+          </Col>
+        </Row>
+
         <Row>
           <Col sm={12}>
             {operatorsToAdd.length > 0
@@ -242,7 +253,7 @@ class MyServices extends Component {
     return (
       <ExpandableListItem
         key={id}
-        header={service.name}
+        header={`Сервис: ${service.name}`}
         content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
         onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}

@@ -96,6 +96,7 @@ function translateMyServices(apiServices) {
           maxTransfer: service.maxPerDayLimit,
         },
         isActive: service.isActive,
+        externalServiceIsActive: service.externalServiceIsActive,
         operators: translateAPIOperators(service.operators || []),
       }),
     )

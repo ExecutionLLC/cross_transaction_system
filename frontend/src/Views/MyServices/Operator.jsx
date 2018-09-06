@@ -12,6 +12,7 @@ function Operator(props) {
   const {
     serviceId, operatorId,
     isExpanded,
+    externalServiceIsActive,
     name, startDate, isActive,
     onActivateToggleResult, onExpandToggle,
   } = props;
@@ -43,11 +44,16 @@ function Operator(props) {
   const content = (
     <Grid>
       <Row>
-        <Col sm={6}>
+        <Col sm={4}>
           {'Подключен с '}
           {startDate}
         </Col>
-        <Col sm={6}>
+        <Col sm={4}>
+          {'ВНЕШНИЙ СЕРВИС АКТИВЕН {'}
+          {externalServiceIsActive}
+          {'}'}
+        </Col>
+        <Col sm={4}>
           {renderSwitch()}
         </Col>
       </Row>
@@ -73,6 +79,7 @@ Operator.propTypes = {
   isActive: PropTypes.bool.isRequired,
   onExpandToggle: PropTypes.func.isRequired,
   onActivateToggleResult: PropTypes.func.isRequired,
+  externalServiceIsActive: PropTypes.bool.isRequired,
 };
 
 Operator.defaultProps = {
