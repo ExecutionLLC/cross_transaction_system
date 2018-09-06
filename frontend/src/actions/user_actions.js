@@ -14,7 +14,10 @@ function login(token) {
     userService.login(token)
       .then(
         (user) => {
-          dispatch(success(user));
+          dispatch(success({
+            ...user,
+            token,
+          }));
           // eslint-disable-next-line no-restricted-globals
           history.push('/profile');
         },

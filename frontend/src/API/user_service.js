@@ -15,13 +15,15 @@ function login(token) {
       json: true,
     },
   )
-    // .then(handleResponse)
     .then((user) => {
       // login successful if there's a jwt token in the response
       if (user.name) {
         // store user details and jwt token in local storage to
         // keep user logged in between page refreshes
-        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('user', JSON.stringify({
+          ...user,
+          token,
+        }));
       }
       return user;
     });

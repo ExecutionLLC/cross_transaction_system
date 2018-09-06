@@ -1,7 +1,9 @@
 import request from 'request-promise';
-import utils from '../utils/utils';
 import config from '../config';
-import { getAuthHeader } from './auth_header';
+import {
+  getAuthHeader,
+  getUserName,
+} from './auth_header';
 
 
 class APIError extends Error {
@@ -36,18 +38,6 @@ function getBaseUrl() {
   return config.API_BASE_URL;
 }
 
-function auth(token) {
-  return request.get(
-    `${getBaseUrl()}auth`,
-    {
-      headers: {
-        'X-Access-Token': token,
-      },
-      json: true,
-    },
-  );
-}
-
 function getProfile(date) {
   return TimeoutPromise(500, (resolve, reject) => {
     if (Math.random() < 0.5) {
@@ -73,32 +63,16 @@ function getProfile(date) {
   });
 }
 
-function getAuthName() {
+function getProcessing() {
   return request.get(
-    `${getBaseUrl()}auth/`,
+    `${getBaseUrl()}processing/${getUserName()}`,
     {
       headers: {
         ...getAuthHeader(),
       },
       json: true,
     },
-  )
-    .then(res => res.name);
-}
-
-function getProcessing() {
-  return getAuthName()
-    .then(name => (
-      request.get(
-        `${getBaseUrl()}processing/${name}`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-          json: true,
-        },
-      )
-    ));
+  );
 }
 
 function translateAPIOperators(apiOperators) {
@@ -132,18 +106,15 @@ function getMyServices() {
 }
 
 function getOperators() {
-  return getAuthName()
-    .then(name => (
-      request.get(
-        `${getBaseUrl()}processing/${name}/operatorsList`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.get(
+    `${getBaseUrl()}processing/${getUserName()}/operatorsList`,
+    {
+      headers: {
+        ...getAuthHeader(),
+      },
+      json: true,
+    },
+  )
     .then(operators => operators.map(operator => ({
       ...operator,
       _id: operator.name,
@@ -161,85 +132,68 @@ function getTransactionAndServices(result) {
 }
 
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.post(
-        `${getBaseUrl()}processing/${authName}/services`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            name,
-            description,
-            minBalanceLimit: minBalance,
-            maxPerDayLimit: maxTransfer,
-            isActive: true,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.post(
+    `${getBaseUrl()}processing/${getUserName()}/services`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        name,
+        description,
+        minBalanceLimit: minBalance,
+        maxPerDayLimit: maxTransfer,
+        isActive: true,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndServices);
 }
 
 function addOperator(serviceId, operatorId) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.post(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            parentProcessingName: operatorId,
-            isActive: true,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.post(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}/operators`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        parentProcessingName: operatorId,
+        isActive: true,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndServices);
 }
 
 function setServiceActive(serviceId, isActive) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.put(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            isActive,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.put(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators/${operatorId}`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            isActive,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}/operators/${operatorId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndServices);
 }
 
 
 export default {
-  auth,
   getProfile,
   getOperators,
   getMyServices,
