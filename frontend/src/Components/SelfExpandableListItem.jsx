@@ -25,7 +25,7 @@ class SelfExpandableListItem extends Component {
         header={header}
         content={content}
         isExpanded={isExpanded}
-        onExpandToggle={(expanded) => this.onToggleExpanded(expanded)}
+        onExpandToggle={expanded => this.onToggleExpanded(expanded)}
       />
     );
   }
