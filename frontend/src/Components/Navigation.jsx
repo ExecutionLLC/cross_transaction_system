@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Nav, Navbar, NavItem } from 'react-bootstrap';
+import { Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { getUserName } from '../API/auth_header';
 
 
 function Navigation(props) {
@@ -35,6 +36,11 @@ function Navigation(props) {
             {tab.title}
           </NavItem>
         ))}
+      </Nav>
+      <Nav pullRight>
+        <NavDropdown title={getUserName()} id="basic-nav-dropdown">
+          <MenuItem href="/login">Logout</MenuItem>
+        </NavDropdown>
       </Nav>
     </Navbar>
   );

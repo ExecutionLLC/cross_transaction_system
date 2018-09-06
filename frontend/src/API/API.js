@@ -1,4 +1,9 @@
 import request from 'request-promise';
+import config from '../config';
+import {
+  getAuthHeader,
+  getUserName,
+} from './auth_header';
 
 
 class APIError extends Error {
@@ -29,6 +34,9 @@ function TimeoutPromise(time, f) {
   });
 }
 
+function getBaseUrl() {
+  return config.API_BASE_URL;
+}
 
 function getProfile(date) {
   return TimeoutPromise(500, (resolve, reject) => {
@@ -55,47 +63,16 @@ function getProfile(date) {
   });
 }
 
-function getBaseUrl() {
-  return 'http://192.168.1.101:3001/';
-}
-
-function getAccessToken() {
-  //return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDUxMGNlNzEtY2U5NS00NTZkLWI1YjUtNGQwZjljYzY5ZmJiIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0JrQvtGE0LXQvNCw0L0ifQ.Ec3JzmSGaeBkps4uolaOpxgslvyhpL6iiT8QRsFNlW8';
-  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1dWlkIjoiZDZiN2U3YjgtN2VmOS00NDcwLWE4NGUtYzIyMzc0ZmEyOTQxIiwidHlwZSI6IlBST0NFU1NJTkciLCJuYW1lIjoi0KPQnNCa0JAifQ.TAj78PFZ1qBmbTOQ6qLQKRNI3bjwqz23VAvK1SgQKvA';
-}
-
-function getAuthHeader() {
-  return {
-    'X-Access-Token': getAccessToken(),
-  };
-}
-
-function getAuthName() {
+function getProcessing() {
   return request.get(
-    `${getBaseUrl()}auth/`,
+    `${getBaseUrl()}processing/${getUserName()}`,
     {
       headers: {
         ...getAuthHeader(),
       },
       json: true,
     },
-  )
-    .then(res => res.name);
-}
-
-function getProcessing() {
-  return getAuthName()
-    .then(name => (
-      request.get(
-        `${getBaseUrl()}processing/${name}`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-          json: true,
-        },
-      )
-    ));
+  );
 }
 
 function translateAPIOperators(apiOperators) {
@@ -155,18 +132,15 @@ function getExternalServices() {
 }
 
 function getOperators() {
-  return getAuthName()
-    .then(name => (
-      request.get(
-        `${getBaseUrl()}processing/${name}/operatorsList`,
-        {
-          headers: {
-            ...getAuthHeader(),
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.get(
+    `${getBaseUrl()}processing/${getUserName()}/operatorsList`,
+    {
+      headers: {
+        ...getAuthHeader(),
+      },
+      json: true,
+    },
+  )
     .then(operators => operators.map(operator => ({
       ...operator,
       _id: operator.name,
@@ -193,97 +167,77 @@ function getTransactionAndExternalServices(result) {
 }
 
 function addService({ name, description, limits: { minBalance, maxTransfer } }) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.post(
-        `${getBaseUrl()}processing/${authName}/services`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            name,
-            description,
-            minBalanceLimit: minBalance,
-            maxPerDayLimit: maxTransfer,
-            isActive: true,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.post(
+    `${getBaseUrl()}processing/${getUserName()}/services`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        name,
+        description,
+        minBalanceLimit: minBalance,
+        maxPerDayLimit: maxTransfer,
+        isActive: true,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndMyServices);
 }
 
 function addOperator(serviceId, operatorId) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.post(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            parentProcessingName: operatorId,
-            isActive: true,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.post(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}/operators`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        parentProcessingName: operatorId,
+        isActive: true,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndMyServices);
 }
 
 function setServiceActive(serviceId, isActive) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.put(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            isActive,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndMyServices);
 }
 
 function setOperatorActive(serviceId, operatorId, isActive) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.put(
-        `${getBaseUrl()}processing/${authName}/services/${serviceId}/operators/${operatorId}`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            isActive,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/services/${serviceId}/operators/${operatorId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndMyServices);
 }
 
 function setExternalServiceState(operatorId, serviceId, isActive) {
-  return Promise.resolve()
-    .then(getAuthName)
-    .then(authName => (
-      request.put(
-        `${getBaseUrl()}processing/${authName}/externalServices/${operatorId}/${serviceId}`,
-        {
-          headers: { ...getAuthHeader() },
-          body: {
-            isActive,
-          },
-          json: true,
-        },
-      )
-    ))
+  return request.put(
+    `${getBaseUrl()}processing/${getUserName()}/externalServices/${operatorId}/${serviceId}`,
+    {
+      headers: { ...getAuthHeader() },
+      body: {
+        isActive,
+      },
+      json: true,
+    },
+  )
     .then(getTransactionAndExternalServices);
 }
 

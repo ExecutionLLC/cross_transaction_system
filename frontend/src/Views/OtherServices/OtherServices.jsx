@@ -160,7 +160,6 @@ class OtherServices extends Component {
   }
 
   render() {
-    console.log('render', this.state);
     const {
       isLoading, loadingError, otherServices,
       lastSuccessTransaction,
