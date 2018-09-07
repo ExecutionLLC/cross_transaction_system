@@ -56,7 +56,17 @@ class Cards extends Component {
       return (
         <Row>
           <Col sm={2}>
-            {`${new Date(transaction.timestamp)}`}
+            {new Date(transaction.timestamp)
+              .toLocaleDateString(
+                'ru-RU',
+                {
+                  /* eslint-disable object-property-newline */
+                  year: 'numeric', month: 'long', day: 'numeric',
+                  hour: 'numeric', minute: 'numeric',
+                  /* eslint-enable object-property-newline */
+                },
+              )
+            }
           </Col>
           <Col sm={2}>
             {transaction.comment}
