@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image } from 'react-native';
+import { Text, Image, View } from 'react-native';
 import {
   Container,
   Header,
@@ -62,26 +62,25 @@ class EnterWallet extends Component {
   }
 
   renderGood(good) {
-    console.log(good);
     return (
       <Card
         key={good.name}
       >
-        <CardItem header>
-          <Text>
-          {`${good.name} - ${good.cost} руб.`}
-          </Text>
-        </CardItem>
-        <CardItem>
-          <Body>
-            <Image source={good.image} style={{height: 150, width: 200, flex: 1}} />
-          </Body>
-        </CardItem>
-        <CardItem footer button onPress={() => this.onBuy(good.name)}>
-          <Text>
-            Купить
-          </Text>
-        </CardItem>
+        <View style={{flex: 1, flexDirection: 'row'}}>
+          <View style={{width: '60%'}}>
+            {<Image source={good.image} style={{width: '100%', flex: 1}} />}
+          </View>
+          <View style={{width: '40%'}}>
+            <Text>
+            {`${good.name} - ${good.cost} руб.`}
+            </Text>
+            <Button style={{width: '100%'}}>
+              <Text>
+                Купить
+              </Text>
+            </Button>
+          </View>
+        </View>
       </Card>
     );
   }
