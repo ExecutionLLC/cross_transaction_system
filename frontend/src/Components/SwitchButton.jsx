@@ -1,6 +1,7 @@
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, Glyphicon, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Loading from './Loading';
 
 
@@ -34,29 +35,52 @@ class SwitchButton extends Component {
       });
   }
 
-  render() {
+  renderButton() {
     const {
       isActive,
       activeButtonText, inactiveButtonText,
+    } = this.props;
+    const { isLoading } = this.state;
+    return (
+      <Button
+        onClick={() => this.onClick()}
+        disabled={isLoading}
+      >
+        <Glyphicon
+          glyph={isActive ? 'stop' : 'play'}
+          style={{ paddingRight: '10px', color: isActive ? 'red' : 'green' }}
+        />
+        {isActive ? activeButtonText : inactiveButtonText}
+      </Button>
+    );
+  }
+
+  render() {
+    const {
+      isActive,
       activeStatusText, inactiveStatusText,
+      activeToolTipText, inactiveToolTipText,
     } = this.props;
     const { isLoading, errorText } = this.state;
+    const toolTipText = isActive ? activeToolTipText : inactiveToolTipText;
     return (
       <Row>
-        <Col sm={3}>
+        <Col sm={6}>
           {isLoading
-            ? <Loading />
-            : (
-              <Button
-                onClick={() => this.onClick()}
-                disabled={isLoading}
+            ? (<Loading />)
+            : (toolTipText ? (
+              <OverlayTrigger
+                placement="top"
+                overlay={(<Tooltip id="tooltip">{toolTipText}</Tooltip>)}
               >
-                {isActive ? activeButtonText : inactiveButtonText}
-              </Button>
-            )
+                {this.renderButton()}
+              </OverlayTrigger>
+            ) : (
+              this.renderButton()
+            ))
           }
         </Col>
-        <Col sm={9}>
+        <Col sm={6}>
           {errorText || (isActive ? activeStatusText : inactiveStatusText)}
         </Col>
       </Row>
@@ -71,6 +95,8 @@ SwitchButton.propTypes = {
   activeStatusText: PropTypes.string.isRequired,
   inactiveStatusText: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  activeToolTipText: PropTypes.string.isRequired,
+  inactiveToolTipText: PropTypes.string.isRequired,
 };
 
 

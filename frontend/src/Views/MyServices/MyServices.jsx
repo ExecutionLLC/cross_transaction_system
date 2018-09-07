@@ -163,14 +163,15 @@ class MyServices extends Component {
             operatorId={operatorId}
             name={operatorsHash[operatorId].name}
             isActive={operator.isActive}
-            startDate={`${new Date(operator.startDate)}`}
+            startDate={`${(new Date(operator.startDate)).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })}`}
             isExpanded={expandedHash[operatorId]}
             onExpandToggle={expanded => (
               this.onExpandServiceOperatorToggle(serviceId, operatorId, expanded)
             )}
-            onActivateToggleResult={oepratorToggleResult => (
-              this.onToggleServiceOperatorActiveResult(oepratorToggleResult)
+            onActivateToggleResult={operatorToggleResult => (
+              this.onToggleServiceOperatorActiveResult(operatorToggleResult)
             )}
+            externalServiceIsActive={operator.externalServiceIsActive}
           />
         );
       },
@@ -185,11 +186,37 @@ class MyServices extends Component {
     );
     return (
       <div>
-        <Row>
-          <Col sm={6}>
-            {service.description}
+        <Row style={{ marginBottom: '20px' }}>
+          <Col sm={8}>
+            <Row>
+              <Col sm={6}>
+                Описание:
+              </Col>
+              <Col sm={6}>
+                {service.description}
+              </Col>
+            </Row>
+
+            <Row>
+              <Col sm={6}>
+                Минимальный баланс:
+              </Col>
+              <Col sm={6}>
+                {service.limits.minBalance}
+              </Col>
+            </Row>
+
+            <Row>
+              <Col sm={6}>
+                Максимальное движение:
+              </Col>
+              <Col sm={6}>
+                {service.limits.maxTransfer}
+              </Col>
+            </Row>
           </Col>
-          <Col sm={6}>
+
+          <Col sm={4}>
             <ToggleActive
               isActive={service.isActive}
               serviceId={service._id}
@@ -197,33 +224,16 @@ class MyServices extends Component {
             />
           </Col>
         </Row>
-        <Row>
-          <Col sm={3}>
-            Минимальный баланс
-          </Col>
-          <Col sm={3}>
-            {service.limits.minBalance}
-          </Col>
-          <Col sm={3}>
-            Максимальное движение
-          </Col>
-          <Col sm={3}>
-            {service.limits.maxTransfer}
-          </Col>
-        </Row>
+
         <Row>
           <Col sm={12}>
-            {operatorsToAdd.length > 0
-              && (
-                <AddingOperator
-                  operators={operatorsToAdd}
-                  serviceId={service._id}
-                  onOperatorAddResult={operatorAddResult => (
-                    this.onServiceOperatorAddResult(operatorAddResult)
-                  )}
-                />
-              )
-            }
+            <AddingOperator
+              operators={operatorsToAdd}
+              serviceId={service._id}
+              onOperatorAddResult={operatorAddResult => (
+                this.onServiceOperatorAddResult(operatorAddResult)
+              )}
+            />
             {this.renderServiceOperators(
               service.operators,
               service._id,
@@ -242,10 +252,18 @@ class MyServices extends Component {
     return (
       <ExpandableListItem
         key={id}
-        header={service.name}
+        header={(
+          <span>
+            {`СЕРВИС: ${service.name}`}
+            <span style={{ marginLeft: '20px' }}>
+              {`СТАТУС: ${service.isActive ? 'Запущен' : 'Остановлен'}`}
+            </span>
+          </span>
+        )}
         content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
         onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
+        status={service.isActive}
       />
     );
   }

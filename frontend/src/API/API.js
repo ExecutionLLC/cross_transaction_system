@@ -81,6 +81,7 @@ function translateAPIOperators(apiOperators) {
     name: operator.processingName,
     startDate: +new Date('1 jan 2005'),
     isActive: operator.isActive,
+    externalServiceIsActive: operator.externalServiceIsActive,
   }));
 }
 

@@ -45,7 +45,7 @@ function Navigation(props) {
       </Nav>
       <Nav pullRight>
         <NavDropdown
-          title={getUserName()}
+          title={getUserName() || ''}
           id="basic-nav-dropdown"
         >
           <MenuItem href="/login">Выйти</MenuItem>

@@ -28,6 +28,8 @@ class ToggleActive extends Component {
           activeStatusText="Запущен"
           inactiveStatusText="Остановлен"
           onClick={() => this.onClick()}
+          activeToolTipText="Остановить сервис"
+          inactiveToolTipText="Запустить сервис"
         />
       </div>
     );

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Glyphicon } from 'react-bootstrap';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
+import ExpandableListItem from './ExpandableListItem';
 
 
 class AddItemButton extends Component {
@@ -12,11 +13,12 @@ class AddItemButton extends Component {
     };
   }
 
-  onExpandToggle(expand) {
-    const { onOpen } = this.props;
+  onToggle(expand) {
+    const { isExpanded } = this.state;
     this.setState({
-      isExpanded: expand,
+      isExpanded: !isExpanded,
     });
+    const { onOpen } = this.props;
     if (expand) {
       onOpen();
     }
@@ -52,38 +54,40 @@ class AddItemButton extends Component {
 
   render() {
     const { isExpanded, isDisabled } = this.state;
-    const { caption, children } = this.props;
+    const { caption, children, renderSubmitBtn } = this.props;
     return (
       <div>
-        <div>
-          <Button
-            disabled={isDisabled}
-            onClick={() => this.onExpandToggle(!isExpanded)}
-          >
-            {isExpanded
-              ? <Glyphicon glyph="remove" />
-              : <Glyphicon glyph="plus" />
-            }
-          </Button>
-          <h3 style={{ display: 'inline' }}>
-            {caption}
-          </h3>
-        </div>
-        {isExpanded && (
-          <div>
+        <ExpandableListItem
+          header={caption}
+          content={(
             <div>
-              {children}
+              <div>
+                {children}
+              </div>
+              {
+                renderSubmitBtn && (
+                  <Grid>
+                    <Row>
+                      <Col sm={6}>
+                        <div style={{ marginTop: '20px' }}>
+                          <Button
+                            disabled={isDisabled}
+                            onClick={() => this.onSubmit()}
+                          >
+                            Добавить
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Grid>
+                )
+              }
             </div>
-            <div>
-              <Button
-                disabled={isDisabled}
-                onClick={() => this.onSubmit()}
-              >
-                Добавить
-              </Button>
-            </div>
-          </div>
-        )}
+          )}
+          bsStyle="primary"
+          isExpanded={isExpanded}
+          onExpandToggle={expand => this.onToggle(expand)}
+        />
       </div>
     );
   }
@@ -94,7 +98,11 @@ AddItemButton.propTypes = {
   children: PropTypes.node.isRequired,
   onOpen: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  renderSubmitBtn: PropTypes.bool,
 };
 
+AddItemButton.defaultProps = {
+  renderSubmitBtn: true,
+};
 
 export default AddItemButton;

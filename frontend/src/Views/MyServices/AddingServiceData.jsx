@@ -65,6 +65,12 @@ class AddingServiceData extends Component {
         this.setState(
           {
             isLoading: false,
+            data: {
+              name: '',
+              description: '',
+              minBalance: 0,
+              maxTransfer: 0,
+            },
           },
           () => {
             const { onServiceAddResult } = this.props;
@@ -182,7 +188,7 @@ class AddingServiceData extends Component {
     return (
       <Form>
         {this.renderFormGroup(
-          <div>
+          <div style={{ marginTop: '20px' }}>
             <ControlLabel>Название</ControlLabel>
             <FormControl
               type="text"
@@ -219,7 +225,7 @@ class AddingServiceData extends Component {
         )}
         {this.renderFormGroup(
           <div>
-            <ControlLabel>Максимальное движение вредств за сутки</ControlLabel>
+            <ControlLabel>Максимальное движение средств за сутки</ControlLabel>
             <FormControl
               type="number"
               value={maxTransfer}
