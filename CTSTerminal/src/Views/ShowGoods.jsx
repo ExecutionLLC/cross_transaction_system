@@ -93,18 +93,22 @@ class ShowGoods extends Component {
           <View style={{width: '60%'}}>
             {<Image source={good.image} style={{width: '100%', flex: 1}} />}
           </View>
-          <View style={{width: '40%'}}>
-            <Text>
-              {`${good.name} - ${good.cost} руб.`}
-            </Text>
-            <Button
-              style={{width: '100%'}}
-              onPress={() => this.onBuy(good)}
-            >
-              <Text>
-                Купить
+          <View style={{width: '40%', flex: 1, flexDirection: 'column'}}>
+            <View style={{height: '30%', justifyContent: 'center'}}>
+              <Text style={{width: '100%', textAlign: 'center'}}>
+                {`${good.name} - ${good.cost} руб.`}
               </Text>
-            </Button>
+            </View>
+            <View style={{height: '70%'}}>
+              <Button
+                style={{justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%'}}
+                onPress={() => this.onBuy(good)}
+              >
+                <Text>
+                  Купить
+                </Text>
+              </Button>
+            </View>
           </View>
         </View>
         {balance < good.cost && (
