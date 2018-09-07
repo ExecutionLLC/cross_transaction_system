@@ -56,8 +56,7 @@ class EnterWallet extends Component {
     };
   }
 
-  onBuy(name) {
-    const good = goods.find(g => g.name === name);
+  onBuy(good) {
     console.log(good);
   }
 
@@ -74,7 +73,10 @@ class EnterWallet extends Component {
             <Text>
             {`${good.name} - ${good.cost} руб.`}
             </Text>
-            <Button style={{width: '100%'}}>
+            <Button
+              style={{width: '100%'}}
+              onPress={() => this.onBuy(good)}
+            >
               <Text>
                 Купить
               </Text>
