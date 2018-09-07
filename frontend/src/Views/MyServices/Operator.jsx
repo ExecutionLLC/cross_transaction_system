@@ -35,9 +35,11 @@ function Operator(props) {
         isActive={isActive}
         activeButtonText="Приостановить"
         inactiveButtonText="Продолжить"
-        activeStatusText="Оператор активен"
-        inactiveStatusText="Оператор приостановлен"
+        activeStatusText=""
+        inactiveStatusText=""
         onClick={onSwitch}
+        activeToolTipText="Приостановить работу с оператором"
+        inactiveToolTipText="Возобновить работу с оператором"
       />
     );
   }
@@ -45,7 +47,7 @@ function Operator(props) {
   const content = (
     <Grid>
       <Row>
-        <Col sm={6}>
+        <Col sm={8}>
           <Row>
             <Col sm={6}>
               {'Дата подключения: '}
@@ -93,7 +95,7 @@ function Operator(props) {
         </Col>
 
 
-        <Col sm={4} smOffset={2}>
+        <Col sm={4}>
           {renderSwitch()}
         </Col>
       </Row>
