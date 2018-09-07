@@ -252,7 +252,14 @@ class MyServices extends Component {
     return (
       <ExpandableListItem
         key={id}
-        header={`СЕРВИС: ${service.name}`}
+        header={(
+          <span>
+            {`СЕРВИС: ${service.name}`}
+            <span style={{ marginLeft: '20px' }}>
+              {`СТАТУС: ${service.isActive ? 'Запущен' : 'Остановлен'}`}
+            </span>
+          </span>
+        )}
         content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
         onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
