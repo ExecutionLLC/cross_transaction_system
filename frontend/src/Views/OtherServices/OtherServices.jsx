@@ -78,7 +78,7 @@ class OtherServices extends Component {
     } = service;
     return (
       <div>
-        <Row style={{ marginBottom: '20px' }}>
+        <Row>
           <Col sm={8}>
             <Row>
               <Col sm={6}>
