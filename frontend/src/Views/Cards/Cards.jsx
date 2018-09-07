@@ -139,7 +139,9 @@ class Cards extends Component {
     } = this.state;
     return (
       <ViewBase {...this.props} pageHeader="Карты">
-        <Form>
+        <Form
+          onSubmit={(event) => { this.onSearch(); event.preventDefault(); }}
+        >
           <FormGroup>
             <ControlLabel>Поиск карты</ControlLabel>
             <FormControl
