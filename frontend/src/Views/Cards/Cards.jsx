@@ -56,34 +56,37 @@ class Cards extends Component {
       return (
         <Row>
           <Col sm={2}>
-            {`${transaction.date}`}
+            {`${new Date(transaction.timestamp)}`}
           </Col>
           <Col sm={2}>
-            {transaction.operation}
+            {transaction.comment}
           </Col>
-          <Col sm={3}>
-            {transaction.serviceId}
+          <Col sm={2}>
+            {transaction.operatorName}
           </Col>
-          <Col sm={3}>
-            {transaction.contragent}
+          <Col sm={2}>
+            {transaction.processingName}
+          </Col>
+          <Col sm={2}>
+            {transaction.servicename}
           </Col>
           <Col sm={1}>
             {transaction.amount}
           </Col>
           <Col sm={1}>
-            <Glyphicon glyph={transaction.isActive ? 'ok-sign' : 'remove-sign'} />
+            <Glyphicon glyph="ok-sign" />
           </Col>
         </Row>
       );
     }
 
     function renderContent() {
-      return transaction.transactionId;
+      return transaction.id;
     }
 
     return (
       <SelfExpandableListItem
-        key={transaction.transactionId}
+        key={transaction.id}
         header={renderHeader()}
         content={renderContent()}
       />
