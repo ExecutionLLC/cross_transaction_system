@@ -5,13 +5,17 @@ const AuthController = require('./AuthController');
 const BaseController = require('./BaseController');
 const ProcessingController = require('./ProcessingController');
 const RequestResponseHelper = require('../common/RequestResponseHelper');
+const TransactionController = require('./TransactionController');
 const Utils = require('../common/Utils');
+const WalletController = require('./WalletController');
 
 class ControllersFacade extends AsyncInitializedObject {
   constructor(services) {
     super();
     this.authController = new AuthController(services);
     this.processingController = new ProcessingController(services);
+    this.transactionController = new TransactionController(services);
+    this.walletController = new WalletController(services);
   }
 
   _init() {
@@ -28,6 +32,8 @@ class ControllersFacade extends AsyncInitializedObject {
 
     router.use('/auth', this.authController.createRouter());
     router.use('/processing', this.processingController.createRouter());
+    router.use('/transaction', this.transactionController.createRouter());
+    router.use('/wallet', this.walletController.createRouter());
     router.use(this._notFoundHandler.bind(this));
 
     return router;

@@ -5,7 +5,9 @@ const BaseModel = require('./BaseModel');
 const ChaincodeApi = require('../hyperledger-api/ChaincodeApi');
 const config = require('../common/Config');
 const ProcessingModel = require('./ProcessingModel');
+const TransactionModel = require('./TransactionModel');
 const Utils = require('../common/Utils');
+const WalletModel = require('./WalletModel');
 
 class ModelsFacade extends AsyncInitializedObject {
   constructor() {
@@ -15,6 +17,8 @@ class ModelsFacade extends AsyncInitializedObject {
     this._chaincodeApi = new ChaincodeApi();
 
     this.processingModel = new ProcessingModel(this._db, this._chaincodeApi);
+    this.transactionModel = new TransactionModel(this._db, this._chaincodeApi);
+    this.walletModel = new WalletModel(this._db, this._chaincodeApi);
   }
 
   _init() {

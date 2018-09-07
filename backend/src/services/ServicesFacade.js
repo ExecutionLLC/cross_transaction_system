@@ -2,14 +2,18 @@ const AsyncInitializedObject = require('../common/AsyncInitializedObject');
 const BaseService = require('./BaseService');
 const config = require('../common/Config');
 const ProcessingService = require('./ProcessingService');
+const TransactionService = require('./TransactionService');
 const UmkaAggregatorService = require('./UmkaAggregatorService');
 const Utils = require('../common/Utils');
+const WalletService = require('./WalletService');
 
 class ServicesFacade extends AsyncInitializedObject {
   constructor(models) {
     super();
     this._models = models;
     this.processingService = new ProcessingService(models, this);
+    this.transactionService = new TransactionService(models, this);
+    this.walletService = new WalletService(models, this);
 
     this._config = config.services;
 

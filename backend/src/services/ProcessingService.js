@@ -1,6 +1,7 @@
 const BaseService = require('./BaseService');
 const ConflictError = require('../common/errors/ConflictError');
 const NotFoundError = require('../common/errors/NotFoundError');
+const Utils = require('../common/Utils');
 
 class ProcessingService extends BaseService {
   constructor(models, services) {
@@ -22,17 +23,8 @@ class ProcessingService extends BaseService {
     return this._processingModel.getOperatorsList(processingName);
   }
 
-  static _checkObjProperties(obj, requiredProps) {
-    requiredProps.forEach((k) => {
-      const p = obj[k];
-      if (p === undefined) {
-        throw new Error(`Required property (${k}) is empty`);
-      }
-    });
-  }
-
   addProcessing(processing) {
-    ProcessingService._checkObjProperties(processing, ['name']);
+    Utils.checkObjProperties(processing, ['name']);
 
     const { name } = processing;
     return this._processingModel.isProcessingExists(name).then((isExists) => {
@@ -45,7 +37,7 @@ class ProcessingService extends BaseService {
   }
 
   addService(processingName, service) {
-    ProcessingService._checkObjProperties(
+    Utils.checkObjProperties(
       service,
       [
         'name',
@@ -76,7 +68,7 @@ class ProcessingService extends BaseService {
   }
 
   addOperator(processingName, serviceName, operator) {
-    ProcessingService._checkObjProperties(
+    Utils.checkObjProperties(
       operator,
       [
         'parentProcessingName',
