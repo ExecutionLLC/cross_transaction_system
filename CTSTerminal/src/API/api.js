@@ -18,9 +18,9 @@ function getAuthHeaders() {
 function enterWallet(walletId) {
   return fetchival(
     `${getBaseUrl()}wallet/${getCardProcessingName()}/${walletId}`,
-    { headers: { ...getAuthHeaders() }}
+    { headers: { ...getAuthHeaders() } }
   )
-    .get()
+    .get({ limit: 0, offset: 0 })
     .then(walletInfo => ({ id: walletId, balance: walletInfo.balance + walletInfo.balanceVirtualDiff }));
 }
 
