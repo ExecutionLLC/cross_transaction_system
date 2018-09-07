@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Panel, Button, Glyphicon } from 'react-bootstrap';
+import { Panel, Glyphicon } from 'react-bootstrap';
 
 
 class ExpandableListItem extends Component {
@@ -21,21 +21,21 @@ class ExpandableListItem extends Component {
       header, content,
       isExpanded,
       status,
+      bsStyle,
     } = this.props;
 
-    // TODO: render bsStyle in accordance with the status property
     return (
       <Panel
         expanded={isExpanded}
-        bsStyle={status ? 'success' : 'default'}
+        bsStyle={bsStyle || (status ? 'success' : 'default')}
         onToggle={() => {}}
       >
         <Panel.Heading onClick={this.onExpandToggle}>
           <div style={{ margin: '5px 5px' }}>
-          {isExpanded
-            ? <Glyphicon glyph="triangle-bottom" />
-            : <Glyphicon glyph="triangle-right" />
-          }
+            {isExpanded
+              ? <Glyphicon glyph="triangle-bottom" />
+              : <Glyphicon glyph="triangle-right" />
+            }
             <span style={{ paddingLeft: '10px' }}>{header}</span>
           </div>
 
