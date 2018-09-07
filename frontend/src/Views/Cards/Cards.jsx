@@ -53,7 +53,7 @@ class Cards extends Component {
 
   renderTransaction(transaction) {
     return (
-      <tr>
+      <tr key={transaction.id}>
         <td>
           {
             new Date(transaction.timestamp).toLocaleDateString(
@@ -68,12 +68,12 @@ class Cards extends Component {
             )
           }
         </td>
-        <td>{transaction.comment}</td>
+        <td><Glyphicon glyph="ok-sign" style={{ color: 'green' }} /></td>
+        <td>{transaction.amount}</td>
         <td>{transaction.operatorName}</td>
         <td>{transaction.processingName}</td>
         <td>{transaction.serviceName}</td>
-        <td>{transaction.amount}</td>
-        <td><Glyphicon glyph="ok-sign" style={{ color: 'green' }} /></td>
+        <td>{transaction.comment}</td>
         <td>{transaction.id}</td>
       </tr>
     );
@@ -89,13 +89,13 @@ class Cards extends Component {
           <thead>
             <tr>
               <th>Дата</th>
-              <th>Комментарий</th>
+              <th>Статус</th>
+              <th>Движение</th>
               <th>Оператор</th>
               <th>Процессинг</th>
               <th>Сервис</th>
-              <th>Движение</th>
-              <th>Статус</th>
-              <th>#</th>
+              <th>Комментарий</th>
+              <th>Идентификатор транзакции</th>
             </tr>
           </thead>
           <tbody>
