@@ -46,10 +46,20 @@ class EnterWallet extends Component {
         onWalletInfo(walletInfo);
       })
       .catch(error => {
-        this.setState({
-          isLoading: false,
-          error,
-        });
+        if (error.code === api.ERRORS.NOT_FOUND) {
+          this.setState({
+            isLoading: false,
+            error: {
+              message: 'Кошелёк не найден',
+              walletError: true,
+            },
+          });
+        } else {
+          this.setState({
+            isLoading: false,
+            error,
+          });
+        }
       });
   }
 
@@ -80,8 +90,7 @@ class EnterWallet extends Component {
             </Item>
             {error && (
               <Text>
-                Error:
-                {`${error}`}
+                {`Ошибка: ${error.message}`}
               </Text>
             )}
             {isLoading ? (

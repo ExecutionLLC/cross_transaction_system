@@ -1,6 +1,21 @@
 import fetchival from 'fetchival';
 
 
+class APIError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.code = code;
+    this.message = message;
+  }
+}
+
+
+const ERRORS = {
+  UNKNOWN: 'UNKNOWN',
+  NOT_FOUND: 'NOT_FOUND',
+};
+
+
 function getBaseUrl() {
   return 'http://192.168.1.101:3001/';
 }
@@ -21,7 +36,14 @@ function enterWallet(walletId) {
     { headers: { ...getAuthHeaders() } }
   )
     .get({ limit: 0, offset: 0 })
-    .then(walletInfo => ({ id: walletId, balance: walletInfo.balance + walletInfo.balanceVirtualDiff }));
+    .then(walletInfo => ({ id: walletId, balance: walletInfo.balance + walletInfo.balanceVirtualDiff }))
+    .catch(error => {
+      if (error.response.status === 404) {
+        throw new APIError(ERRORS.NOT_FOUND, 'wallet not found');
+      } else {
+        throw new APIError(ERRORS.UNKNOWN, error.response._bodyText)
+      }
+    });
 }
 
 function buyGood(walletId, cost, name) {
@@ -69,4 +91,5 @@ function makeMoney(walletId, cost, name) {
 export default {
   enterWallet,
   buyGood,
+  ERRORS,
 };
