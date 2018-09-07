@@ -61,23 +61,23 @@ class ShowGoods extends Component {
     const { walletInfo: { id } } = this.props;
     this.setState({
       isLoading: true,
-      isError: null,
+      error: null,
       buyingGoodName: good.name,
     });
     api.buyGood(id, good.cost, good.name)
       .then(res => {
-        console.log('res', res);
         this.setState({
           isLoading: false,
-          isError: null,
+          error: null,
         });
         this.props.onWalletInfo(res.walletInfo);
       })
-      .catch(err => {
-        console.log('err', err);
+      .catch(error => {
         this.setState({
           isLoading: false,
-          isError: err,
+          error: {
+            message: error.message,
+          },
         });
       });
   }
@@ -145,6 +145,7 @@ class ShowGoods extends Component {
   }
 
   render() {
+    const { error } = this.state;
     const { walletInfo: { balance }, onCancel } = this.props;
     return (
       <Container>
@@ -164,9 +165,13 @@ class ShowGoods extends Component {
         </Header>
         <Content>
           <Text>
-            {'Баланс: '}
-            {balance}
+            {`Баланс: ${balance}`}
           </Text>
+          {error && (
+            <Text>
+              {`Ошибка: ${error.message}`}
+            </Text>
+          )}
           {this.renderGoods()}
         </Content>
       </Container>

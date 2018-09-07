@@ -62,6 +62,9 @@ function buyGood(walletId, cost, name) {
     .then(transaction => {
       return enterWallet(walletId)
         .then(walletInfo => ({transaction, walletInfo}));
+    })
+    .catch(error => {
+      throw new APIError(ERRORS.UNKNOWN, error.response._bodyText)
     });
 }
 
