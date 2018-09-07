@@ -29,11 +29,11 @@ class TokenFileControl extends Component {
         >
           <h3>
             <span className="file-input-wrapper btn btn-default btn-primary login-form-btn">
-              Выберите файл с токеном
               <Glyphicon
-                glyph="floppy-disk"
-                style={{ paddingLeft: '10px' }}
+                glyph="cog"
+                style={{ paddingRight: '10px' }}
               />
+              Выберите файл с токеном...
             </span>
           </h3>
           <FormControl

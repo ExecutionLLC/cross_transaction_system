@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, Glyphicon } from 'react-bootstrap';
 import Loading from './Loading';
 
 
@@ -51,6 +51,10 @@ class SwitchButton extends Component {
                 onClick={() => this.onClick()}
                 disabled={isLoading}
               >
+                <Glyphicon
+                  glyph={isActive ? 'stop' : 'play'}
+                  style={{ paddingRight: '10px', color: isActive ? 'red' : 'green' }}
+                />
                 {isActive ? activeButtonText : inactiveButtonText}
               </Button>
             )
