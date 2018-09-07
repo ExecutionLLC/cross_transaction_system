@@ -5,7 +5,7 @@ function getBaseUrl() {
   return 'http://192.168.1.101:3001/';
 }
 
-function getProcessingName() {
+function getCardProcessingName() {
   return 'УМКА';
 }
 
@@ -17,7 +17,7 @@ function getAuthHeaders() {
 
 function enterWallet(walletId) {
   return fetchival(
-    `${getBaseUrl()}wallet/${getProcessingName()}/${walletId}`,
+    `${getBaseUrl()}wallet/${getCardProcessingName()}/${walletId}`,
     { headers: { ...getAuthHeaders() }}
   )
     .get()
