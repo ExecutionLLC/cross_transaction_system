@@ -47,7 +47,7 @@ const goods = [
 ];
 
 
-class EnterWallet extends Component {
+class ShowGoods extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -166,4 +166,4 @@ class EnterWallet extends Component {
 }
 
 
-export default EnterWallet;
+export default ShowGoods;
