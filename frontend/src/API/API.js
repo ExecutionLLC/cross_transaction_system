@@ -242,30 +242,14 @@ function setExternalServiceState(operatorId, serviceId, isActive) {
 }
 
 function getWallet(cardNumber, offset, limit) {
-  return TimeoutPromise(2000, (resolve, reject) => {
-    if (cardNumber.length < 3) {
-      reject(new APIError(ERRORS.UNKNOWN, 'Card search error'));
-      return;
-    }
-    const operations = cardNumber.split('').slice(0, cardNumber.length - 3).map(
-      (ch, i) => ({
-        date: new Date(2018, 0, i + 1),
-        operation: `op-${ch.toUpperCase()}`,
-        serviceId: `service-${ch.toUpperCase()}`,
-        contragent: `contragent-${ch.toUpperCase()}`,
-        amount: ch.charCodeAt(0),
-        isActive: ch.charCodeAt(0) % 2,
-        transactionId: `${Math.random()}`,
-      }),
-    );
-    resolve(
-      {
-        cardNumber,
-        balance: 214534,
-        operations: operations.slice(offset, offset + limit),
-      },
-    );
-  });
+  return request.get(
+    `${getBaseUrl()}wallet/${getUserName()}/${cardNumber}`,
+    {
+      qs: { limit, offset },
+      headers: { ...getAuthHeader() },
+      json: true,
+    },
+  );
 }
 
 

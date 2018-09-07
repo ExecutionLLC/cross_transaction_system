@@ -51,39 +51,39 @@ class Cards extends Component {
       });
   }
 
-  renderOperation(operation) {
+  renderTransaction(transaction) {
     function renderHeader() {
       return (
         <Row>
           <Col sm={2}>
-            {`${operation.date}`}
+            {`${transaction.date}`}
           </Col>
           <Col sm={2}>
-            {operation.operation}
+            {transaction.operation}
           </Col>
           <Col sm={3}>
-            {operation.serviceId}
+            {transaction.serviceId}
           </Col>
           <Col sm={3}>
-            {operation.contragent}
+            {transaction.contragent}
           </Col>
           <Col sm={1}>
-            {operation.amount}
+            {transaction.amount}
           </Col>
           <Col sm={1}>
-            <Glyphicon glyph={operation.isActive ? 'ok-sign' : 'remove-sign'} />
+            <Glyphicon glyph={transaction.isActive ? 'ok-sign' : 'remove-sign'} />
           </Col>
         </Row>
       );
     }
 
     function renderContent() {
-      return operation.transactionId;
+      return transaction.transactionId;
     }
 
     return (
       <SelfExpandableListItem
-        key={operation.transactionId}
+        key={transaction.transactionId}
         header={renderHeader()}
         content={renderContent()}
       />
@@ -91,12 +91,12 @@ class Cards extends Component {
   }
 
   renderOperations() {
-    const { card: { operations } } = this.state;
-    return operations.map(operation => this.renderOperation(operation));
+    const { card: { transactions } } = this.state;
+    return transactions.map(transaction => this.renderTransaction(transaction));
   }
 
   renderCard() {
-    const { card: { cardNumber, balance } } = this.state;
+    const { card: { id, balance, balanceVirtualDiff } } = this.state;
     return (
       <Grid>
         <Row>
@@ -104,13 +104,13 @@ class Cards extends Component {
             Карта:
           </Col>
           <Col sm={3}>
-            {cardNumber}
+            {id}
           </Col>
           <Col sm={3}>
             Баланс:
           </Col>
           <Col sm={3}>
-            {balance}
+            {`${balance + balanceVirtualDiff}`}
           </Col>
         </Row>
         <Row>
