@@ -762,7 +762,7 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 
 	transaction.ID = transactionID
 
-	if transaction.ProcessingName != transaction.OperatorName {
+	if processingName != serviceProcessingName {
 		var serviceInfo ServiceInfo
 		var operatorInfo OperatorInfo
 		var externalServiceInfo ExternalServiceInfo
@@ -784,7 +784,7 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 			return shim.Error("Transaction blocked (service, operator and external service must be active)")
 		}
 
-		walletExtendedInfo, err := cts.getWalletExtendedInfo(APIstub, serviceProcessingName, walletID, 0, 0)
+		walletExtendedInfo, err := cts.getWalletExtendedInfo(APIstub, processingName, walletID, 0, 0)
 		if err != nil {
 			return shim.Error(err.Error())
 		}
@@ -794,9 +794,9 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 			return shim.Error("Transaction blocked (currentBalance < MinBalanceLimit)")
 		}
 
-		err = PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, WALLET_VIRTUAL_BALANCE_INDX, []string{processingName, walletID, transactionID}, amountAsBytes)
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot put virtual balance: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot update virtual balance: %s", err))
 		}
 
 		err = PutStateByCompositeKey(APIstub, SRC_DST_TRANSACTIONS_INDX, []string{processingName, serviceProcessingName, dateString, timeString, transactionID}, amountAsBytes)
