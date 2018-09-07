@@ -40,7 +40,7 @@ class WalletService extends BaseService {
           throw new ConflictError('Wallet already exists');
         }
 
-        return this._walletModel.addWallet(wallet);
+        return this._walletModel.add(wallet);
       });
   }
 }

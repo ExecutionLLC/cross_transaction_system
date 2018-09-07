@@ -1,7 +1,7 @@
 const Express = require('express');
 const BaseController = require('./BaseController');
 
-class ProcessingController extends BaseController {
+class WalletController extends BaseController {
   constructor(services) {
     super(services);
     this._walletService = this._services.walletService;
@@ -48,4 +48,4 @@ class ProcessingController extends BaseController {
   }
 }
 
-module.exports = ProcessingController;
+module.exports = WalletController;
