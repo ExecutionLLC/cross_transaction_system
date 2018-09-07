@@ -3,13 +3,13 @@ import {
   Form, FormGroup,
   ControlLabel, FormControl,
   Button, Glyphicon,
-  Row, Col,
+  Grid, Row, Col, Table, Image, Well,
 } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import Loading from '../../Components/Loading';
 import ErrorPanel from '../../Components/ErrorPanel';
 import API from '../../API/API';
-import SelfExpandableListItem from '../../Components/SelfExpandableListItem';
+import cardImage from './credit-card.png';
 
 
 class Cards extends Component {
@@ -52,83 +52,97 @@ class Cards extends Component {
   }
 
   renderTransaction(transaction) {
-    function renderHeader() {
-      return (
-        <Row>
-          <Col sm={2}>
-            {new Date(transaction.timestamp)
-              .toLocaleDateString(
-                'ru-RU',
-                {
-                  /* eslint-disable object-property-newline */
-                  year: 'numeric', month: 'long', day: 'numeric',
-                  hour: 'numeric', minute: 'numeric',
-                  /* eslint-enable object-property-newline */
-                },
-              )
-            }
-          </Col>
-          <Col sm={2}>
-            {transaction.comment}
-          </Col>
-          <Col sm={2}>
-            {transaction.operatorName}
-          </Col>
-          <Col sm={2}>
-            {transaction.processingName}
-          </Col>
-          <Col sm={2}>
-            {transaction.servicename}
-          </Col>
-          <Col sm={1}>
-            {transaction.amount}
-          </Col>
-          <Col sm={1}>
-            <Glyphicon glyph="ok-sign" />
-          </Col>
-        </Row>
-      );
-    }
-
-    function renderContent() {
-      return transaction.id;
-    }
-
     return (
-      <SelfExpandableListItem
-        key={transaction.id}
-        header={renderHeader()}
-        content={renderContent()}
-      />
+      <tr>
+        <td>
+          {
+            new Date(transaction.timestamp).toLocaleDateString(
+              'ru-RU',
+              {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              },
+            )
+          }
+        </td>
+        <td>{transaction.comment}</td>
+        <td>{transaction.operatorName}</td>
+        <td>{transaction.processingName}</td>
+        <td>{transaction.serviceName}</td>
+        <td>{transaction.amount}</td>
+        <td><Glyphicon glyph="ok-sign" style={{ color: 'green' }} /></td>
+        <td>{transaction.id}</td>
+      </tr>
     );
   }
 
   renderOperations() {
     const { card: { transactions } } = this.state;
-    return transactions.map(transaction => this.renderTransaction(transaction));
+    return (
+      <div
+        style={{ marginTop: '20px' }}
+      >
+        <Table striped bordered condensed hover>
+          <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Комментарий</th>
+              <th>Оператор</th>
+              <th>Процессинг</th>
+              <th>Сервис</th>
+              <th>Движение</th>
+              <th>Статус</th>
+              <th>#</th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map(transaction => this.renderTransaction(transaction))}
+          </tbody>
+        </Table>
+      </div>
+    );
   }
 
   renderCard() {
     const { card: { id, balance, balanceVirtualDiff } } = this.state;
     return (
-      <div>
-        <Row>
-          <Col sm={3}>
-            Карта:
-          </Col>
-          <Col sm={3}>
-            {id}
-          </Col>
-          <Col sm={3}>
-            Баланс:
-          </Col>
-          <Col sm={3}>
-            {`${balance + balanceVirtualDiff}`}
-          </Col>
-        </Row>
-        <Row>
-          {this.renderOperations()}
-        </Row>
+      <div style={{ marginTop: '15px' }}>
+        <Well>
+          <Grid>
+            <Row>
+              <Col sm={6}>
+                <Row>
+                  <Col sm={6}>
+                    Карта:
+                  </Col>
+                  <Col sm={6}>
+                    {id}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={6}>
+                    Баланс:
+                  </Col>
+                  <Col sm={6}>
+                    {`${balance + balanceVirtualDiff} руб`}
+                  </Col>
+                </Row>
+              </Col>
+              <Col sm={4}>
+                <Image
+                  src={cardImage}
+                  alt="cardImage"
+                  responsive
+                  style={{ maxHeight: '80px' }}
+                />
+              </Col>
+            </Row>
+          </Grid>
+        </Well>
+        {this.renderOperations()}
       </div>
     );
   }

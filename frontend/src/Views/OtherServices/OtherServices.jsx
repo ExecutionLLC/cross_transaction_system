@@ -79,32 +79,50 @@ class OtherServices extends Component {
     return (
       <div>
         <Row>
-          <Col sm={6}>
-            {processingDescription}
+          <Col sm={8}>
+            <Row>
+              <Col sm={6}>
+                Название сервиса:
+              </Col>
+              <Col sm={6}>
+                {processingDescription}
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={6}>
+                Минимальный баланс:
+              </Col>
+              <Col sm={6}>
+                {minBalance}
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={6}>
+                Максимальное движение:
+              </Col>
+              <Col sm={6}>
+                {maxTransfer}
+              </Col>
+            </Row>
+            <Row>
+              <Col sm={6}>
+                Сервис активен и доступен:
+              </Col>
+              <Col>
+                <Glyphicon
+                  glyph={processingIsAllowed ? 'ok-sign' : 'remove-sign'}
+                  style={{
+                    marginLeft: '16px',
+                    color: processingIsAllowed ? 'green' : 'red',
+                    fontSize: '16px',
+                  }}
+                />
+              </Col>
+            </Row>
+
           </Col>
-        </Row>
-        <Row>
-          <Col sm={3}>
-            Минимальный баланс
-          </Col>
-          <Col sm={3}>
-            {minBalance}
-          </Col>
-          <Col sm={3}>
-            Максимальное движение
-          </Col>
-          <Col sm={3}>
-            {maxTransfer}
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={6}>
-            Сервис активен и доступен:
-            <Glyphicon
-              glyph={processingIsAllowed ? 'ok-sign' : 'remove-sign'}
-            />
-          </Col>
-          <Col sm={6}>
+
+          <Col sm={4}>
             <ToggleActive
               isActive={serviceIsActive}
               operatorId={processingName}
@@ -124,32 +142,39 @@ class OtherServices extends Component {
     } = service;
     const serviceIsWorking = processingIsAllowed && serviceIsActive;
     return (
-      <Row>
-        <Col sm={10}>
-          {processingName}
-          /
-          {name}
-        </Col>
-        <Col sm={2}>
+      <span>
+        {`${processingName}/${name}`}
+        <span style={{ marginLeft: '20px' }}>
+          {`СТАТУС: ${serviceIsWorking ? 'Запущен' : 'Остановлен'}`}
           <Glyphicon
             glyph={serviceIsWorking ? 'ok-sign' : 'remove-sign'}
+            style={{
+              marginLeft: '20px',
+              color: serviceIsWorking ? 'green' : 'red',
+              fontSize: '18px',
+            }}
           />
-        </Col>
-      </Row>
+        </span>
+      </span>
     );
   }
 
   renderService(service) {
-    const id = service._id;
+    const {
+      _id,
+      processingIsAllowed, serviceIsActive,
+    } = service;
+    const serviceIsWorking = processingIsAllowed && serviceIsActive;
     const { expandedServicesHash } = this.state;
-    const isExpanded = expandedServicesHash[id];
+    const isExpanded = expandedServicesHash[_id];
     return (
       <ExpandableListItem
-        key={id}
+        key={_id}
         header={this.renderServiceHeader(service)}
         content={this.renderServiceContent(service)}
         isExpanded={isExpanded}
-        onExpandToggle={expand => this.onServiceExpandToggle(id, expand)}
+        onExpandToggle={expand => this.onServiceExpandToggle(_id, expand)}
+        status={serviceIsWorking}
       />
     );
   }

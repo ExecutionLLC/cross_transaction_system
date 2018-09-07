@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { PageHeader, Grid } from 'react-bootstrap';
 import Navigation from '../Components/Navigation';
+import Footer from '../Components/Footer';
 import Loading from '../Components/Loading';
 
 
@@ -19,6 +20,7 @@ function ViewBase(props) {
       </PageHeader>
       {isLoading && <Loading />}
       {!isLoading && children}
+      <Footer />
     </Grid>
   );
 }

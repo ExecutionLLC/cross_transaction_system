@@ -1,3 +1,9 @@
 .navbar > .container {
   width: auto;
 }
+
+.navbar a {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 16px;
+}
