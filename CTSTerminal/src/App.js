@@ -8,29 +8,29 @@ export default class App extends Component {
     super(props);
     this.state = {
       isWalletRequest: true,
-      balance: null,
+      walletInfo: null,
     }
   }
 
-  onWalletBalance(balance) {
+  onWalletInfo(walletInfo) {
     this.setState({
-      balance,
+      walletInfo,
       isWalletRequest: false,
     });
   }
 
   render() {
-    const { isWalletRequest, balance } = this.state;
+    const { isWalletRequest, walletInfo } = this.state;
     return (
       isWalletRequest
         ? (
           <EnterWallet
-            onWalletBalance={balance => this.onWalletBalance(balance)}
+            onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
           />
         ) : (
           <ShowGoods
-            balance={balance}
-            onWalletBalance={balance => this.onWalletBalance(balance)}
+            walletInfo={walletInfo}
+            onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
           />
         )
     );

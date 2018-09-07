@@ -90,7 +90,7 @@ class EnterWallet extends Component {
   }
 
   render() {
-    const { balance } = this.props;
+    const { walletInfo: { balance } } = this.props;
     return (
       <Container>
         <Header>

@@ -32,7 +32,7 @@ class EnterWallet extends Component {
   }
 
   onSubmit() {
-    const { onWalletBalance } = this.props;
+    const { onWalletInfo } = this.props;
     this.setState({
       isLoading: true,
       error: null,
@@ -43,7 +43,7 @@ class EnterWallet extends Component {
           isLoading: false,
           error: null,
         });
-        onWalletBalance(walletInfo.balance);
+        onWalletInfo(walletInfo);
       })
       .catch(error => {
         this.setState({
