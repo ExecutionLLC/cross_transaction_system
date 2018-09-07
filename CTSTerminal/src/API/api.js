@@ -24,6 +24,25 @@ function enterWallet(walletId) {
     .then(walletInfo => ({ id: walletId, balance: walletInfo.balance + walletInfo.balanceVirtualDiff }));
 }
 
+function buyGood(walletId, cost, name) {
+  return fetchival(
+    `${getBaseUrl()}transaction`,
+    { headers: { ...getAuthHeaders() }}
+  )
+    .post({
+      processingName: 'Кофеман',
+      serviceName: 'Кофе',
+      operatorName: getCardProcessingName(),
+      walletId: walletId,
+      amount: -cost,
+      comment: `Продажа кофе "${name}" в вендинговом автомате`,
+    })
+    .then(transaction => {
+      return enterWallet(walletId)
+        .then(walletInfo => ({transaction, walletInfo}));
+    });
+}
+
 
 export default {
   enterWallet,

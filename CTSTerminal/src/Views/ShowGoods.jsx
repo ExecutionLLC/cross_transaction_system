@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View } from 'react-native';
+import { Text, Image, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import {
   Container,
   Header,
@@ -52,27 +52,60 @@ class EnterWallet extends Component {
     super(props);
     this.state = {
       isLoading: false,
+      buyingGoodName: null,
       error: null,
     };
   }
 
   onBuy(good) {
-    console.log(good);
+    const { walletInfo: { id } } = this.props;
+    this.setState({
+      isLoading: true,
+      isError: null,
+      buyingGoodName: good.name,
+    });
+    api.buyGood(id, good.cost, good.name)
+      .then(res => {
+        console.log('res', res);
+        this.setState({
+          isLoading: false,
+          isError: null,
+        });
+        this.props.onWalletInfo(res.walletInfo);
+      })
+      .catch(err => {
+        console.log('err', err);
+        this.setState({
+          isLoading: false,
+          isError: err,
+        });
+      });
   }
 
   renderGood(good) {
+    const { isLoading, buyingGoodName } = this.state;
     return (
       <Card
         key={good.name}
       >
-        <View style={{flex: 1, flexDirection: 'row'}}>
+        <View style={{flex: 1, flexDirection: 'row', opacity: isLoading ? 0.2 : 1}}>
           <View style={{width: '60%'}}>
             {<Image source={good.image} style={{width: '100%', flex: 1}} />}
           </View>
           <View style={{width: '40%'}}>
             <Text>
-            {`${good.name} - ${good.cost} руб.`}
+              {`${good.name} - ${good.cost} руб.`}
             </Text>
+            <TouchableOpacity disabled={true}>
+              <Text>
+                {`${good.name} - ${good.cost} руб.`}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity activeOpacity={0.1}>
+              <Text>
+                {`${good.name} - ${good.cost} руб.`}
+              </Text>
+            </TouchableOpacity>
             <Button
               style={{width: '100%'}}
               onPress={() => this.onBuy(good)}
@@ -83,6 +116,20 @@ class EnterWallet extends Component {
             </Button>
           </View>
         </View>
+        {isLoading && buyingGoodName === good.name && (
+          <ActivityIndicator
+            size='large'
+            style={{
+              position: 'absolute',
+              alignItems: 'center',
+              justifyContent: 'center',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+            }}
+          />
+        )}
       </Card>
     );
   }
