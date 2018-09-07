@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Image } from 'react-bootstrap';
 
 import './style.css';
-import logo from './img-01.png';
+import logo from './new_logo.png';
 import TokenFileControl from '../../Components/TokenFileControl';
 import userActions from '../../actions/user_actions';
 
@@ -45,7 +45,7 @@ class Login extends Component {
               </div>
               <div
                 className="form-group"
-                style={{ paddingBottom: '180px', textAlign: 'center' }}
+                style={{ paddingBottom: '160px', textAlign: 'center' }}
               >
                 {error
                 && (
