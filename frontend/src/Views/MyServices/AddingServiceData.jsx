@@ -65,6 +65,12 @@ class AddingServiceData extends Component {
         this.setState(
           {
             isLoading: false,
+            data: {
+              name: '',
+              description: '',
+              minBalance: 0,
+              maxTransfer: 0,
+            },
           },
           () => {
             const { onServiceAddResult } = this.props;
