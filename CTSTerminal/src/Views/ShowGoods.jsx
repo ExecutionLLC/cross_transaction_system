@@ -84,6 +84,7 @@ class EnterWallet extends Component {
 
   renderGood(good) {
     const { isLoading, buyingGoodName } = this.state;
+    const { walletInfo: { balance } } = this.props;
     return (
       <Card
         key={good.name}
@@ -116,6 +117,21 @@ class EnterWallet extends Component {
             </Button>
           </View>
         </View>
+        {balance < good.cost && (
+          <View
+            style={{
+              position: 'absolute',
+              alignItems: 'center',
+              justifyContent: 'center',
+              left: 0,
+              right: 0,
+              top: 0,
+              bottom: 0,
+              backgroundColor: 'red',
+              opacity: 0.5,
+            }}
+          />
+        )}
         {isLoading && buyingGoodName === good.name && (
           <ActivityIndicator
             size='large'
