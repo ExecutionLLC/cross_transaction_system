@@ -97,16 +97,6 @@ class EnterWallet extends Component {
             <Text>
               {`${good.name} - ${good.cost} руб.`}
             </Text>
-            <TouchableOpacity disabled={true}>
-              <Text>
-                {`${good.name} - ${good.cost} руб.`}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.1}>
-              <Text>
-                {`${good.name} - ${good.cost} руб.`}
-              </Text>
-            </TouchableOpacity>
             <Button
               style={{width: '100%'}}
               onPress={() => this.onBuy(good)}
