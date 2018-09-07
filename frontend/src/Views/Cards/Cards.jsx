@@ -3,7 +3,7 @@ import {
   Form, FormGroup,
   ControlLabel, FormControl,
   Button, Glyphicon,
-  Grid, Row, Col,
+  Row, Col,
 } from 'react-bootstrap';
 import ViewBase from '../ViewBase';
 import Loading from '../../Components/Loading';
@@ -101,7 +101,7 @@ class Cards extends Component {
   renderCard() {
     const { card: { id, balance, balanceVirtualDiff } } = this.state;
     return (
-      <Grid>
+      <div>
         <Row>
           <Col sm={3}>
             Карта:
@@ -119,7 +119,7 @@ class Cards extends Component {
         <Row>
           {this.renderOperations()}
         </Row>
-      </Grid>
+      </div>
     );
   }
 
