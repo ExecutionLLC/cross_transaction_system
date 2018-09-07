@@ -44,6 +44,7 @@ services:
         - ./config/:/etc/hyperledger/configtx
         - ./crypto-config/ordererOrganizations/cts.net/orderers/orderer.cts.net/:/etc/hyperledger/msp/orderer
         - ./crypto-config/peerOrganizations/org1.cts.net/peers/peer0.org1.cts.net/:/etc/hyperledger/msp/peerOrg1
+        - ./storage-volumes/orderer:/var/hyperledger/production
     networks:
       - ctsnet
     ports:
@@ -61,6 +62,7 @@ services:
     volumes:
         - ./crypto-config/peerOrganizations/org1.cts.net/peers/peer0.org1.cts.net/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/org1.cts.net/users:/etc/hyperledger/msp/users
+        - ./storage-volumes/org1/peer0:/var/hyperledger/production
     depends_on:
       - orderer.cts.net
     ports:
@@ -79,6 +81,7 @@ services:
     volumes:
         - ./crypto-config/peerOrganizations/org2.cts.net/peers/peer0.org2.cts.net/msp:/etc/hyperledger/msp/peer
         - ./crypto-config/peerOrganizations/org2.cts.net/users:/etc/hyperledger/msp/users
+        - ./storage-volumes/org2/peer0:/var/hyperledger/production
     depends_on:
       - orderer.cts.net
 

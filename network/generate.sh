@@ -13,10 +13,13 @@ PUBLIC_CHANNEL_PROFILE="PublicChannel"
 # remove previous crypto material and config transactions
 rm -rf $CONFIG_DIR
 rm -rf $CRYPTO_CONFIG_DIR
-rm -rf $STORAGE_DIR
+sudo rm -rf $STORAGE_DIR
 
 mkdir $CONFIG_DIR
 mkdir $CRYPTO_CONFIG_DIR
+mkdir -p $STORAGE_DIR/orderer
+mkdir -p $STORAGE_DIR/org1/peer0
+mkdir -p $STORAGE_DIR/org2/peer0
 
 function generateChannel() {
     channelProfile="${1}"
