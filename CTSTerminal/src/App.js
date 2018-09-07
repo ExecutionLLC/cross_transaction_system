@@ -19,6 +19,12 @@ export default class App extends Component {
     });
   }
 
+  onExitGoods() {
+    this.setState({
+      isWalletRequest: true,
+    });
+  }
+
   render() {
     const { isWalletRequest, walletInfo } = this.state;
     return (
@@ -31,6 +37,7 @@ export default class App extends Component {
           <ShowGoods
             walletInfo={walletInfo}
             onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
+            onCancel={() => this.onExitGoods()}
           />
         )
     );

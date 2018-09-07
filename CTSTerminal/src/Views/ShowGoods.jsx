@@ -145,10 +145,19 @@ class ShowGoods extends Component {
   }
 
   render() {
-    const { walletInfo: { balance } } = this.props;
+    const { walletInfo: { balance }, onCancel } = this.props;
     return (
       <Container>
         <Header>
+          <Left>
+            <Button
+              onPress={onCancel}
+            >
+              <Text>
+                &lt; Завершить
+              </Text>
+            </Button>
+          </Left>
           <Body>
           <Title>Выбор товара</Title>
           </Body>
