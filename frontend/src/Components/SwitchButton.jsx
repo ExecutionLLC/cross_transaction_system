@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Row, Col, Glyphicon, Tooltip, OverlayTrigger } from 'react-bootstrap';
@@ -33,8 +34,6 @@ class SwitchButton extends Component {
         });
       });
   }
-
-
 
   renderButton() {
     const {
@@ -96,6 +95,8 @@ SwitchButton.propTypes = {
   activeStatusText: PropTypes.string.isRequired,
   inactiveStatusText: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  activeToolTipText: PropTypes.string.isRequired,
+  inactiveToolTipText: PropTypes.string.isRequired,
 };
 
 
