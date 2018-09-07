@@ -242,6 +242,17 @@ function setExternalServiceState(operatorId, serviceId, isActive) {
     .then(getTransactionAndExternalServices);
 }
 
+function getWallet(cardNumber, offset, limit) {
+  return request.get(
+    `${getBaseUrl()}wallet/${getUserName()}/${cardNumber}`,
+    {
+      qs: { limit, offset },
+      headers: { ...getAuthHeader() },
+      json: true,
+    },
+  );
+}
+
 
 export default {
   getProfile,
@@ -253,5 +264,6 @@ export default {
   addOperator,
   setOperatorActive,
   setExternalServiceState,
+  getWallet,
   ERRORS,
 };
