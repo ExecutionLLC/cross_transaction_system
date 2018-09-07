@@ -55,12 +55,15 @@ ExpandableListItem.propTypes = {
   content: PropTypes.node.isRequired,
   isExpanded: PropTypes.bool,
   onExpandToggle: PropTypes.func,
-  status: PropTypes.bool.isRequired,
+  status: PropTypes.bool,
+  bsStyle: PropTypes.string,
 };
 
 ExpandableListItem.defaultProps = {
   isExpanded: false,
   onExpandToggle: null,
+  status: null,
+  bsStyle: null,
 };
 
 
