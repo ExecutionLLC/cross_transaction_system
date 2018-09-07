@@ -241,7 +241,7 @@ function setExternalServiceState(operatorId, serviceId, isActive) {
     .then(getTransactionAndExternalServices);
 }
 
-function getCards(cardNumber, offset, limit) {
+function getWallet(cardNumber, offset, limit) {
   return TimeoutPromise(2000, (resolve, reject) => {
     if (cardNumber.length < 3) {
       reject(new APIError(ERRORS.UNKNOWN, 'Card search error'));
@@ -279,6 +279,6 @@ export default {
   addOperator,
   setOperatorActive,
   setExternalServiceState,
-  getCards,
+  getWallet,
   ERRORS,
 };
