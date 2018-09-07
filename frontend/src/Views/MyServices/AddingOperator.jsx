@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { FormGroup, HelpBlock } from 'react-bootstrap';
+import {
+  Button, FormGroup, HelpBlock,
+  Grid, Row, Col,
+} from 'react-bootstrap';
 import API from '../../API/API';
-import AddItemButton from '../../Components/AddItemButton';
 import Loading from '../../Components/Loading';
 import OperatorsSelect from './OperatorsSelect';
+import ExpandableListItem from '../../Components/ExpandableListItem';
 
 
 class AddingOperator extends Component {
@@ -12,18 +15,17 @@ class AddingOperator extends Component {
     super(props);
     const { operators } = this.props;
     this.state = {
-      currentOperatorId: operators[0]._id,
+      currentOperatorId: operators.length > 0 ? operators[0]._id : -1,
       error: null,
       isLoading: false,
+      isExpanded: false,
     };
   }
 
-  onAddOperatorOpen() {
-    const { operators } = this.props;
+  onAddOperatorToggle() {
+    const { isExpanded } = this.state;
     this.setState({
-      currentOperatorId: operators[0]._id,
-      error: null,
-      isLoading: false,
+      isExpanded: !isExpanded,
     });
   }
 
@@ -64,31 +66,79 @@ class AddingOperator extends Component {
     });
   }
 
-  render() {
+  renderAddContent() {
     const { operators } = this.props;
     const { currentOperatorId, isLoading, error } = this.state;
     const disabled = isLoading;
     return (
-      <AddItemButton
-        caption="Добавить оператора"
-        onOpen={() => this.onAddOperatorOpen()}
-        onSubmit={() => this.onAddOperatorSubmit()}
-      >
-        <OperatorsSelect
-          operators={operators}
-          currentOperator={currentOperatorId}
-          onSelect={operatorId => this.onSelect(operatorId)}
-          disabled={disabled}
-        />
-        {isLoading && <Loading />}
-        {error && (
-          <FormGroup
-            validationState="error"
-          >
-            <HelpBlock>{error}</HelpBlock>
-          </FormGroup>
-        )}
-      </AddItemButton>
+      <div>
+        {
+          operators.length < 1 ? (
+            <Grid>
+              <Row>
+                <Col sm={6}>
+                  Нет доступных операторов для добавления
+                </Col>
+              </Row>
+            </Grid>
+          ) : (
+            <Grid>
+              <Row>
+                <Col sm={6}>
+                  Выберите из доступных операторов:
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={6}>
+                  <OperatorsSelect
+                    operators={operators}
+                    currentOperator={currentOperatorId}
+                    onSelect={operatorId => this.onSelect(operatorId)}
+                    disabled={disabled}
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={6}>
+                  {isLoading && <Loading />}
+                  {error && (
+                    <FormGroup
+                      validationState="error"
+                    >
+                      <HelpBlock>{error}</HelpBlock>
+                    </FormGroup>
+                  )}
+                </Col>
+              </Row>
+              <Row>
+                <Col sm={6}>
+                  <div style={{ marginTop: '20px' }}>
+                    <Button
+                      disabled={disabled}
+                      onClick={() => this.onAddOperatorSubmit()}
+                    >
+                      Добавить
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+            </Grid>
+          )
+        }
+      </div>
+    );
+  }
+
+  render() {
+    const { isExpanded } = this.state;
+    return (
+      <ExpandableListItem
+        header="Добавить оператора"
+        content={this.renderAddContent()}
+        bsStyle="primary"
+        isExpanded={isExpanded}
+        onExpandToggle={expand => this.onAddOperatorToggle(expand)}
+      />
     );
   }
 }
