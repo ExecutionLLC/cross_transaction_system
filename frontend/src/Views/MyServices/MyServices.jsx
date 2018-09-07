@@ -186,34 +186,37 @@ class MyServices extends Component {
     );
     return (
       <div>
-        <Row>
-          <Col sm={10}>
-            {'Описание: '}
-            {service.description}
+        <Row style={{ marginBottom: '20px' }}>
+          <Col sm={8}>
+            <Row>
+              <Col sm={6}>
+                Описание:
+              </Col>
+              <Col sm={6}>
+                {service.description}
+              </Col>
+            </Row>
+
+            <Row>
+              <Col sm={6}>
+                Минимальный баланс:
+              </Col>
+              <Col sm={6}>
+                {service.limits.minBalance}
+              </Col>
+            </Row>
+
+            <Row>
+              <Col sm={6}>
+                Максимальное движение:
+              </Col>
+              <Col sm={6}>
+                {service.limits.maxTransfer}
+              </Col>
+            </Row>
           </Col>
 
-        </Row>
-
-        <Row>
-          <Col sm={3}>
-            Минимальный баланс
-          </Col>
-          <Col sm={3}>
-            {service.limits.minBalance}
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={3}>
-            Максимальное движение
-          </Col>
-          <Col sm={3}>
-            {service.limits.maxTransfer}
-          </Col>
-        </Row>
-
-        <Row>
-          <Col sm={12}>
+          <Col sm={4}>
             <ToggleActive
               isActive={service.isActive}
               serviceId={service._id}
@@ -224,17 +227,13 @@ class MyServices extends Component {
 
         <Row>
           <Col sm={12}>
-            {operatorsToAdd.length > 0
-              && (
-                <AddingOperator
-                  operators={operatorsToAdd}
-                  serviceId={service._id}
-                  onOperatorAddResult={operatorAddResult => (
-                    this.onServiceOperatorAddResult(operatorAddResult)
-                  )}
-                />
-              )
-            }
+            <AddingOperator
+              operators={operatorsToAdd}
+              serviceId={service._id}
+              onOperatorAddResult={operatorAddResult => (
+                this.onServiceOperatorAddResult(operatorAddResult)
+              )}
+            />
             {this.renderServiceOperators(
               service.operators,
               service._id,
