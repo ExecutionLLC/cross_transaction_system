@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button, FormGroup, HelpBlock,
+  FormGroup, HelpBlock,
   Grid, Row, Col,
 } from 'react-bootstrap';
 import API from '../../API/API';
 import Loading from '../../Components/Loading';
 import OperatorsSelect from './OperatorsSelect';
-import ExpandableListItem from '../../Components/ExpandableListItem';
+import AddItemButton from '../../Components/AddItemButton';
 
 
 class AddingOperator extends Component {
@@ -18,14 +18,15 @@ class AddingOperator extends Component {
       currentOperatorId: operators.length > 0 ? operators[0]._id : -1,
       error: null,
       isLoading: false,
-      isExpanded: false,
     };
   }
 
-  onAddOperatorToggle() {
-    const { isExpanded } = this.state;
+  onAddOperatorOpen() {
+    const { operators } = this.props;
     this.setState({
-      isExpanded: !isExpanded,
+      currentOperatorId: operators.length > 0 ? operators[0]._id : -1,
+      error: null,
+      isLoading: false,
     });
   }
 
@@ -110,18 +111,6 @@ class AddingOperator extends Component {
                   )}
                 </Col>
               </Row>
-              <Row>
-                <Col sm={6}>
-                  <div style={{ marginTop: '20px' }}>
-                    <Button
-                      disabled={disabled}
-                      onClick={() => this.onAddOperatorSubmit()}
-                    >
-                      Добавить
-                    </Button>
-                  </div>
-                </Col>
-              </Row>
             </Grid>
           )
         }
@@ -130,15 +119,16 @@ class AddingOperator extends Component {
   }
 
   render() {
-    const { isExpanded } = this.state;
+    const { operators } = this.props;
     return (
-      <ExpandableListItem
-        header="Добавить оператора"
-        content={this.renderAddContent()}
-        bsStyle="primary"
-        isExpanded={isExpanded}
-        onExpandToggle={expand => this.onAddOperatorToggle(expand)}
-      />
+      <AddItemButton
+        caption="Добавить оператора"
+        onOpen={() => this.onAddOperatorOpen()}
+        onSubmit={() => this.onAddOperatorSubmit()}
+        renderSubmitBtn={operators.length > 0}
+      >
+        {this.renderAddContent()}
+      </AddItemButton>
     );
   }
 }

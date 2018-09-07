@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'react-bootstrap';
+import { Button, Grid, Row, Col } from 'react-bootstrap';
 import ExpandableListItem from './ExpandableListItem';
 
 
@@ -54,7 +54,7 @@ class AddItemButton extends Component {
 
   render() {
     const { isExpanded, isDisabled } = this.state;
-    const { caption, children } = this.props;
+    const { caption, children, renderSubmitBtn } = this.props;
     return (
       <div>
         <ExpandableListItem
@@ -64,14 +64,24 @@ class AddItemButton extends Component {
               <div>
                 {children}
               </div>
-              <div>
-                <Button
-                  disabled={isDisabled}
-                  onClick={() => this.onSubmit()}
-                >
-                  Добавить
-                </Button>
-              </div>
+              {
+                renderSubmitBtn && (
+                  <Grid>
+                    <Row>
+                      <Col sm={6}>
+                        <div style={{ marginTop: '20px' }}>
+                          <Button
+                            disabled={isDisabled}
+                            onClick={() => this.onSubmit()}
+                          >
+                            Добавить
+                          </Button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </Grid>
+                )
+              }
             </div>
           )}
           bsStyle="primary"
@@ -88,6 +98,11 @@ AddItemButton.propTypes = {
   children: PropTypes.node.isRequired,
   onOpen: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  renderSubmitBtn: PropTypes.bool,
+};
+
+AddItemButton.defaultProps = {
+  renderSubmitBtn: true,
 };
 
 export default AddItemButton;
