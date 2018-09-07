@@ -44,6 +44,28 @@ function buyGood(walletId, cost, name) {
 }
 
 
+function makeMoney(walletId, cost, name) {
+  return fetchival(
+    `${getBaseUrl()}transaction`,
+    { headers: { ...getAuthHeaders() }}
+  )
+    .post({
+      processingName: getCardProcessingName(),
+      serviceName: 'Кофе',
+      operatorName: getCardProcessingName(),
+      walletId: walletId,
+      amount: cost,
+      comment: `Продажа кофе "${name}" в вендинговом автомате`,
+    })
+    .then(transaction => {
+      return enterWallet(walletId)
+        .then(walletInfo => ({transaction, walletInfo}));
+    });
+}
+
+// makeMoney('001', 1000, 'qwe').then(res => console.log(res));
+
+
 export default {
   enterWallet,
   buyGood,
