@@ -76,8 +76,8 @@ type WalletExtendedInfo struct {
 	ID                 string         `json:"id"`
 	Balance            float32        `json:"balance"`
 	BalanceVirtualDiff float32        `json:"balanceVirtualDiff"`
-	TransactionsOffset uint32         `json:"transactionsOffset"`
-	TransactionsLimit  uint32         `json:"transactionsLimit"`
+	StartPosition      uint32         `json:"startPosition"`
+	StopPosition       uint32         `json:"stopPosition"`
 	Transactions       []*Transaction `json:"transactions"`
 }
 
@@ -677,6 +677,8 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 	result.ID = walletInfo.ID
 	result.Balance = walletInfo.Balance
 	result.BalanceVirtualDiff = 0
+	result.StartPosition = 0
+	result.StopPosition = 0
 	result.Transactions = make([]*Transaction, 0)
 
 	virtualBalanceIter, err := APIstub.GetStateByPartialCompositeKey(WALLET_VIRTUAL_BALANCE_INDX, []string{processingName, walletID})
@@ -700,6 +702,8 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 			return result, errors.New(fmt.Sprintf("Cannot get virtual balance index: %s", err))
 		}
 		defer transactionsIter.Close()
+
+		result.StartPosition = offset
 
 		var position uint32
 		position = 0
@@ -728,6 +732,8 @@ func (cts *CrossTransactionSystem) getWalletExtendedInfo(APIstub shim.ChaincodeS
 				break
 			}
 		}
+
+		result.StopPosition = offset + uint32(len(result.Transactions))
 	}
 
 	return result, err
@@ -808,7 +814,7 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 		}
 	}
 
-	err = PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, nil)
+	err = PutStateByCompositeKey(APIstub, WALLET_TRANSACTIONS_INDX, []string{processingName, walletID, dateString, timeString, transactionID}, amountAsBytes)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot update wallet transactions index: %s", err))
 	}
