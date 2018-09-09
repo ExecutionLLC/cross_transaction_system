@@ -4,18 +4,12 @@ import {
   Container,
   Header,
   Left,
-  Form,
-  Item,
-  Input,
   Content,
   Body,
   Title,
   Button,
-  Icon,
   Card,
-  CardItem,
 } from 'native-base';
-import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
 
 
