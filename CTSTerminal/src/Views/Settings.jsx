@@ -110,10 +110,13 @@ class Settings extends Component {
           </Body>
         </Header>
         <Content>
-          <Form style={{margin: 20, marginTop: 100}}>
+          <Form style={{margin: 20, marginTop: 80}}>
+            <Text style={{marginBottom: 20, fontSize: 20}}>
+              Адрес сервера:
+            </Text>
             <Item regular error={error && error.urlError} style={{marginBottom: 20}}>
               <Input
-                placeholder="УРЛ"
+                placeholder="<url>"
                 autoCorrect={false}
                 autoCapitalize="none"
                 value={url}
@@ -140,7 +143,7 @@ class Settings extends Component {
                 disabled={disabled}
                 onPress={() => this.onSubmit()}
               >
-                <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
+                <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>ОК</Text>
               </TouchableHighlight>
             )}
           </Form>

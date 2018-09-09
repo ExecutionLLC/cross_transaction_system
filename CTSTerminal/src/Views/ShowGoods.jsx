@@ -119,7 +119,7 @@ class ShowGoods extends Component {
                   backgroundColor: '#eee'
                 }}
                 onPress={() => this.onBuy(good)}
-                disabled={disable}
+                disabled={disable || isLoading}
               >
                 <Text style={{color: disable ? 'red' : null, textAlign: 'center'}}>
                   {disable ? `${good.cost} руб.\nНедостаточно средств для покупки` : `${good.cost} руб.\nКупить`}
