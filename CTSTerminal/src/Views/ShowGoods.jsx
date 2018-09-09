@@ -79,6 +79,7 @@ class ShowGoods extends Component {
   renderGood(good) {
     const { isLoading, buyingGoodName } = this.state;
     const { walletInfo: { balance } } = this.props;
+    const disable = balance < good.cost;
     return (
       <Card
         key={good.name}
@@ -95,31 +96,23 @@ class ShowGoods extends Component {
             </View>
             <View style={{height: '70%', width: '80%'}}>
               <TouchableHighlight
-                style={{justifyContent: 'center', alignItems: 'center', width: '100%', height: '80%', backgroundColor: '#eee'}}
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '80%',
+                  backgroundColor: '#eee'
+                }}
                 onPress={() => this.onBuy(good)}
+                disabled={disable}
               >
-                <Text>
-                  Купить
+                <Text style={{color: disable ? 'red' : null, textAlign: 'center'}}>
+                  {disable ? 'Недостаточно средств для покупки' : 'Купить'}
                 </Text>
               </TouchableHighlight>
             </View>
           </View>
         </View>
-        {balance < good.cost && (
-          <View
-            style={{
-              position: 'absolute',
-              alignItems: 'center',
-              justifyContent: 'center',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-              backgroundColor: 'red',
-              opacity: 0.5,
-            }}
-          />
-        )}
         {isLoading && buyingGoodName === good.name && (
           <ActivityIndicator
             size='large'
