@@ -92,7 +92,7 @@ class EnterWallet extends Component {
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
-            <Item error={error && error.urlError}>
+            <Item regular error={error && error.urlError}>
               <Input
                 placeholder="Кошелёк"
                 autoCorrect={false}
