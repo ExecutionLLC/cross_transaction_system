@@ -79,6 +79,16 @@ class ProcessingModel extends BaseModel {
     const request = this._chaincodeApi.createInvokeRequest('setExternalServiceState', requestArgs);
     return this._chaincodeApi.sendInvokeRequest(request, true);
   }
+
+  getProcessingStats(processingName, startTimestamp, endTimestamp) {
+    const requestArgs = [
+      processingName,
+      startTimestamp.toString(),
+      endTimestamp.toString(),
+    ];
+    const request = this._chaincodeApi.createQueryRequest('getProcessingStats', requestArgs);
+    return this._chaincodeApi.sendQueryRequest(request);
+  }
 }
 
 module.exports = ProcessingModel;

@@ -132,12 +132,31 @@ class ProcessingController extends BaseController {
       });
   }
 
+  getProcessingStats(request, response) {
+    const requestId = this._generateIdAndWriteRequestLog(request);
+
+    const { name } = request.params;
+    const { startTimestampString, endTimestampString } = request.query;
+
+    const startTimestamp = parseInt(startTimestampString, 10);
+    const endTimestamp = parseInt(endTimestampString, 10);
+
+    this._processingService
+      .getProcessingStats(name, startTimestamp, endTimestamp)
+      .then((processingStats) => {
+        this._sendJsonAndWriteResponseLog(requestId, response, processingStats);
+      })
+      .catch((error) => {
+        this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
+      });
+  }
 
   createRouter() {
     const router = new Express();
 
     router.get('/:name', this.get.bind(this));
     router.get('/:name/operatorsList', this.getOperatorsList.bind(this));
+    router.get('/:name/stats', this.getProcessingStats.bind(this));
     router.post('/', this.addProcessing.bind(this));
     router.post('/:name/services', this.addService.bind(this));
     router.post('/:name/services/:serviceName/operators', this.addOperator.bind(this));

@@ -160,6 +160,20 @@ class ProcessingService extends BaseService {
           );
       });
   }
+
+  getProcessingStats(processingName, startTimestamp, endTimestamp) {
+    return this._processingModel
+      .isProcessingExists(processingName)
+      .then((isExists) => {
+        if (!isExists) {
+          throw new NotFoundError('Processing not found');
+        }
+        const startTimestampFixed = startTimestamp || +(new Date());
+        const endTimestampFixed = endTimestamp || startTimestampFixed;
+        return this._processingModel
+          .getProcessingStats(processingName, startTimestampFixed, endTimestampFixed);
+      });
+  }
 }
 
 module.exports = ProcessingService;
