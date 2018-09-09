@@ -79,7 +79,7 @@ class EnterWallet extends Component {
       <Container>
         <Header>
           <Body>
-            <Title>Ввод кошелька</Title>
+            <Title>Введите № кошелька</Title>
           </Body>
           <Right>
             <Button
@@ -94,7 +94,7 @@ class EnterWallet extends Component {
           <Form style={{margin: 20, marginTop: 100}}>
             <Item regular error={error && error.urlError} style={{marginBottom: 20}}>
               <Input
-                placeholder="Кошелёк"
+                placeholder="№ кошелька"
                 autoCorrect={false}
                 autoCapitalize="none"
                 value={walletId}
