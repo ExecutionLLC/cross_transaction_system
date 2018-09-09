@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text } from 'react-native';
+import { Text, TouchableHighlight } from 'react-native';
 import {
   Container,
   Header,
@@ -69,6 +69,7 @@ class EnterWallet extends Component {
       isLoading,
       error,
     } = this.state;
+    const disabled = !walletId;
     return (
       <Container>
         <Header>
@@ -96,14 +97,20 @@ class EnterWallet extends Component {
             {isLoading ? (
               <SmallSpinner />
             ) : (
-              <Button
-                block
+              <TouchableHighlight
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: 50,
+                  backgroundColor: '#eee'
+                }}
+                disabled={disabled}
                 onPress={() => this.onSubmit()}
               >
-                <Text>Ввод</Text>
-              </Button>
-            )
-            }
+                <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
+              </TouchableHighlight>
+            )}
           </Form>
         </Content>
       </Container>
