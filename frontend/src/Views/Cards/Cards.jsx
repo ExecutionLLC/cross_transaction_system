@@ -74,7 +74,9 @@ class Cards extends Component {
         <td>{transaction.processingName}</td>
         <td>{transaction.serviceName}</td>
         <td>{transaction.comment}</td>
-        <td>{transaction.id}</td>
+        <td style={{ fontFamily: 'monospace', fontSize: '10px' }}>
+          {transaction.id}
+        </td>
       </tr>
     );
   }
