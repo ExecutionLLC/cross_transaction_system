@@ -18,6 +18,12 @@ class WalletModel extends BaseModel {
     const request = this._chaincodeApi.createQueryRequest('isWalletExists', [processingName, walletId]);
     return this._chaincodeApi.sendQueryRequest(request);
   }
+
+  updateWalletBalance(processingName, walletId, balanceTimestamp, balance) {
+    const requestArgs = [processingName, walletId, balanceTimestamp.toString(), balance.toString()];
+    const request = this._chaincodeApi.createInvokeRequest('updateWalletBalance', requestArgs);
+    return this._chaincodeApi.sendInvokeRequest(request);
+  }
 }
 
 module.exports = WalletModel;

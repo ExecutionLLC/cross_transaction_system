@@ -43,6 +43,25 @@ class WalletService extends BaseService {
         return this._walletModel.add(wallet);
       });
   }
+
+  addOrUpdateWallet(wallet) {
+    const { processingName, id: walletId } = wallet;
+    return this._walletModel
+      .isWalletExists(processingName, walletId)
+      .then((isExists) => {
+        if (isExists) {
+          const { balanceTimestamp, balance } = wallet;
+          return this._walletModel.updateWalletBalance(
+            processingName,
+            walletId,
+            balanceTimestamp,
+            balance,
+          );
+        }
+
+        return this._walletModel.add(wallet);
+      });
+  }
 }
 
 module.exports = WalletService;
