@@ -102,7 +102,7 @@ class Settings extends Component {
               onPress={onCancel}
             >
               <Text>
-                &lt; Завершить
+                &lt; Назад
               </Text>
             </Button>
           </Left>

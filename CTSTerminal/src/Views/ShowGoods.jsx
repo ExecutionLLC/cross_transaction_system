@@ -93,7 +93,7 @@ class ShowGoods extends Component {
           <View style={{width: '40%', flex: 1, flexDirection: 'column', alignItems: 'center'}}>
             <View style={{height: '30%', justifyContent: 'center'}}>
               <Text style={{width: '100%', textAlign: 'center'}}>
-                {`${good.name} - ${good.cost} руб.`}
+                {good.name}
               </Text>
             </View>
             <View style={{height: '70%', width: '80%'}}>
@@ -109,7 +109,7 @@ class ShowGoods extends Component {
                 disabled={disable}
               >
                 <Text style={{color: disable ? 'red' : null, textAlign: 'center'}}>
-                  {disable ? 'Недостаточно средств для покупки' : 'Купить'}
+                  {disable ? `${good.cost} руб.\nНедостаточно средств для покупки` : `${good.cost} руб.\nКупить`}
                 </Text>
               </TouchableHighlight>
             </View>
@@ -148,7 +148,7 @@ class ShowGoods extends Component {
               onPress={onCancel}
             >
               <Text>
-                &lt; Завершить
+                &lt; Назад
               </Text>
             </Button>
           </Left>
