@@ -70,12 +70,24 @@ class ShowGoods extends Component {
         this.props.onWalletInfo(res.walletInfo);
       })
       .catch(error => {
-        this.setState({
-          isLoading: false,
-          error: {
-            message: error.message,
-          },
-        });
+        this.api.enterWallet(id)
+          .then(walletInfo => {
+            this.setState({
+              isLoading: false,
+              error: {
+                message: error.message,
+              },
+            });
+            this.props.onWalletInfo(walletInfo);
+          })
+          .catch(() => {
+            this.setState({
+              isLoading: false,
+              error: {
+                message: error.message,
+              },
+            });
+          });
       });
   }
 
