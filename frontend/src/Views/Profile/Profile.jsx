@@ -112,7 +112,7 @@ class Profile extends Component {
 
   renderCardedContent(title, content) {
     return (
-      <Panel>
+      <Panel bsStyle="success">
         <Panel.Heading>{title}</Panel.Heading>
         <Panel.Body>
           {content}
