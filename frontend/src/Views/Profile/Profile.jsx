@@ -95,7 +95,7 @@ class Profile extends Component {
           <ListGroupItem>
             <Row>
               <Col sm={6}>
-                Количество
+                Количество транзакций:
               </Col>
               <Col sm={6}>
                 {count}
@@ -105,7 +105,7 @@ class Profile extends Component {
           <ListGroupItem>
             <Row>
               <Col sm={6}>
-                Сумма
+                Сумма:
               </Col>
               <Col sm={6}>
                 {amount}
@@ -131,7 +131,7 @@ class Profile extends Component {
         + otherServicesOwnCards.count;
     }
     return this.renderCardedContent(
-      'Статистика',
+      'Статистика за сутки',
       (
         <ListGroup>
           <ListGroupItem>
@@ -166,7 +166,7 @@ class Profile extends Component {
   renderProfileData() {
     const { profileData } = this.state;
     return (
-      <Grid>
+      <div>
         <Row>
           <Col sm={6}>
             {this.renderStat()}
@@ -183,7 +183,7 @@ class Profile extends Component {
             {this.renderCardInfo('Чужие сервисы, свои карты', profileData.otherServicesOwnCards)}
           </Col>
         </Row>
-      </Grid>
+      </div>
     );
   }
 
