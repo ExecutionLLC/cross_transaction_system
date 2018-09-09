@@ -924,10 +924,10 @@ func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStu
 
 	processingName := args[0]
 	walletID := args[1]
-	balanceTimestampString[2]
+	balanceTimestampString := args[2]
 	balanceString := args[3]
 
-	balanceTimestamp, err := strconv.ParseFloat(balanceTimestampString, 10, 64)
+	balanceTimestamp, err := strconv.ParseInt(balanceTimestampString, 10, 64)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot parse balance timestamp: %s", err))
 	}
@@ -942,8 +942,8 @@ func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStu
 		return shim.Error(err.Error())
 	}
 
-	if (walletInfo.BalanceTimestamp < balanceTimestamp) {
-		walletInfo.BalanceTimestamp = BalanceTimestamp
+	if walletInfo.BalanceTimestamp < balanceTimestamp {
+		walletInfo.BalanceTimestamp = balanceTimestamp
 		walletInfo.Balance = float32(balance)
 
 		err = PutItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, walletInfo)
@@ -1086,25 +1086,25 @@ func (cts *CrossTransactionSystem) getUserKeyValue(APIstub shim.ChaincodeStubInt
 	}
 
 	key := args[0]
-	
+
 	result, err := APIstub.GetState(key)
-	if err =! nil {
+	if err != nil {
 		return shim.Error("Cannot get user key value pair")
 	}
 
 	return shim.Success(result)
 }
 
-func (cts *CrossTransactionSystem) getUserKeyValue(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (cts *CrossTransactionSystem) setUserKeyValue(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args) != 2 {
 		return shim.Error("Expected 2 parameter")
 	}
 
 	key := args[0]
 	value := args[1]
-	
+
 	err := APIstub.PutState(key, []byte(value))
-	if err =! nil {
+	if err != nil {
 		return shim.Error("Cannot put user key value pair")
 	}
 
