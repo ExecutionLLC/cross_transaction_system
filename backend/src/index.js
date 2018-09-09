@@ -12,15 +12,15 @@ const models = new ModelsFacade();
 const services = new ServicesFacade(models);
 const controllers = new ControllersFacade(services);
 
-Promise.all([
-  models.init(),
-  services.init(),
-  controllers.init(),
-]).then(() => {
-  const webServer = new WebServer(models, services, controllers);
-  return webServer.start();
-}).catch((error) => {
-  logger.error(`FATAL ERROR cannot start server: ${error}`);
-  logger.debug(error.stack);
-  process.exit(1);
-});
+models.init()
+  .then(() => services.init())
+  .then(() => controllers.init())
+  .then(() => {
+    const webServer = new WebServer(models, services, controllers);
+    return webServer.start();
+  })
+  .catch((error) => {
+    logger.error(`FATAL ERROR cannot start server: ${error}`);
+    logger.debug(error.stack);
+    process.exit(1);
+  });
