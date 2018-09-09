@@ -76,8 +76,8 @@ class EnterWallet extends Component {
             <Title>Ввод кошелька</Title>
           </Body>
         </Header>
-        <Content>
-          <Form>
+        <Content contentContainerStyle={{flex: 1, justifyContent: 'center'}}>
+          <Form style={{margin: 20}}>
             <Item error={error && error.walletError}>
               <Input
                 placeholder="Кошелёк"
