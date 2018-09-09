@@ -40,7 +40,7 @@ class Settings extends Component {
   }
 
   onSubmit() {
-    const { onUrl } = this.props;
+    const { onDone } = this.props;
     const { url } = this.state;
     const isValid = this.validate();
     if (!isValid) {
@@ -66,7 +66,7 @@ class Settings extends Component {
           isLoading: false,
           error: null,
         });
-        onUrl(url);
+        onDone();
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {

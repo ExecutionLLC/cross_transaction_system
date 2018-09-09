@@ -45,7 +45,7 @@ export default class App extends Component {
     });
   }
 
-  onUrl(url) {
+  onDone() {
     this.setState({
       isSettings: false,
     });
@@ -59,7 +59,7 @@ export default class App extends Component {
           {isSettings
             ? (
               <Settings
-                onUrl={url => this.onUrl(url)}
+                onDone={() => this.onDone()}
                 onCancel={() => this.onExitSettings()}
               />
             ) : (
