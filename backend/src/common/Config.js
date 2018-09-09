@@ -61,13 +61,6 @@ store.defaults({
   services: {
     useUmkaAggregator: true,
   },
-  mongodb: {
-    host: 'localhost',
-    port: 27017,
-    user: 'cts',
-    password: 'cts',
-    database: 'cts',
-  },
   hyperledger: {
     storePath: './runtime/hfc-key-store',
     channelName: 'public',
@@ -81,6 +74,7 @@ store.defaults({
     dbConnectionString: '192.168.10.4:1521/MAGICASH',
     dbUser: 'Cptt',
     dbPassword: '1',
+    dbBatchSize: 100,
   },
 });
 
