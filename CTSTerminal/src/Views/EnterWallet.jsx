@@ -12,6 +12,7 @@ import {
   Title,
   Button,
   Right,
+  Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
@@ -82,11 +83,10 @@ class EnterWallet extends Component {
           </Body>
           <Right>
             <Button
+              transparent
               onPress={onSettings}
             >
-              <Text>
-                Настройки
-              </Text>
+              <Icon name='menu' />
             </Button>
           </Right>
         </Header>

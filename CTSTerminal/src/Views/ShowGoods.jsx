@@ -10,6 +10,7 @@ import {
   Title,
   Button,
   Card,
+  Icon,
 } from 'native-base';
 import api from '../API/api';
 
@@ -147,9 +148,7 @@ class ShowGoods extends Component {
             <Button
               onPress={onCancel}
             >
-              <Text>
-                &lt; Назад
-              </Text>
+              <Icon name='arrow-back' />
             </Button>
           </Left>
           <Body>

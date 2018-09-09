@@ -12,6 +12,7 @@ import {
   Title,
   Button,
   Left,
+  Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
@@ -101,9 +102,7 @@ class Settings extends Component {
             <Button
               onPress={onCancel}
             >
-              <Text>
-                &lt; Назад
-              </Text>
+              <Icon name='arrow-back' />
             </Button>
           </Left>
           <Body>
@@ -112,7 +111,7 @@ class Settings extends Component {
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
-            <Item error={error && error.urlError}>
+            <Item regular error={error && error.urlError}>
               <Input
                 placeholder="УРЛ"
                 autoCorrect={false}
