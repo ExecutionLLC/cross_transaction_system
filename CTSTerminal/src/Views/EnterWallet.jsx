@@ -78,7 +78,7 @@ class EnterWallet extends Component {
     return (
       <Container>
         <Header>
-          <Body>
+          <Body style={{flex: 3}}>
             <Title>Введите № кошелька</Title>
           </Body>
           <Right>
