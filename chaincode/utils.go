@@ -12,6 +12,19 @@ import (
 	pb "github.com/hyperledger/fabric/protos/peer"
 )
 
+var indexCharsMap = map[rune]rune{
+	'0': '9',
+	'1': '8',
+	'2': '7',
+	'3': '6',
+	'4': '5',
+	'5': '4',
+	'6': '3',
+	'7': '2',
+	'8': '1',
+	'9': '0',
+}
+
 func GetItemByKey(APIstub shim.ChaincodeStubInterface, key string, item interface{}) error {
 	itemAsBytes, err := APIstub.GetState(key)
 	if err != nil {
@@ -115,8 +128,50 @@ func Float32bytes(float float32) []byte {
 	return bytes
 }
 
-func TimestampToDateAndTimeStrings(timestamp int64) (string, string) {
+func TimestampStringToDateTime(timestampString string) (time.Time, error) {
+	var result time.Time
+
+	timestampInt64, err := strconv.ParseInt(timestampString, 10, 64)
+	if err != nil {
+		return result, errors.New(fmt.Sprintf("Cannot parse timestamp string: %s", err))
+	}
+
+	result = time.Unix(timestampInt64/1000, 0)
+	return result, nil
+}
+
+func TimestampStringToDate(timestampString string) (time.Time, error) {
+	dateTime, err := TimestampStringToDateTime(timestampString)
+	if err != nil {
+		return dateTime, err
+	}
+	result := time.Date(dateTime.Year(), dateTime.Month(), dateTime.Day(), 0, 0, 0, 0, time.UTC)
+	return result, nil
+}
+
+func stringToIndexString(value string) string {
+	result := make([]rune, 0, len(value))
+	for _, c := range value {
+		indexC, hasC := indexCharsMap[c]
+		if hasC {
+			result = append(result, indexC)
+		} else {
+			result = append(result, c)
+		}
+	}
+
+	return string(result)
+}
+
+func DateTimeToIndexStrings(dateTime time.Time) (string, string) {
+	part0, part1 := dateTime .Format("2006-01-02"), dateTime .Format("15:04:05")
+	return stringToIndexString(part0), stringToIndexString(part1)
+
+}
+
+func TimestampToIndexStrings(timestamp int64) (string, string) {
 	timestampSec := timestamp / 1000
 	unixTime := time.Unix(timestampSec, 0)
-	return unixTime.Format("2006-01-02"), unixTime.Format("15:04:05")
+	return DateTimeToIndexStrings(unixTime)
 }
+

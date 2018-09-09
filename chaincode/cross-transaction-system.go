@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	pb "github.com/hyperledger/fabric/protos/peer"
@@ -93,6 +94,19 @@ type Transaction struct {
 	Comment               string  `json:"comment"`
 }
 
+type TransactionsStats struct {
+	Number  int32   `json:"number"`
+	Income  float32 `json:"income"`
+	Outcome float32 `json:"outcome"`
+}
+
+type ProcessingDayStats struct {
+	Date                    time.Time         `json:"date"`
+	InternalTransactions    TransactionsStats `json:"internalTransactions"`
+	SourceTransactions      TransactionsStats `json:"sourceTransactions"`
+	DestinationTransactions TransactionsStats `json:"destinationTransactions"`
+}
+
 const (
 	PROCESSING_INDX        = "processingName"
 	SERVICES_INDX          = "serviceProcessingName~serviceName"
@@ -105,8 +119,8 @@ const (
 	WALLET_TRANSACTIONS_INDX    = "processingName~walletID~date~time~transactionID"
 
 	INTERNAL_TRANSACTIONS_INDX = "processingName~date~time~transactionID"
-	SRC_DST_TRANSACTIONS_INDX  = "sourceProcessingName~destinationProcessingName~date~time~transactionID"
-	DST_SRC_TRANSACTIONS_INDX  = "destinationProcessingName~sourceProcessingName~date~time~transactionID"
+	SRC_TRANSACTIONS_INDX      = "sourceProcessingName~date~time~transactionID"
+	DST_TRANSACTIONS_INDX      = "destinationProcessingName~date~time~transactionID"
 )
 
 type CrossTransactionSystem struct {
@@ -755,7 +769,7 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 	processingName := transaction.OperatorName
 	serviceProcessingName := transaction.ProcessingName
 	serviceName := transaction.ServiceName
-	dateString, timeString := TimestampToDateAndTimeStrings(transaction.Timestamp)
+	dateString, timeString := TimestampToIndexStrings(transaction.Timestamp)
 	transactionID := APIstub.GetTxID()
 	amountAsBytes := Float32bytes(transaction.Amount)
 	walletID := transaction.WalletID
@@ -799,13 +813,13 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 			return shim.Error(fmt.Sprintf("Cannot update virtual balance: %s", err))
 		}
 
-		err = PutStateByCompositeKey(APIstub, SRC_DST_TRANSACTIONS_INDX, []string{processingName, serviceProcessingName, dateString, timeString, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, SRC_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot update src dst transactions index: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot update src transactions index: %s", err))
 		}
-		err = PutStateByCompositeKey(APIstub, DST_SRC_TRANSACTIONS_INDX, []string{serviceProcessingName, processingName, dateString, timeString, transactionID}, amountAsBytes)
+		err = PutStateByCompositeKey(APIstub, DST_TRANSACTIONS_INDX, []string{serviceProcessingName, dateString, timeString, transactionID}, amountAsBytes)
 		if err != nil {
-			return shim.Error(fmt.Sprintf("Cannot update dst src transactions index: %s", err))
+			return shim.Error(fmt.Sprintf("Cannot update dst transactions index: %s", err))
 		}
 	} else {
 		err = PutStateByCompositeKey(APIstub, INTERNAL_TRANSACTIONS_INDX, []string{processingName, dateString, timeString, transactionID}, amountAsBytes)
@@ -925,18 +939,130 @@ func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStu
 	return shim.Success(nil)
 }
 
-/*
+func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeStubInterface, processingName string, date time.Time, dayStats *ProcessingDayStats) error {
+	indexDate := DateTimeToIndexStrings(date)
+
+	dayStats.Date = date
+
+	internalTransactionsIter, err := APIstub.GetStateByPartialCompositeKey(INTERNAL_TRANSACTIONS_INDX, []string{processingName, indexDate})
+	if err != nil {
+		return errors.New(fmt.Sprintf("Cannot get internal transactions index: %s", err))
+	}
+	defer internalTransactionsIter.Close()
+
+	dayStats.InternalTransactions.Number = 0
+	dayStats.InternalTransactions.Income = 0.0
+	dayStats.InternalTransactions.Outcome = 0.0
+	for internalTransactionsIter.HasNext() {
+		internalTransactionKV, err := internalTransactionsIter.Next()
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot read next internal transaction index value: %s", err))
+		}
+		amountBytes := internalTransactionKV.GetValue()
+		amount := Float32frombytes(amountBytes)
+
+		dayStats.InternalTransactions.Number += 1
+		if amount > 0 {
+			dayStats.InternalTransactions.Income += amount
+		} else {
+			dayStats.InternalTransactions.Outcome += amount
+		}
+	}
+
+	srcIter, err := APIstub.GetStateByPartialCompositeKey(SRC_TRANSACTIONS_INDX, []string{processingName, indexDate})
+	if err != nil {
+		return errors.New(fmt.Sprintf("Cannot get src transactions index: %s", err))
+	}
+	defer srcIter.Close()
+
+	dayStats.SourceTransactions.Number = 0
+	dayStats.SourceTransactions.Income = 0.0
+	dayStats.SourceTransactions.Outcome = 0.0
+	for srcIter.HasNext() {
+		srcKV, err := srcIter.Next()
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot read src transaction index value: %s", err))
+		}
+		amountBytes := srcKV.GetValue()
+		amount := Float32frombytes(amountBytes)
+
+		dayStats.SourceTransactions.Number += 1
+		if amount > 0 {
+			dayStats.SourceTransactions.Income += amount
+		} else {
+			dayStats.SourceTransactions.Outcome += amount
+		}
+	}
+
+	dstIter, err := APIstub.GetStateByPartialCompositeKey(DST_TRANSACTIONS_INDX, []string{processingName, indexDate})
+	if err != nil {
+		return errors.New(fmt.Sprintf("Cannot get dst transactions index: %s", err))
+	}
+	defer dstIter.Close()
+
+	dayStats.DestenationTransactions.Number = 0
+	dayStats.DestenationTransactions.Income = 0.0
+	dayStats.DestenationTransactions.Outcome = 0.0
+	for dstIter.HasNext() {
+		dstKV, err := dstIter.Next()
+		if err != nil {
+			return errors.New(fmt.Sprintf("Cannot read dst transaction index value: %s", err))
+		}
+		amountBytes := dstKV.GetValue()
+		amount := Float32frombytes(amountBytes)
+
+		dayStats.DestinationTransactions.Number += 1
+		if amount > 0 {
+			dayStats.DestinationTransactions.Income += amount
+		} else {
+			dayStats.DestinationTransactions.Outcome += amount
+		}
+	}
+
+	return nil
+}
+
 func (cts *CrossTransactionSystem) getProcessingStats(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 2 {
-		return shim.Error("Expected 2 parameter")
+	if len(args) != 3 {
+		return shim.Error("Expected 3 parameter")
 	}
 
 	processingName := args[0]
-	dateString := args[1]
+	startDateString := args[1]
+	endDateString := args[2]
 
-	return shim.Success(result)
+	startDate, err := TimestampStringToDate(startDateString)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	endDate, err := TimestampStringToDate(endDateString)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	if startDate.After(endDate) {
+		shim.Error("Start date must be before or equal end date")
+	}
+
+	result := make([]ProcessingDayStats, 0)
+	currentDate := startDate
+	for !currentDate.After(endDate) {
+		var dayStats ProcessingDayStats
+		err := getProcessingDayStats(APIstub, processingName, currentDate, &dayStats)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
+		result = append(resilt, dayStats)
+		currentDate = currentDate.AddDate(0, 0, 1)
+	}
+
+	resultAsBytes, err := json.Marshal(result)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot marshal list of stats: %s", err))
+	}
+
+	return shim.Success(resultAsBytes)
 }
-*/
 
 func main() {
 	err := shim.Start(&CrossTransactionSystem{})
