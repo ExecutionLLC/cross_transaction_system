@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import DatePicker from 'react-bootstrap-date-picker';
 import {
-  Grid, Row, Col,
+  Row, Col,
   Panel,
   ListGroup, ListGroupItem,
 } from 'react-bootstrap';
@@ -43,7 +43,7 @@ class Profile extends Component {
       profileData: null,
       date,
     });
-    API.getProfile(date)
+    API.getProfile(new Date(date))
       .then((profileData) => {
         this.setState(prevState => (
           {
@@ -72,8 +72,42 @@ class Profile extends Component {
    * @param formattedValue {string} Formatted String, eg '14/09/2018'
    */
   handleChange(value, formattedValue) {
-    console.log('Obtain profile for date: ', formattedValue);
     this.getDataByDate(value);
+  }
+
+  calcTotalValues() {
+    const { profileData } = this.state;
+    const ownServicesOwnCards = profileData.reduce((acc, item) => {
+      return {
+        ...acc,
+        number: acc.number + item.internalTransactions.number,
+        income: acc.income + item.internalTransactions.income,
+        outcome: acc.outcome + item.internalTransactions.outcome,
+      };
+    }, { number: 0, income: 0, outcome: 0 });
+
+    const ownServicesOtherCards = profileData.reduce((acc, item) => {
+      return {
+        ...acc,
+        number: acc.number + item.sourceTransactions.number,
+        income: acc.income + item.sourceTransactions.income,
+        outcome: acc.outcome + item.sourceTransactions.outcome,
+      };
+    }, { number: 0, income: 0, outcome: 0 });
+
+    const otherServicesOwnCards = profileData.reduce((acc, item) => {
+      return {
+        ...acc,
+        number: acc.number + item.destinationTransactions.number,
+        income: acc.income + item.destinationTransactions.income,
+        outcome: acc.outcome + item.destinationTransactions.outcome,
+      };
+    }, { number: 0, income: 0, outcome: 0 });
+    return {
+      ownServicesOwnCards,
+      ownServicesOtherCards,
+      otherServicesOwnCards,
+    };
   }
 
   renderCardedContent(title, content) {
@@ -87,7 +121,8 @@ class Profile extends Component {
     );
   }
 
-  renderCardInfo(title, { count, amount }) {
+  renderCardInfo(title, { number, income, outcome }) {
+    const amount = Math.abs(income) + Math.abs(outcome);
     return this.renderCardedContent(
       title,
       (
@@ -98,7 +133,7 @@ class Profile extends Component {
                 Количество транзакций:
               </Col>
               <Col sm={6}>
-                {count}
+                {number}
               </Col>
             </Row>
           </ListGroupItem>
@@ -125,10 +160,14 @@ class Profile extends Component {
     // total transaction count
     let totalCount = 0;
     if (profileData) {
-      const { ownServicesOwnCards, ownServicesOtherCards, otherServicesOwnCards } = profileData;
-      totalCount = ownServicesOwnCards.count
-        + ownServicesOtherCards.count
-        + otherServicesOwnCards.count;
+      const {
+        ownServicesOwnCards,
+        ownServicesOtherCards,
+        otherServicesOwnCards,
+      } = this.calcTotalValues();
+      totalCount = ownServicesOwnCards.number
+        + ownServicesOtherCards.number
+        + otherServicesOwnCards.number;
     }
     return this.renderCardedContent(
       'Статистика за сутки',
@@ -164,7 +203,11 @@ class Profile extends Component {
   }
 
   renderProfileData() {
-    const { profileData } = this.state;
+    const {
+      ownServicesOwnCards,
+      ownServicesOtherCards,
+      otherServicesOwnCards,
+    } = this.calcTotalValues();
     return (
       <div>
         <Row>
@@ -172,15 +215,15 @@ class Profile extends Component {
             {this.renderStat()}
           </Col>
           <Col sm={6}>
-            {this.renderCardInfo('Свои сервисы, свои карты', profileData.ownServicesOwnCards)}
+            {this.renderCardInfo('Свои сервисы, свои карты', ownServicesOwnCards)}
           </Col>
         </Row>
         <Row>
           <Col sm={6}>
-            {this.renderCardInfo('Свои сервисы, чужие карты', profileData.ownServicesOtherCards)}
+            {this.renderCardInfo('Свои сервисы, чужие карты', ownServicesOtherCards)}
           </Col>
           <Col sm={6}>
-            {this.renderCardInfo('Чужие сервисы, свои карты', profileData.otherServicesOwnCards)}
+            {this.renderCardInfo('Чужие сервисы, свои карты', otherServicesOwnCards)}
           </Col>
         </Row>
       </div>
