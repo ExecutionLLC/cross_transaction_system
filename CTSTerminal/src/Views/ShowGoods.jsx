@@ -50,6 +50,7 @@ class ShowGoods extends Component {
       buyingGoodName: null,
       error: null,
     };
+    this.api = api.URLedAPI(props.settings.url);
   }
 
   onBuy(good) {
@@ -59,7 +60,7 @@ class ShowGoods extends Component {
       error: null,
       buyingGoodName: good.name,
     });
-    api.buyGood(id, good.cost, good.name)
+    this.api.buyGood(id, good.cost, good.name)
       .then(res => {
         this.setState({
           isLoading: false,

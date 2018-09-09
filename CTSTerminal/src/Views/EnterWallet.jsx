@@ -25,6 +25,7 @@ class EnterWallet extends Component {
       isLoading: false,
       error: null,
     };
+    this.api = api.URLedAPI(props.settings.url);
   }
 
   onWalletChange(walletId) {
@@ -39,7 +40,7 @@ class EnterWallet extends Component {
       isLoading: true,
       error: null,
     });
-    api.enterWallet(this.state.walletId)
+    this.api.enterWallet(this.state.walletId)
       .then(walletInfo => {
         this.setState({
           isLoading: false,

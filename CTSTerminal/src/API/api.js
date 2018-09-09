@@ -16,10 +16,6 @@ const ERRORS = {
 };
 
 
-function getBaseUrl() {
-  return 'http://192.168.1.101:3001/';
-}
-
 function getCardProcessingName() {
   return 'УМКА';
 }
@@ -30,68 +26,85 @@ function getAuthHeaders() {
   };
 }
 
-function enterWallet(walletId) {
-  return fetchival(
-    `${getBaseUrl()}wallet/${getCardProcessingName()}/${walletId}`,
-    { headers: { ...getAuthHeaders() } }
-  )
-    .get({ limit: 0, offset: 0 })
-    .then(walletInfo => ({ id: walletId, balance: walletInfo.balance + walletInfo.balanceVirtualDiff }))
-    .catch(error => {
-      if (error.response.status === 404) {
-        throw new APIError(ERRORS.NOT_FOUND, 'wallet not found');
-      } else {
+
+function URLedAPI(url) {
+
+  function getBaseUrl() {
+    return url;
+  }
+
+  function enterWallet(walletId) {
+    return fetchival(
+      `${getBaseUrl()}wallet/${getCardProcessingName()}/${walletId}`,
+      { headers: { ...getAuthHeaders() } }
+    )
+      .get({ limit: 0, offset: 0 })
+      .then(walletInfo => ({
+        id: walletId,
+        balance: walletInfo.balance + walletInfo.balanceVirtualDiff
+      }))
+      .catch(error => {
+        if (error.response.status === 404) {
+          throw new APIError(ERRORS.NOT_FOUND, 'wallet not found');
+        } else {
+          throw new APIError(ERRORS.UNKNOWN, error.response._bodyText)
+        }
+      });
+  }
+
+  function buyGood(walletId, cost, name) {
+    return fetchival(
+      `${getBaseUrl()}transaction`,
+      { headers: { ...getAuthHeaders() } }
+    )
+      .post({
+        processingName: 'Кофеман',
+        serviceName: 'Кофе',
+        operatorName: getCardProcessingName(),
+        walletId: walletId,
+        amount: -cost,
+        comment: `Продажа кофе "${name}" в вендинговом автомате`,
+      })
+      .then(transaction => {
+        return enterWallet(walletId)
+          .then(walletInfo => ({ transaction, walletInfo }));
+      })
+      .catch(error => {
         throw new APIError(ERRORS.UNKNOWN, error.response._bodyText)
-      }
-    });
+      });
+  }
+
+
+  function makeMoney(walletId, cost, name) {
+    return fetchival(
+      `${getBaseUrl()}transaction`,
+      { headers: { ...getAuthHeaders() } }
+    )
+      .post({
+        processingName: getCardProcessingName(),
+        serviceName: 'Кофе',
+        operatorName: getCardProcessingName(),
+        walletId: walletId,
+        amount: cost,
+        comment: `Продажа кофе "${name}" в вендинговом автомате`,
+      })
+      .then(transaction => {
+        return enterWallet(walletId)
+          .then(walletInfo => ({ transaction, walletInfo }));
+      });
+  }
+
+  // makeMoney('001', 1000, 'qwe').then(res => console.log(res));
+
+  return {
+    enterWallet,
+    buyGood,
+    checkBaseUrl
+  };
 }
 
-function buyGood(walletId, cost, name) {
-  return fetchival(
-    `${getBaseUrl()}transaction`,
-    { headers: { ...getAuthHeaders() }}
-  )
-    .post({
-      processingName: 'Кофеман',
-      serviceName: 'Кофе',
-      operatorName: getCardProcessingName(),
-      walletId: walletId,
-      amount: -cost,
-      comment: `Продажа кофе "${name}" в вендинговом автомате`,
-    })
-    .then(transaction => {
-      return enterWallet(walletId)
-        .then(walletInfo => ({transaction, walletInfo}));
-    })
-    .catch(error => {
-      throw new APIError(ERRORS.UNKNOWN, error.response._bodyText)
-    });
-}
-
-
-function makeMoney(walletId, cost, name) {
-  return fetchival(
-    `${getBaseUrl()}transaction`,
-    { headers: { ...getAuthHeaders() }}
-  )
-    .post({
-      processingName: getCardProcessingName(),
-      serviceName: 'Кофе',
-      operatorName: getCardProcessingName(),
-      walletId: walletId,
-      amount: cost,
-      comment: `Продажа кофе "${name}" в вендинговом автомате`,
-    })
-    .then(transaction => {
-      return enterWallet(walletId)
-        .then(walletInfo => ({transaction, walletInfo}));
-    });
-}
-
-// makeMoney('001', 1000, 'qwe').then(res => console.log(res));
 
 function checkBaseUrl(baseUrl) {
-  console.log(baseUrl);
   return fetchival(
     `${baseUrl}auth`,
     { headers: { ...getAuthHeaders() }}
@@ -102,8 +115,7 @@ function checkBaseUrl(baseUrl) {
 
 
 export default {
-  enterWallet,
-  buyGood,
+  URLedAPI,
   checkBaseUrl,
   ERRORS,
 };
