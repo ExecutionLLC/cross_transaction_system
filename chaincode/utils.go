@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -164,7 +165,7 @@ func stringToIndexString(value string) string {
 }
 
 func DateTimeToIndexStrings(dateTime time.Time) (string, string) {
-	part0, part1 := dateTime .Format("2006-01-02"), dateTime .Format("15:04:05")
+	part0, part1 := dateTime.Format("2006-01-02"), dateTime.Format("15:04:05")
 	return stringToIndexString(part0), stringToIndexString(part1)
 
 }
@@ -174,4 +175,3 @@ func TimestampToIndexStrings(timestamp int64) (string, string) {
 	unixTime := time.Unix(timestampSec, 0)
 	return DateTimeToIndexStrings(unixTime)
 }
-

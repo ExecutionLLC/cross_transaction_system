@@ -173,6 +173,8 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.getOperatorsList(APIstub, functionArgs)
 	case "updateWalletBalance":
 		return cts.updateWalletBalance(APIstub, functionArgs)
+	case "getProcessingStats":
+		return cts.getProcessingStats(APIstub, functionArgs)
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
@@ -940,7 +942,7 @@ func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStu
 }
 
 func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeStubInterface, processingName string, date time.Time, dayStats *ProcessingDayStats) error {
-	indexDate := DateTimeToIndexStrings(date)
+	indexDate, _ := DateTimeToIndexStrings(date)
 
 	dayStats.Date = date
 
@@ -1000,9 +1002,9 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 	}
 	defer dstIter.Close()
 
-	dayStats.DestenationTransactions.Number = 0
-	dayStats.DestenationTransactions.Income = 0.0
-	dayStats.DestenationTransactions.Outcome = 0.0
+	dayStats.DestinationTransactions.Number = 0
+	dayStats.DestinationTransactions.Income = 0.0
+	dayStats.DestinationTransactions.Outcome = 0.0
 	for dstIter.HasNext() {
 		dstKV, err := dstIter.Next()
 		if err != nil {
@@ -1048,11 +1050,11 @@ func (cts *CrossTransactionSystem) getProcessingStats(APIstub shim.ChaincodeStub
 	currentDate := startDate
 	for !currentDate.After(endDate) {
 		var dayStats ProcessingDayStats
-		err := getProcessingDayStats(APIstub, processingName, currentDate, &dayStats)
+		err := cts.getProcessingDayStats(APIstub, processingName, currentDate, &dayStats)
 		if err != nil {
 			return shim.Error(err.Error())
 		}
-		result = append(resilt, dayStats)
+		result = append(result, dayStats)
 		currentDate = currentDate.AddDate(0, 0, 1)
 	}
 
