@@ -158,6 +158,7 @@ class ShowGoods extends Component {
         <Header>
           <Left>
             <Button
+              transparent
               onPress={onCancel}
             >
               <Icon name='arrow-back' />
