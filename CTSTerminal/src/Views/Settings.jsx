@@ -10,48 +10,64 @@ import {
   Body,
   Title,
   Button,
-  Right,
+  Left,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
 
 
-class EnterWallet extends Component {
+class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      walletId: '',
+      url: props.url,
       isLoading: false,
       error: null,
     };
   }
 
-  onWalletChange(walletId) {
+  onUrlChange(url) {
     this.setState({
-      walletId
+      url
     });
   }
 
+  validate() {
+    const { url } = this.state;
+    return /^\S+:\/\/\S+\/$/.test(url);
+  }
+
   onSubmit() {
-    const { onWalletInfo } = this.props;
+    const { onUrl } = this.props;
+    const { url } = this.state;
+    const isValid = this.validate();
+    if (!isValid) {
+      this.setState({
+        error: {
+          message: 'Неправильный формат адреса, пример: http://example.com/',
+          urlError: true,
+        },
+      });
+      return;
+    }
     this.setState({
       isLoading: true,
       error: null,
     });
-    api.enterWallet(this.state.walletId)
-      .then(walletInfo => {
+    api.checkBaseUrl(url)
+      .then(() => {
         this.setState({
           isLoading: false,
           error: null,
         });
-        onWalletInfo(walletInfo);
+        onUrl(url);
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {
           this.setState({
             isLoading: false,
             error: {
-              message: 'Кошелёк не найден',
+              message: 'Некорректный УРЛ',
               urlError: true,
             },
           });
@@ -66,38 +82,38 @@ class EnterWallet extends Component {
 
   render() {
     const {
-      walletId,
+      url,
       isLoading,
       error,
     } = this.state;
-    const {onSettings} = this.props;
-    const disabled = !walletId;
+    const { onCancel } = this.props;
+    const disabled = !url;
     return (
       <Container>
         <Header>
-          <Body>
-            <Title>Ввод кошелька</Title>
-          </Body>
-          <Right>
+          <Left>
             <Button
-              onPress={onSettings}
+              onPress={onCancel}
             >
               <Text>
-                Настройки
+                &lt; Завершить
               </Text>
             </Button>
-          </Right>
+          </Left>
+          <Body>
+          <Title>Настройки</Title>
+          </Body>
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
             <Item error={error && error.urlError}>
               <Input
-                placeholder="Кошелёк"
+                placeholder="УРЛ"
                 autoCorrect={false}
                 autoCapitalize="none"
-                value={walletId}
+                value={url}
                 disabled={isLoading}
-                onChangeText={walletId => this.onWalletChange(walletId)}
+                onChangeText={url => this.onUrlChange(url)}
               />
             </Item>
             {error && (
@@ -130,4 +146,4 @@ class EnterWallet extends Component {
 }
 
 
-export default EnterWallet;
+export default Settings;

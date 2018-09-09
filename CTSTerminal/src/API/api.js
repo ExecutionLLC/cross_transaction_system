@@ -90,9 +90,20 @@ function makeMoney(walletId, cost, name) {
 
 // makeMoney('001', 1000, 'qwe').then(res => console.log(res));
 
+function checkBaseUrl(baseUrl) {
+  console.log(baseUrl);
+  return fetchival(
+    `${baseUrl}auth`,
+    { headers: { ...getAuthHeaders() }}
+  )
+    .get()
+    .then(res=> res && res.uuid);
+}
+
 
 export default {
   enterWallet,
   buyGood,
+  checkBaseUrl,
   ERRORS,
 };
