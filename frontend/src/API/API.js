@@ -6,13 +6,13 @@ import {
 } from './auth_header';
 
 
-class APIError extends Error {
-  constructor(code, message) {
-    super(message);
-    this.code = code;
-    this.message = message;
-  }
-}
+// class APIError extends Error {
+//   constructor(code, message) {
+//     super(message);
+//     this.code = code;
+//     this.message = message;
+//   }
+// }
 
 
 const ERRORS = {
@@ -25,42 +25,42 @@ const ERRORS = {
 };
 
 
-function TimeoutPromise(time, f) {
-  return new Promise((resolve, reject) => {
-    setTimeout(
-      f.bind(f, resolve, reject),
-      time,
-    );
-  });
-}
+// function TimeoutPromise(time, f) {
+//   return new Promise((resolve, reject) => {
+//     setTimeout(
+//       f.bind(f, resolve, reject),
+//       time,
+//     );
+//   });
+// }
 
 function getBaseUrl() {
   return config.API_BASE_URL;
 }
 
-function getProfile(date) {
-  return TimeoutPromise(500, (resolve, reject) => {
-    if (Math.random() < 0.5) {
-      reject(new APIError(ERRORS.UNKNOWN, 'DEBUG ERROR: can not get profile info'));
-      return;
-    }
-    resolve({
-      _id: '4',
-      dateRange: [new Date('01/01/2017'), new Date()],
-      ownServicesOwnCards: {
-        count: 10,
-        amount: 1000,
+/**
+ *
+ * @param startDate {Date}
+ * @param endDate {Date}
+ * @returns {*}
+ */
+function getProfile(startDate, endDate = null) {
+  const qs = {
+    startTimestamp: +startDate, // pass timestamp
+  };
+  if (endDate) {
+    qs.endTimestamp = +endDate; // pass timestamp
+  }
+  return request.get(
+    `${getBaseUrl()}processing/${getUserName()}/stats`,
+    {
+      headers: {
+        ...getAuthHeader(),
       },
-      ownServicesOtherCards: {
-        count: 20,
-        amount: 2000,
-      },
-      otherServicesOwnCards: {
-        count: 50,
-        amount: 5000,
-      },
-    });
-  });
+      json: true,
+      qs,
+    },
+  );
 }
 
 function getProcessing() {

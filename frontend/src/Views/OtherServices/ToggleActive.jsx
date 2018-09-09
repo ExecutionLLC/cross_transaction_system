@@ -31,6 +31,8 @@ class ToggleActive extends Component {
           activeStatusText="Разрешена обработка карт"
           inactiveStatusText="Запрещена обработка карт"
           onClick={() => this.onClick()}
+          activeToolTipText="Запретить обработку карт"
+          inactiveToolTipText="Разрешить обработку карт"
         />
       </div>
     );
