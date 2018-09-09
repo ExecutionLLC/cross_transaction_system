@@ -67,9 +67,10 @@ type ProcessingExtendedInfo struct {
 }
 
 type WalletInfo struct {
-	ProcessingName string  `json:"processingName"`
-	ID             string  `json:"id"`
-	Balance        float32 `json:"balance"`
+	ProcessingName   string  `json:"processingName"`
+	ID               string  `json:"id"`
+	Balance          float32 `json:"balance"`
+	BalanceTimestamp int64   `json:"balanceTimestamp"`
 }
 
 type WalletExtendedInfo struct {
@@ -77,6 +78,7 @@ type WalletExtendedInfo struct {
 	ID                 string         `json:"id"`
 	Balance            float32        `json:"balance"`
 	BalanceVirtualDiff float32        `json:"balanceVirtualDiff"`
+	BalanceTimestamp   int64          `json:"balanceTimestamp"`
 	StartPosition      uint32         `json:"startPosition"`
 	StopPosition       uint32         `json:"stopPosition"`
 	Transactions       []*Transaction `json:"transactions"`
@@ -175,6 +177,10 @@ func (cts *CrossTransactionSystem) Invoke(APIstub shim.ChaincodeStubInterface) p
 		return cts.updateWalletBalance(APIstub, functionArgs)
 	case "getProcessingStats":
 		return cts.getProcessingStats(APIstub, functionArgs)
+	case "getUserKeyValue":
+		return cts.getUserKeyValue(APIstub, functionArgs)
+	case "setUserKeyValue":
+		return cts.setUserKeyValue(APIstub, functionArgs)
 	}
 
 	return shim.Error(fmt.Sprintf("Got unknown function name (%s).", functionName))
@@ -912,14 +918,19 @@ func (cts *CrossTransactionSystem) getWallet(APIstub shim.ChaincodeStubInterface
 }
 
 func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
-	if len(args) != 3 {
-		return shim.Error("Expected 3 parameter")
+	if len(args) != 4 {
+		return shim.Error("Expected 4 parameter")
 	}
 
 	processingName := args[0]
 	walletID := args[1]
-	balanceString := args[2]
+	balanceTimestampString[2]
+	balanceString := args[3]
 
+	balanceTimestamp, err := strconv.ParseFloat(balanceTimestampString, 10, 64)
+	if err != nil {
+		return shim.Error(fmt.Sprintf("Cannot parse balance timestamp: %s", err))
+	}
 	balance, err := strconv.ParseFloat(balanceString, 32)
 	if err != nil {
 		return shim.Error(fmt.Sprintf("Cannot parse balance: %s", err))
@@ -931,11 +942,14 @@ func (cts *CrossTransactionSystem) updateWalletBalance(APIstub shim.ChaincodeStu
 		return shim.Error(err.Error())
 	}
 
-	walletInfo.Balance = float32(balance)
+	if (walletInfo.BalanceTimestamp < balanceTimestamp) {
+		walletInfo.BalanceTimestamp = BalanceTimestamp
+		walletInfo.Balance = float32(balance)
 
-	err = PutItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, walletInfo)
-	if err != nil {
-		return shim.Error(err.Error())
+		err = PutItemByCompositeKey(APIstub, WALLETS_INDX, []string{processingName, walletID}, walletInfo)
+		if err != nil {
+			return shim.Error(err.Error())
+		}
 	}
 
 	return shim.Success(nil)
@@ -1064,6 +1078,37 @@ func (cts *CrossTransactionSystem) getProcessingStats(APIstub shim.ChaincodeStub
 	}
 
 	return shim.Success(resultAsBytes)
+}
+
+func (cts *CrossTransactionSystem) getUserKeyValue(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 1 {
+		return shim.Error("Expected 1 parameter")
+	}
+
+	key := args[0]
+	
+	result, err := APIstub.GetState(key)
+	if err =! nil {
+		return shim.Error("Cannot get user key value pair")
+	}
+
+	return shim.Success(result)
+}
+
+func (cts *CrossTransactionSystem) getUserKeyValue(APIstub shim.ChaincodeStubInterface, args []string) pb.Response {
+	if len(args) != 2 {
+		return shim.Error("Expected 2 parameter")
+	}
+
+	key := args[0]
+	value := args[1]
+	
+	err := APIstub.PutState(key, []byte(value))
+	if err =! nil {
+		return shim.Error("Cannot put user key value pair")
+	}
+
+	return shim.Success(nil)
 }
 
 func main() {
