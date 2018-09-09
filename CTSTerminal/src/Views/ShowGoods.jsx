@@ -168,7 +168,7 @@ class ShowGoods extends Component {
           </Body>
         </Header>
         <Content>
-          <Text>
+          <Text style={{fontSize: 30}}>
             {`Баланс: ${balance}`}
           </Text>
           {error && (
