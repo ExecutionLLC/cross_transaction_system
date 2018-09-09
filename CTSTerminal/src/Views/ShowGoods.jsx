@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Text, Image, View, TouchableHighlight, ActivityIndicator } from 'react-native';
 import {
   Container,
@@ -171,4 +172,9 @@ class ShowGoods extends Component {
 }
 
 
-export default ShowGoods;
+function mapStateToProps(state) {
+  const { settings } = state;
+  return { settings };
+}
+
+export default connect(mapStateToProps)(ShowGoods);

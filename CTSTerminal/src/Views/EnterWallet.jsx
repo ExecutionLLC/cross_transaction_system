@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Text, TouchableHighlight } from 'react-native';
 import {
   Container,
@@ -130,4 +131,9 @@ class EnterWallet extends Component {
 }
 
 
-export default EnterWallet;
+function mapStateToProps(state) {
+  const { settings } = state;
+  return { settings };
+}
+
+export default connect(mapStateToProps)(EnterWallet);

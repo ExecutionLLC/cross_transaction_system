@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Text, TouchableHighlight } from 'react-native';
 import {
   Container,
@@ -14,13 +15,14 @@ import {
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
+import * as SettingsActionTypes from '../actions/settings';
 
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      url: props.url,
+      url: props.settings.url || '',
       isLoading: false,
       error: null,
     };
@@ -53,6 +55,10 @@ class Settings extends Component {
     this.setState({
       isLoading: true,
       error: null,
+    });
+    this.props.dispatch({
+      type: SettingsActionTypes.SET_URL,
+      url,
     });
     api.checkBaseUrl(url)
       .then(() => {
@@ -146,4 +152,9 @@ class Settings extends Component {
 }
 
 
-export default Settings;
+function mapStateToProps(state) {
+  const { settings } = state;
+  return { settings };
+}
+
+export default connect(mapStateToProps)(Settings);
