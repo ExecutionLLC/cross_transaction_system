@@ -1,8 +1,14 @@
 import React, {Component} from 'react';
+import { PersistGate } from 'redux-persist/integration/react';
+import { Provider } from 'react-redux';
 import EnterWallet from './Views/EnterWallet';
 import ShowGoods from './Views/ShowGoods';
 import Settings from './Views/Settings';
+import SmallSpinner from './Components/SmallSpinner';
+import configureStore from './configureStore';
 
+
+const { store, persistor } = configureStore();
 
 export default class App extends Component {
   constructor(props) {
@@ -48,28 +54,31 @@ export default class App extends Component {
   render() {
     const { isWalletRequest, isSettings, walletInfo } = this.state;
     return (
-      isSettings
-        ? (
-          <Settings
-            url="http://192.168.1.101:3001/"
-            onUrl={url => this.onUrl(url)}
-            onCancel={() => this.onExitSettings()}
-          />
-        ) : (
-          isWalletRequest
+      <Provider store={store}>
+        <PersistGate loading={<SmallSpinner />} persistor={persistor}>
+          {isSettings
             ? (
-              <EnterWallet
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                onSettings={() => this.onSettings()}
+              <Settings
+                onUrl={url => this.onUrl(url)}
+                onCancel={() => this.onExitSettings()}
               />
             ) : (
-              <ShowGoods
-                walletInfo={walletInfo}
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                onCancel={() => this.onExitGoods()}
-              />
-            )
-        )
+              isWalletRequest
+                ? (
+                  <EnterWallet
+                    onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
+                    onSettings={() => this.onSettings()}
+                  />
+                ) : (
+                  <ShowGoods
+                    walletInfo={walletInfo}
+                    onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
+                    onCancel={() => this.onExitGoods()}
+                  />
+                )
+            )}
+        </PersistGate>
+      </Provider>
     );
   }
 }
