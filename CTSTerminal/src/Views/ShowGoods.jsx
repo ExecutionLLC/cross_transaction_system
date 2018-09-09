@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Text, Image, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { Text, Image, View, TouchableHighlight, ActivityIndicator } from 'react-native';
 import {
   Container,
   Header,
@@ -93,21 +93,21 @@ class ShowGoods extends Component {
           <View style={{width: '60%'}}>
             {<Image source={good.image} style={{width: '100%', flex: 1}} />}
           </View>
-          <View style={{width: '40%', flex: 1, flexDirection: 'column'}}>
+          <View style={{width: '40%', flex: 1, flexDirection: 'column', alignItems: 'center'}}>
             <View style={{height: '30%', justifyContent: 'center'}}>
               <Text style={{width: '100%', textAlign: 'center'}}>
                 {`${good.name} - ${good.cost} руб.`}
               </Text>
             </View>
-            <View style={{height: '70%'}}>
-              <Button
-                style={{justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%'}}
+            <View style={{height: '70%', width: '80%'}}>
+              <TouchableHighlight
+                style={{justifyContent: 'center', alignItems: 'center', width: '100%', height: '80%', backgroundColor: '#eee'}}
                 onPress={() => this.onBuy(good)}
               >
                 <Text>
                   Купить
                 </Text>
-              </Button>
+              </TouchableHighlight>
             </View>
           </View>
         </View>
