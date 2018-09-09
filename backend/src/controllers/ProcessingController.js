@@ -136,10 +136,7 @@ class ProcessingController extends BaseController {
     const requestId = this._generateIdAndWriteRequestLog(request);
 
     const { name } = request.params;
-    const { startTimestampString, endTimestampString } = request.query;
-
-    const startTimestamp = parseInt(startTimestampString, 10);
-    const endTimestamp = parseInt(endTimestampString, 10);
+    const { startTimestamp, endTimestamp } = request.query;
 
     this._processingService
       .getProcessingStats(name, startTimestamp, endTimestamp)
