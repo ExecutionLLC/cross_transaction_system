@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { connect } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Provider } from 'react-redux';
 import EnterWallet from './Views/EnterWallet';
@@ -10,12 +11,14 @@ import configureStore from './configureStore';
 
 const { store, persistor } = configureStore();
 
-export default class App extends Component {
+
+class AppWStorage extends Component {
   constructor(props) {
+    console.log(props);
     super(props);
     this.state = {
       isWalletRequest: true,
-      isSettings: false,
+      isSettings: !props.settings.url,
       walletInfo: null,
     }
   }
@@ -54,29 +57,46 @@ export default class App extends Component {
   render() {
     const { isWalletRequest, isSettings, walletInfo } = this.state;
     return (
-      <Provider store={store}>
-        <PersistGate loading={<SmallSpinner />} persistor={persistor}>
-          {isSettings
+      isSettings
+        ? (
+          <Settings
+            onDone={() => this.onDone()}
+            onCancel={() => this.onExitSettings()}
+          />
+        ) : (
+          isWalletRequest
             ? (
-              <Settings
-                onDone={() => this.onDone()}
-                onCancel={() => this.onExitSettings()}
+              <EnterWallet
+                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
+                onSettings={() => this.onSettings()}
               />
             ) : (
-              isWalletRequest
-                ? (
-                  <EnterWallet
-                    onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                    onSettings={() => this.onSettings()}
-                  />
-                ) : (
-                  <ShowGoods
-                    walletInfo={walletInfo}
-                    onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                    onCancel={() => this.onExitGoods()}
-                  />
-                )
-            )}
+              <ShowGoods
+                walletInfo={walletInfo}
+                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
+                onCancel={() => this.onExitGoods()}
+              />
+            )
+        )
+    );
+  }
+}
+
+function mapStateToProps(state) {
+  const { settings } = state;
+  return { settings };
+}
+
+const AppWStorageConnected = connect(mapStateToProps)(AppWStorage);
+
+
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <PersistGate loading={<SmallSpinner />} persistor={persistor}>
+          <AppWStorageConnected />
         </PersistGate>
       </Provider>
     );
