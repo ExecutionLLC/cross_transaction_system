@@ -121,8 +121,9 @@ class Profile extends Component {
     );
   }
 
+  // eslint-disable-next-line no-unused-vars
   renderCardInfo(title, { number, income, outcome }) {
-    const amount = Math.abs(income) + Math.abs(outcome);
+    const amount = Math.abs(outcome); // показываем только outcome
     return this.renderCardedContent(
       title,
       (
