@@ -56,7 +56,7 @@ class OtherServices extends Component {
       this.setState({
         otherServices: services,
         lastSuccessTransaction: {
-          title: 'Статус карты изменён',
+          title: 'Статус внешнего сервиса изменён',
           id: transactionId,
         },
       });
