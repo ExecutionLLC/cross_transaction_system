@@ -1,3 +1,4 @@
 {
-  "API_BASE_URL": "http://192.168.1.101:3001/"
+  "API_BASE_URL": "http://37.195.64.171:30001/",
+  "WALLET_TRANSACTION_LIM": 50
 }

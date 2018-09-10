@@ -10,6 +10,7 @@ import Loading from '../../Components/Loading';
 import ErrorPanel from '../../Components/ErrorPanel';
 import API from '../../API/API';
 import cardImage from './credit-card.png';
+import config from '../../config';
 
 
 class Cards extends Component {
@@ -34,7 +35,7 @@ class Cards extends Component {
     this.setState({
       isLoading: true,
     });
-    API.getWallet(cardNumber, 0, 10)
+    API.getWallet(cardNumber, 0, config.WALLET_TRANSACTION_LIM)
       .then((card) => {
         this.setState({
           isLoading: false,
