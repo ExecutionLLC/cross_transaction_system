@@ -1,0 +1,109 @@
+version: '2'
+
+networks:
+  ctsnet:
+
+x-common:
+  orderer-loglevel: &orderer-loglevel
+    ORDERER_GENERAL_LOGLEVEL=DEBUG
+    
+  cli-logglevel: &cli-logglevel
+    CORE_LOGGING_PEER=DEBUG
+
+
+services:
+  ca.cts.net:
+    container_name: ca.cts.net
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca.cts.net
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1.cts.net-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/432783ac4123d0f49b3abbfd6dac153c0f5ff2a2b4db69e5983a17d257eeb4b9_sk
+    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/org1.cts.net/ca/:/etc/hyperledger/fabric-ca-server-config
+    networks:
+      - ctsnet
+    ports:
+      - 7054:7054
+
+  orderer.cts.net:
+    container_name: orderer.cts.net
+    image: hyperledger/fabric-orderer
+    environment:
+      - *orderer-loglevel
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/msp/orderer/msp
+      - ORDERER_GENERAL_LOCALMSPID=OrdererOrgMSP
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderer
+    command: orderer
+    volumes:
+        - ./config/:/etc/hyperledger/configtx
+        - ./crypto-config/ordererOrganizations/cts.net/orderers/orderer.cts.net/:/etc/hyperledger/msp/orderer
+        - ./crypto-config/peerOrganizations/org1.cts.net/peers/peer0.org1.cts.net/:/etc/hyperledger/msp/peerOrg1
+        - ./storage-volumes/orderer:/var/hyperledger/production
+    networks:
+      - ctsnet
+    ports:
+      - 7050:7050
+
+  peer0.org1.cts.net:
+    extends:
+      file: docker-compose-base.yml
+      service: base-peer
+    container_name: peer0.org1.cts.net
+    environment:
+      - CORE_PEER_ID=peer0.org1
+      - CORE_PEER_LOCALMSPID=Org1MSP
+      - CORE_PEER_ADDRESS=peer0.org1.cts.net:7051
+    volumes:
+        - ./crypto-config/peerOrganizations/org1.cts.net/peers/peer0.org1.cts.net/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/org1.cts.net/users:/etc/hyperledger/msp/users
+        - ./storage-volumes/org1/peer0:/var/hyperledger/production
+    depends_on:
+      - orderer.cts.net
+    ports:
+      - 7051:7051
+      - 7053:7053
+
+  peer0.org2.cts.net:
+    extends:
+      file: docker-compose-base.yml
+      service: base-peer
+    container_name: peer0.org2.cts.net
+    environment:
+      - CORE_PEER_ID=peer0.org2
+      - CORE_PEER_LOCALMSPID=Org2MSP
+      - CORE_PEER_ADDRESS=peer0.org2.cts.net:7051
+    volumes:
+        - ./crypto-config/peerOrganizations/org2.cts.net/peers/peer0.org2.cts.net/msp:/etc/hyperledger/msp/peer
+        - ./crypto-config/peerOrganizations/org2.cts.net/users:/etc/hyperledger/msp/users
+        - ./storage-volumes/org2/peer0:/var/hyperledger/production
+    depends_on:
+      - orderer.cts.net
+
+  cli.cts.net:
+    container_name: cli.cts.net
+    image: hyperledger/fabric-tools
+    tty: true
+    environment:
+      - *cli-logglevel
+      - GOPATH=/opt/gopath
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+      - CORE_PEER_ID=cli.cts.net
+      - CORE_PEER_ADDRESS=peer0.org1.cts.net:7051
+      - CORE_PEER_LOCALMSPID=Org0MSP
+      - CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.cts.net/users/Admin@org1.cts.net/msp
+      - CORE_CHAINCODE_KEEPALIVE=10
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+        - /var/run/:/host/var/run/
+        - ./../chaincode/:/opt/gopath/src/github.com/cts
+        - ./crypto-config:/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/
+        - ./config:/opt/gopath/src/github.com/hyperledger/fabric/peer/config/
+    networks:
+        - ctsnet

@@ -1,0 +1,34 @@
+{
+  "name": "cross-transaction-system-backend",
+  "version": "1.0.0",
+  "description": "Cross transaction system backend",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "init-store": "node scripts/init-store.js",
+    "generate-token": "node scripts/generate-token.js"
+  },
+  "dependencies": {
+    "body-parser": "1.18.3",
+    "change-case": "3.0.2",
+    "cors": "2.8.4",
+    "dateformat": "3.0.3",
+    "express": "4.16.3",
+    "fabric-ca-client": "1.2.1",
+    "fabric-client": "1.2.1",
+    "http-status-codes": "1.3.0",
+    "jsonwebtoken": "8.3.0",
+    "nconf": "0.10.0",
+    "oracledb": "2.3.0",
+    "path": "0.12.7",
+    "uuid": "3.3.2",
+    "winston": "3.0.0"
+  },
+  "author": "RadicalEdward",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "eslint": "5.4.0",
+    "eslint-config-airbnb-base": "13.1.0",
+    "eslint-plugin-import": "2.14.0"
+  }
+}
