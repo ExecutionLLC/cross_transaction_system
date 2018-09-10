@@ -97,9 +97,10 @@ type Transaction struct {
 }
 
 type TransactionsStats struct {
-	Number  int32   `json:"number"`
-	Income  float32 `json:"income"`
-	Outcome float32 `json:"outcome"`
+	NumberIncome  int32   `json:"numberIncome"`
+	NumberOutcome int32   `json:"numberOutcome"`
+	Income        float32 `json:"income"`
+	Outcome       float32 `json:"outcome"`
 }
 
 type ProcessingDayStats struct {
@@ -966,7 +967,8 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 	}
 	defer internalTransactionsIter.Close()
 
-	dayStats.InternalTransactions.Number = 0
+	dayStats.InternalTransactions.NumberIncome = 0
+	dayStats.InternalTransactions.NumberOutcome = 0
 	dayStats.InternalTransactions.Income = 0.0
 	dayStats.InternalTransactions.Outcome = 0.0
 	for internalTransactionsIter.HasNext() {
@@ -977,10 +979,11 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 		amountBytes := internalTransactionKV.GetValue()
 		amount := Float32frombytes(amountBytes)
 
-		dayStats.InternalTransactions.Number += 1
 		if amount > 0 {
+			dayStats.InternalTransactions.NumberIncome += 1
 			dayStats.InternalTransactions.Income += amount
 		} else {
+			dayStats.InternalTransactions.NumberOutcome += 1
 			dayStats.InternalTransactions.Outcome += amount
 		}
 	}
@@ -991,7 +994,8 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 	}
 	defer srcIter.Close()
 
-	dayStats.SourceTransactions.Number = 0
+	dayStats.SourceTransactions.NumberIncome = 0
+	dayStats.SourceTransactions.NumberOutcome = 0
 	dayStats.SourceTransactions.Income = 0.0
 	dayStats.SourceTransactions.Outcome = 0.0
 	for srcIter.HasNext() {
@@ -1002,10 +1006,11 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 		amountBytes := srcKV.GetValue()
 		amount := Float32frombytes(amountBytes)
 
-		dayStats.SourceTransactions.Number += 1
 		if amount > 0 {
+			dayStats.SourceTransactions.NumberIncome += 1
 			dayStats.SourceTransactions.Income += amount
 		} else {
+			dayStats.SourceTransactions.NumberOutcome += 1
 			dayStats.SourceTransactions.Outcome += amount
 		}
 	}
@@ -1016,7 +1021,8 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 	}
 	defer dstIter.Close()
 
-	dayStats.DestinationTransactions.Number = 0
+	dayStats.DestinationTransactions.NumberIncome = 0
+	dayStats.DestinationTransactions.NumberOutcome = 0
 	dayStats.DestinationTransactions.Income = 0.0
 	dayStats.DestinationTransactions.Outcome = 0.0
 	for dstIter.HasNext() {
@@ -1027,10 +1033,11 @@ func (cts *CrossTransactionSystem) getProcessingDayStats(APIstub shim.ChaincodeS
 		amountBytes := dstKV.GetValue()
 		amount := Float32frombytes(amountBytes)
 
-		dayStats.DestinationTransactions.Number += 1
 		if amount > 0 {
+			dayStats.DestinationTransactions.NumberIncome += 1
 			dayStats.DestinationTransactions.Income += amount
 		} else {
+			dayStats.DestinationTransactions.NumberOutcome += 1
 			dayStats.DestinationTransactions.Outcome += amount
 		}
 	}
