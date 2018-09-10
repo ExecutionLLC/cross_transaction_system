@@ -45,7 +45,9 @@ class Cards extends Component {
       .catch((error) => {
         this.setState({
           isLoading: false,
-          error: error.message,
+          error: error.statusCode === 404
+            ? `Карта с номером '${cardNumber}' не найдена.`
+            : 'Внутренняя ошибка сервера. Обратитесь к администратору.',
           card: null,
         });
       });
