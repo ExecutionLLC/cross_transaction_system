@@ -36,6 +36,16 @@ deployChaincode()
     execCliCommand "peer" "chaincode" "instantiate" "-o" "$ORDERER_URL" "-C" "$channelName" "-n" "$chaincodeName" "-v" "1.0" "-c" "{\"Args\":[\"\"]}"
 }
 
+upgradeChaincode()
+{
+    channelName="${1}"
+    chaincodeName="${2}"
+    version="${3}"
+
+    execCliCommand "peer" "chaincode" "install" "-n" "$chaincodeName" "-v" "$version" "-p" "github.com/cts"
+    execCliCommand "peer" "chaincode" "upgrade" "-o" "$ORDERER_URL" "-C" "$channelName" "-n" "$chaincodeName" "-v" "$version" "-c" "{\"Args\":[\"\"]}"
+}
+
 chaincodeQuery()
 {
     channelName="${1}"
