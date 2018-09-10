@@ -3,7 +3,9 @@ const BaseModel = require('./BaseModel');
 class UmkaAggregatorModel extends BaseModel {
   getMinInsDate() {
     const request = this._chaincodeApi.createQueryRequest('getUserKeyValue', ['minInsDate']);
-    return this._chaincodeApi.sendQueryRequest(request).then(result => new Date(result));
+    return this._chaincodeApi
+      .sendQueryRequest(request)
+      .then(result => new Date(result));
   }
 
   setMinInsDate(date) {
