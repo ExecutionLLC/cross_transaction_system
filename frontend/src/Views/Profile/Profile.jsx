@@ -77,32 +77,26 @@ class Profile extends Component {
 
   calcTotalValues() {
     const { profileData } = this.state;
-    const ownServicesOwnCards = profileData.reduce((acc, item) => {
-      return {
-        ...acc,
-        number: acc.number + item.internalTransactions.number,
-        income: acc.income + item.internalTransactions.income,
-        outcome: acc.outcome + item.internalTransactions.outcome,
-      };
-    }, { number: 0, income: 0, outcome: 0 });
+    const ownServicesOwnCards = profileData.reduce((acc, item) => ({
+      ...acc,
+      numberOutcome: acc.numberOutcome + item.internalTransactions.numberOutcome,
+      income: acc.income + item.internalTransactions.income,
+      outcome: acc.outcome + item.internalTransactions.outcome,
+    }), { numberOutcome: 0, income: 0, outcome: 0 });
 
-    const ownServicesOtherCards = profileData.reduce((acc, item) => {
-      return {
-        ...acc,
-        number: acc.number + item.sourceTransactions.number,
-        income: acc.income + item.sourceTransactions.income,
-        outcome: acc.outcome + item.sourceTransactions.outcome,
-      };
-    }, { number: 0, income: 0, outcome: 0 });
+    const ownServicesOtherCards = profileData.reduce((acc, item) => ({
+      ...acc,
+      numberOutcome: acc.numberOutcome + item.sourceTransactions.numberOutcome,
+      income: acc.income + item.sourceTransactions.income,
+      outcome: acc.outcome + item.sourceTransactions.outcome,
+    }), { numberOutcome: 0, income: 0, outcome: 0 });
 
-    const otherServicesOwnCards = profileData.reduce((acc, item) => {
-      return {
-        ...acc,
-        number: acc.number + item.destinationTransactions.number,
-        income: acc.income + item.destinationTransactions.income,
-        outcome: acc.outcome + item.destinationTransactions.outcome,
-      };
-    }, { number: 0, income: 0, outcome: 0 });
+    const otherServicesOwnCards = profileData.reduce((acc, item) => ({
+      ...acc,
+      numberOutcome: acc.numberOutcome + item.destinationTransactions.numberOutcome,
+      income: acc.income + item.destinationTransactions.income,
+      outcome: acc.outcome + item.destinationTransactions.outcome,
+    }), { numberOutcome: 0, income: 0, outcome: 0 });
     return {
       ownServicesOwnCards,
       ownServicesOtherCards,
@@ -122,7 +116,7 @@ class Profile extends Component {
   }
 
   // eslint-disable-next-line no-unused-vars
-  renderCardInfo(title, { number, income, outcome }) {
+  renderCardInfo(title, { numberOutcome, income, outcome }) {
     const amount = Math.abs(outcome); // показываем только outcome
     return this.renderCardedContent(
       title,
@@ -134,7 +128,7 @@ class Profile extends Component {
                 Количество транзакций:
               </Col>
               <Col sm={6}>
-                {number}
+                {numberOutcome}
               </Col>
             </Row>
           </ListGroupItem>
@@ -166,9 +160,9 @@ class Profile extends Component {
         ownServicesOtherCards,
         otherServicesOwnCards,
       } = this.calcTotalValues();
-      totalCount = ownServicesOwnCards.number
-        + ownServicesOtherCards.number
-        + otherServicesOwnCards.number;
+      totalCount = ownServicesOwnCards.numberOutcome
+        + ownServicesOtherCards.numberOutcome
+        + otherServicesOwnCards.numberOutcome;
     }
     return this.renderCardedContent(
       'Статистика за сутки',
