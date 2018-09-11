@@ -28,13 +28,6 @@ class AppWStorage extends Component {
     });
   }
 
-  onExitGoods() {
-    // TODO there will not be exit
-    // this.setState({
-    //   isWalletRequest: true,
-    // });
-  }
-
   onBuy(good) {
     this.setState({
       isWalletRequest: true,
