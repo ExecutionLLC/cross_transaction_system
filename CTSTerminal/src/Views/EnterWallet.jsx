@@ -35,6 +35,18 @@ class EnterWallet extends Component {
     });
   }
 
+  onWalletInfo(walletInfo) {
+    const { good } = this.props;
+    if (walletInfo.balance < good.cost) {
+      this.setState({
+        error: {
+          message: `Недостаточно средств, баланс ${walletInfo.balance}р`,
+        }
+      });
+      return;
+    }
+  }
+
   onSubmit() {
     this.setState({
       isLoading: true,
@@ -46,7 +58,7 @@ class EnterWallet extends Component {
           isLoading: false,
           error: null,
         });
-        // TODO do something with wallet
+        this.onWalletInfo(walletInfo);
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {
