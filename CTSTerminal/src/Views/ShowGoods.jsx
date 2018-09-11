@@ -4,7 +4,7 @@ import { Text, Image, View, TouchableHighlight, ActivityIndicator } from 'react-
 import {
   Container,
   Header,
-  Left,
+  Right,
   Content,
   Body,
   Title,
@@ -151,21 +151,21 @@ class ShowGoods extends Component {
 
   render() {
     const { error } = this.state;
-    const { onCancel } = this.props;
+    const { onSettings } = this.props;
     return (
       <Container>
         <Header>
-          <Left>
+          <Body>
+            <Title>Выбор товара</Title>
+          </Body>
+          <Right>
             <Button
               transparent
-              onPress={onCancel}
+              onPress={onSettings}
             >
-              <Icon name='arrow-back' />
+              <Icon name='menu' />
             </Button>
-          </Left>
-          <Body>
-          <Title>Выбор товара</Title>
-          </Body>
+          </Right>
         </Header>
         <Content>
           {error && (

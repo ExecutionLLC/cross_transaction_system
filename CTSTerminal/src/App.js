@@ -75,7 +75,7 @@ class AppWStorage extends Component {
               />
             ) : (
               <ShowGoods
-                onCancel={() => this.onExitGoods()}
+                onSettings={() => this.onSettings()}
               />
             )
         )
