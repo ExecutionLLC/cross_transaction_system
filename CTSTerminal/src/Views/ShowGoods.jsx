@@ -12,7 +12,6 @@ import {
   Card,
   Icon,
 } from 'native-base';
-import api from '../API/api';
 
 
 const goodsImages = {
@@ -47,21 +46,17 @@ class ShowGoods extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false, // TODO there will be no 'loading' state
-      buyingGoodName: null,
       error: null,
     };
-    this.api = api.URLedAPI(props.settings.url);
   }
 
   renderGood(good) {
     const { onBuy } = this.props;
-    const { isLoading, buyingGoodName } = this.state;
     return (
       <Card
         key={good.name}
       >
-        <View style={{flex: 1, flexDirection: 'row', opacity: isLoading ? 0.2 : 1}}>
+        <View style={{flex: 1, flexDirection: 'row'}}>
           <View style={{width: '60%'}}>
             {<Image source={good.image} style={{width: '100%', flex: 1}} />}
           </View>
@@ -81,7 +76,6 @@ class ShowGoods extends Component {
                   backgroundColor: '#eee'
                 }}
                 onPress={() => onBuy(good)}
-                disabled={isLoading}
               >
                 <Text style={{textAlign: 'center'}}>
                   {`${good.cost} руб.\nКупить`}
@@ -90,20 +84,6 @@ class ShowGoods extends Component {
             </View>
           </View>
         </View>
-        {isLoading && buyingGoodName === good.name && (
-          <ActivityIndicator
-            size='large'
-            style={{
-              position: 'absolute',
-              alignItems: 'center',
-              justifyContent: 'center',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-            }}
-          />
-        )}
       </Card>
     );
   }
