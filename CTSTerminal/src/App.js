@@ -17,23 +17,26 @@ class AppWStorage extends Component {
     console.log(props);
     super(props);
     this.state = {
-      isWalletRequest: true,
+      isWalletRequest: false,
       isSettings: !props.settings.url,
-      walletInfo: null,
+      walletInfo: null, // TODO all wallet info left in EnterWallet
+      // TODO will be added good for buy
     }
   }
 
   onWalletInfo(walletInfo) {
-    this.setState({
-      walletInfo,
-      isWalletRequest: false,
-    });
+    // TODO: there will be 'onWalletDone' without any info
+    // this.setState({
+    //   walletInfo,
+    //   isWalletRequest: false,
+    // });
   }
 
   onExitGoods() {
-    this.setState({
-      isWalletRequest: true,
-    });
+    // TODO there will not be exit
+    // this.setState({
+    //   isWalletRequest: true,
+    // });
   }
 
   onSettings() {
@@ -48,7 +51,7 @@ class AppWStorage extends Component {
     });
   }
 
-  onDone() {
+  onDoneSettings() {
     this.setState({
       isSettings: false,
     });
@@ -60,7 +63,7 @@ class AppWStorage extends Component {
       isSettings
         ? (
           <Settings
-            onDone={() => this.onDone()}
+            onDone={() => this.onDoneSettings()}
             onCancel={() => this.onExitSettings()}
           />
         ) : (

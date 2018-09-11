@@ -47,7 +47,7 @@ class ShowGoods extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false,
+      isLoading: false, // TODO there will be no 'loading' state
       buyingGoodName: null,
       error: null,
     };
@@ -55,46 +55,45 @@ class ShowGoods extends Component {
   }
 
   onBuy(good) {
-    const { walletInfo: { id } } = this.props;
-    this.setState({
-      isLoading: true,
-      error: null,
-      buyingGoodName: good.name,
-    });
-    this.api.buyGood(id, good.cost, good.name)
-      .then(res => {
-        this.setState({
-          isLoading: false,
-          error: null,
-        });
-        this.props.onWalletInfo(res.walletInfo);
-      })
-      .catch(error => {
-        this.api.enterWallet(id)
-          .then(walletInfo => {
-            this.setState({
-              isLoading: false,
-              error: {
-                message: error.message,
-              },
-            });
-            this.props.onWalletInfo(walletInfo);
-          })
-          .catch(() => {
-            this.setState({
-              isLoading: false,
-              error: {
-                message: error.message,
-              },
-            });
-          });
-      });
+    // TODO just call back with selected good
+    // const { walletInfo: { id } } = this.props;
+    // this.setState({
+    //   isLoading: true,
+    //   error: null,
+    //   buyingGoodName: good.name,
+    // });
+    // this.api.buyGood(id, good.cost, good.name)
+    //   .then(res => {
+    //     this.setState({
+    //       isLoading: false,
+    //       error: null,
+    //     });
+    //     this.props.onWalletInfo(res.walletInfo);
+    //   })
+    //   .catch(error => {
+    //     this.api.enterWallet(id)
+    //       .then(walletInfo => {
+    //         this.setState({
+    //           isLoading: false,
+    //           error: {
+    //             message: error.message,
+    //           },
+    //         });
+    //         this.props.onWalletInfo(walletInfo);
+    //       })
+    //       .catch(() => {
+    //         this.setState({
+    //           isLoading: false,
+    //           error: {
+    //             message: error.message,
+    //           },
+    //         });
+    //       });
+    //   });
   }
 
   renderGood(good) {
     const { isLoading, buyingGoodName } = this.state;
-    const { walletInfo: { balance } } = this.props;
-    const disable = balance < good.cost;
     return (
       <Card
         key={good.name}
@@ -119,10 +118,10 @@ class ShowGoods extends Component {
                   backgroundColor: '#eee'
                 }}
                 onPress={() => this.onBuy(good)}
-                disabled={disable || isLoading}
+                disabled={isLoading}
               >
-                <Text style={{color: disable ? 'red' : null, textAlign: 'center'}}>
-                  {disable ? `${good.cost} руб.\nНедостаточно средств для покупки` : `${good.cost} руб.\nКупить`}
+                <Text style={{textAlign: 'center'}}>
+                  {`${good.cost} руб.\nКупить`}
                 </Text>
               </TouchableHighlight>
             </View>
@@ -152,7 +151,7 @@ class ShowGoods extends Component {
 
   render() {
     const { error } = this.state;
-    const { walletInfo: { balance }, onCancel } = this.props;
+    const { onCancel } = this.props;
     return (
       <Container>
         <Header>
@@ -169,9 +168,6 @@ class ShowGoods extends Component {
           </Body>
         </Header>
         <Content>
-          <Text style={{fontSize: 30}}>
-            {`Баланс: ${balance}`}
-          </Text>
           {error && (
             <Text>
               {`Ошибка: ${error.message}`}
