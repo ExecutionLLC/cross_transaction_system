@@ -75,8 +75,6 @@ class AppWStorage extends Component {
               />
             ) : (
               <ShowGoods
-                walletInfo={walletInfo}
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
                 onCancel={() => this.onExitGoods()}
               />
             )
