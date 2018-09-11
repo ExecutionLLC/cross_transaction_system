@@ -73,7 +73,7 @@ class EnterWallet extends Component {
       isLoading,
       error,
     } = this.state;
-    const {onSettings} = this.props;
+    const { onSettings, good } = this.props;
     const disabled = !walletId;
     return (
       <Container>
@@ -92,6 +92,9 @@ class EnterWallet extends Component {
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
+            <Text style={{marginBottom: 20}}>
+              {`Сумма покупки: ${good.cost}р`}
+            </Text>
             <Item regular error={error && error.urlError} style={{marginBottom: 20}}>
               <Input
                 placeholder="№ кошелька"

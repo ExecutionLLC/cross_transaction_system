@@ -64,7 +64,7 @@ class AppWStorage extends Component {
   }
 
   render() {
-    const { isWalletRequest, isSettings, walletInfo } = this.state;
+    const { isWalletRequest, isSettings, selectedGood } = this.state;
     return (
       isSettings
         ? (
@@ -76,6 +76,7 @@ class AppWStorage extends Component {
           isWalletRequest
             ? (
               <EnterWallet
+                good={selectedGood}
                 onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
                 onSettings={() => this.onSettings()}
               />

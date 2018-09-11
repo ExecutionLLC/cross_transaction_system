@@ -80,7 +80,7 @@ class ShowGoods extends Component {
                   height: '80%',
                   backgroundColor: '#eee'
                 }}
-                onPress={onBuy}
+                onPress={() => onBuy(good)}
                 disabled={isLoading}
               >
                 <Text style={{textAlign: 'center'}}>
