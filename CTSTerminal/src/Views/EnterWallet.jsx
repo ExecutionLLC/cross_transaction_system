@@ -66,7 +66,7 @@ class EnterWallet extends Component {
             isLoading: false,
             error: {
               message: 'Кошелёк не найден',
-              urlError: true,
+              walletError: true,
             },
           });
         } else {
@@ -106,7 +106,7 @@ class EnterWallet extends Component {
             <Text style={{marginBottom: 20}}>
               {`Сумма покупки: ${good.cost}р`}
             </Text>
-            <Item regular error={error && error.urlError} style={{marginBottom: 20}}>
+            <Item regular error={error && error.walletError} style={{marginBottom: 20}}>
               <Input
                 placeholder="№ кошелька"
                 autoCorrect={false}
