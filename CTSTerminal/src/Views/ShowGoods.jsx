@@ -45,9 +45,6 @@ const goods = [
 class ShowGoods extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      error: null,
-    };
   }
 
   renderGood(good) {
@@ -93,7 +90,6 @@ class ShowGoods extends Component {
   }
 
   render() {
-    const { error } = this.state;
     const { onSettings } = this.props;
     return (
       <Container>
@@ -111,11 +107,6 @@ class ShowGoods extends Component {
           </Right>
         </Header>
         <Content>
-          {error && (
-            <Text>
-              {`Ошибка: ${error.message}`}
-            </Text>
-          )}
           {this.renderGoods()}
         </Content>
       </Container>
