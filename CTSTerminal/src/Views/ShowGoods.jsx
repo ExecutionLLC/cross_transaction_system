@@ -54,45 +54,8 @@ class ShowGoods extends Component {
     this.api = api.URLedAPI(props.settings.url);
   }
 
-  onBuy(good) {
-    // TODO just call back with selected good
-    // const { walletInfo: { id } } = this.props;
-    // this.setState({
-    //   isLoading: true,
-    //   error: null,
-    //   buyingGoodName: good.name,
-    // });
-    // this.api.buyGood(id, good.cost, good.name)
-    //   .then(res => {
-    //     this.setState({
-    //       isLoading: false,
-    //       error: null,
-    //     });
-    //     this.props.onWalletInfo(res.walletInfo);
-    //   })
-    //   .catch(error => {
-    //     this.api.enterWallet(id)
-    //       .then(walletInfo => {
-    //         this.setState({
-    //           isLoading: false,
-    //           error: {
-    //             message: error.message,
-    //           },
-    //         });
-    //         this.props.onWalletInfo(walletInfo);
-    //       })
-    //       .catch(() => {
-    //         this.setState({
-    //           isLoading: false,
-    //           error: {
-    //             message: error.message,
-    //           },
-    //         });
-    //       });
-    //   });
-  }
-
   renderGood(good) {
+    const { onBuy } = this.props;
     const { isLoading, buyingGoodName } = this.state;
     return (
       <Card
@@ -117,7 +80,7 @@ class ShowGoods extends Component {
                   height: '80%',
                   backgroundColor: '#eee'
                 }}
-                onPress={() => this.onBuy(good)}
+                onPress={onBuy}
                 disabled={isLoading}
               >
                 <Text style={{textAlign: 'center'}}>

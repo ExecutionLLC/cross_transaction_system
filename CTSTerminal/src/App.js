@@ -20,7 +20,7 @@ class AppWStorage extends Component {
       isWalletRequest: false,
       isSettings: !props.settings.url,
       walletInfo: null, // TODO all wallet info left in EnterWallet
-      // TODO will be added good for buy
+      selectedGood: null,
     }
   }
 
@@ -37,6 +37,13 @@ class AppWStorage extends Component {
     // this.setState({
     //   isWalletRequest: true,
     // });
+  }
+
+  onBuy(good) {
+    this.setState({
+      isWalletRequest: true,
+      selectedGood: good,
+    });
   }
 
   onSettings() {
@@ -76,6 +83,7 @@ class AppWStorage extends Component {
             ) : (
               <ShowGoods
                 onSettings={() => this.onSettings()}
+                onBuy={(good) => this.onBuy(good)}
               />
             )
         )
