@@ -14,7 +14,6 @@ const { store, persistor } = configureStore();
 
 class AppWStorage extends Component {
   constructor(props) {
-    console.log(props);
     super(props);
     this.state = {
       isWalletRequest: false,
