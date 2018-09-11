@@ -18,17 +18,14 @@ class AppWStorage extends Component {
     this.state = {
       isWalletRequest: false,
       isSettings: !props.settings.url,
-      walletInfo: null, // TODO all wallet info left in EnterWallet
       selectedGood: null,
     }
   }
 
-  onWalletInfo(walletInfo) {
-    // TODO: there will be 'onWalletDone' without any info
-    // this.setState({
-    //   walletInfo,
-    //   isWalletRequest: false,
-    // });
+  onWalletDone() {
+    this.setState({
+      isWalletRequest: false,
+    });
   }
 
   onExitGoods() {
@@ -77,8 +74,7 @@ class AppWStorage extends Component {
             ? (
               <EnterWallet
                 good={selectedGood}
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                onSettings={() => this.onSettings()}
+                onBack={() => this.onWalletDone()}
               />
             ) : (
               <ShowGoods

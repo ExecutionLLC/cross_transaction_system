@@ -11,7 +11,7 @@ import {
   Body,
   Title,
   Button,
-  Right,
+  Left,
   Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
@@ -36,7 +36,6 @@ class EnterWallet extends Component {
   }
 
   onSubmit() {
-    const { onWalletInfo } = this.props;
     this.setState({
       isLoading: true,
       error: null,
@@ -47,7 +46,7 @@ class EnterWallet extends Component {
           isLoading: false,
           error: null,
         });
-        onWalletInfo(walletInfo);
+        // TODO do something with wallet
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {
@@ -73,22 +72,22 @@ class EnterWallet extends Component {
       isLoading,
       error,
     } = this.state;
-    const { onSettings, good } = this.props;
+    const { onBack, good } = this.props;
     const disabled = !walletId;
     return (
       <Container>
         <Header>
+          <Left>
+            <Button
+              transparent
+              onPress={onBack}
+            >
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
           <Body style={{flex: 3}}>
             <Title>Введите № кошелька</Title>
           </Body>
-          <Right>
-            <Button
-              transparent
-              onPress={onSettings}
-            >
-              <Icon name='menu' />
-            </Button>
-          </Right>
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
