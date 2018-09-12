@@ -36,7 +36,7 @@ class EnterWallet extends Component {
   }
 
   onWalletInfo(walletInfo) {
-    const { good } = this.props;
+    const { good, onBack } = this.props;
     if (walletInfo.balance < good.cost) {
       this.setState({
         error: {
@@ -45,6 +45,27 @@ class EnterWallet extends Component {
       });
       return;
     }
+    this.api.buyGood(
+      walletInfo.id,
+      good.cost,
+      good.name
+    )
+      .then(
+        () => {
+          this.setState({
+            isLoading: false,
+            error,
+          });
+        },
+        onBack,
+      )
+      .catch((error) => {
+        this.setState({
+          error: {
+            message: `Ошибка сервера: ${error.message}`,
+          }
+        });
+      });
   }
 
   onSubmit() {
