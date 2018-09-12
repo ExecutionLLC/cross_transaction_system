@@ -780,7 +780,8 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 	serviceName := transaction.ServiceName
 	dateString, timeString := TimestampToIndexStrings(transaction.Timestamp)
 	transactionID := APIstub.GetTxID()
-	amountAsBytes := Float32bytes(transaction.Amount)
+	amount := transaction.Amount
+	amountAsBytes := Float32bytes(amount)
 	walletID := transaction.WalletID
 
 	transaction.ID = transactionID
@@ -813,7 +814,7 @@ func (cts *CrossTransactionSystem) addTransaction(APIstub shim.ChaincodeStubInte
 		}
 		currentBalance := walletExtendedInfo.Balance
 		currentBalance += walletExtendedInfo.BalanceVirtualDiff
-		if currentBalance < serviceInfo.MinBalanceLimit {
+		if (currentBalance + amount) < serviceInfo.MinBalanceLimit {
 			return shim.Error("Transaction blocked (currentBalance < MinBalanceLimit)")
 		}
 
