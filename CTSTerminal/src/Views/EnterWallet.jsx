@@ -156,11 +156,13 @@ class EnterWallet extends Component {
           </Body>
         </Header>
         <Content>
-          <QRCodeScanner
-            ref={node => { this.QRCodeScanner = node; }}
-            onRead={(event) => this.onScan(event.data)}
-            showMarker={true}
-          />
+          {!success && (
+            <QRCodeScanner
+              ref={node => { this.QRCodeScanner = node; }}
+              onRead={(event) => this.onScan(event.data)}
+              showMarker={true}
+            />
+          )}
           <Form style={{margin: 20, marginTop: 10}}>
             {!success &&
               <Text style={{ marginBottom: 20 }}>
@@ -189,7 +191,7 @@ class EnterWallet extends Component {
             ) : (
               success
                 ? (
-                  <View>
+                  <View style={{marginTop: 20}}>
                     <Text style={{color: 'green', marginBottom: 20}}>
                       Спасибо за покупку
                     </Text>
