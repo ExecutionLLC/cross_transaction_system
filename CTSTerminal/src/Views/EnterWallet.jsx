@@ -121,9 +121,10 @@ class EnterWallet extends Component {
   }
 
   onScan(code) {
+    const walletId = code.slice(3).slice(0, -1);
     this.setState(
       {
-        walletId: code,
+        walletId,
       },
       () => {
         this.onSubmit();
