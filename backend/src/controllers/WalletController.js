@@ -1,11 +1,6 @@
 const Express = require('express');
 const BaseController = require('./BaseController');
-
-const WALLET_MAPPING = {
-  '0150007279': '24378400246845',
-  '0150007280': '24378500246845',
-  '0150007163': '24366800246845',
-};
+const tryToFixWalletId = require('../common/WalletMapping');
 
 class WalletController extends BaseController {
   constructor(services) {
@@ -19,14 +14,10 @@ class WalletController extends BaseController {
     const { processingName, walletId } = request.params;
     const { offset, limit } = request.query;
 
-    const walletIdStr = walletId.toString();
-    let walletIdStrFixed = walletIdStr;
-    if (WALLET_MAPPING[walletIdStrFixed] !== undefined) {
-      walletIdStrFixed = WALLET_MAPPING[walletIdStrFixed];
-    }
+    const fixedWalletId = tryToFixWalletId(walletId);
 
     this._walletService
-      .get(processingName, walletIdStrFixed, offset, limit)
+      .get(processingName, fixedWalletId, offset, limit)
       .then((wallet) => {
         this._sendJsonAndWriteResponseLog(requestId, response, wallet);
       })

@@ -1,5 +1,6 @@
 const Express = require('express');
 const BaseController = require('./BaseController');
+const tryToFixWalletId = require('../common/WalletMapping');
 
 class TransactionController extends BaseController {
   constructor(services) {
@@ -11,6 +12,7 @@ class TransactionController extends BaseController {
     const requestId = this._generateIdAndWriteRequestLog(request);
 
     const transaction = request.body;
+    transaction.walletId = tryToFixWalletId(transaction.walletId);
 
     this._transactionService
       .add(transaction)
