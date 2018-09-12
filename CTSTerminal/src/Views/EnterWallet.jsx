@@ -39,6 +39,7 @@ class EnterWallet extends Component {
     const { good, onBack } = this.props;
     if (walletInfo.balance < good.cost) {
       this.setState({
+        isLoading: false,
         error: {
           message: `Недостаточно средств, баланс ${walletInfo.balance}р`,
         }
@@ -51,16 +52,19 @@ class EnterWallet extends Component {
       good.name
     )
       .then(
-        () => {
-          this.setState({
-            isLoading: false,
-            error,
-          });
+        (walletInfo) => {
+          this.setState(
+            {
+              isLoading: false,
+              error: null,
+            },
+            onBack,
+          );
         },
-        onBack,
       )
       .catch((error) => {
         this.setState({
+          isLoading: false,
           error: {
             message: `сервер вернул "${error.message}"`,
           }
@@ -75,10 +79,6 @@ class EnterWallet extends Component {
     });
     this.api.enterWallet(this.state.walletId)
       .then(walletInfo => {
-        this.setState({
-          isLoading: false,
-          error: null,
-        });
         this.onWalletInfo(walletInfo);
       })
       .catch(error => {
