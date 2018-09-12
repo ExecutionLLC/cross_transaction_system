@@ -19,7 +19,8 @@ class WalletController extends BaseController {
     this._walletService
       .get(processingName, fixedWalletId, offset, limit)
       .then((wallet) => {
-        this._sendJsonAndWriteResponseLog(requestId, response, wallet);
+        const fixedWallet = Object.assign({}, wallet, { id: walletId });
+        this._sendJsonAndWriteResponseLog(requestId, response, fixedWallet);
       })
       .catch((error) => {
         this._sendErrorAndWriteResponseLogAndErrorLog(requestId, response, error);
