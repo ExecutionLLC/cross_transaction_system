@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Text, TouchableHighlight } from 'react-native';
+import { Text, TouchableHighlight, View } from 'react-native';
 import {
   Container,
   Header,
@@ -25,6 +25,7 @@ class EnterWallet extends Component {
       walletId: '',
       isLoading: false,
       error: null,
+      success: false,
     };
     this.api = api.URLedAPI(props.settings.url);
   }
@@ -52,14 +53,12 @@ class EnterWallet extends Component {
       good.name
     )
       .then(
-        (walletInfo) => {
-          this.setState(
-            {
-              isLoading: false,
-              error: null,
-            },
-            onBack,
-          );
+        () => {
+          this.setState({
+            isLoading: false,
+            error: null,
+            success: true,
+          });
         },
       )
       .catch((error) => {
@@ -104,6 +103,7 @@ class EnterWallet extends Component {
       walletId,
       isLoading,
       error,
+      success,
     } = this.state;
     const { onBack, good } = this.props;
     const disabled = !walletId;
@@ -124,19 +124,23 @@ class EnterWallet extends Component {
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
-            <Text style={{marginBottom: 20}}>
-              {`Сумма покупки: ${good.cost}р`}
-            </Text>
-            <Item regular error={error && error.walletError} style={{marginBottom: 20}}>
-              <Input
-                placeholder="№ кошелька"
-                autoCorrect={false}
-                autoCapitalize="none"
-                value={walletId}
-                disabled={isLoading}
-                onChangeText={walletId => this.onWalletChange(walletId)}
-              />
-            </Item>
+            {!success &&
+              <Text style={{ marginBottom: 20 }}>
+                {`Сумма покупки: ${good.cost}р`}
+              </Text>
+            }
+            {!success &&
+              <Item regular error={error && error.walletError} style={{marginBottom: 20}}>
+                <Input
+                  placeholder="№ кошелька"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={walletId}
+                  disabled={isLoading}
+                  onChangeText={walletId => this.onWalletChange(walletId)}
+                />
+              </Item>
+            }
             {error && (
               <Text style={{marginBottom: 20}}>
                 {`Ошибка: ${error.message}`}
@@ -145,19 +149,41 @@ class EnterWallet extends Component {
             {isLoading ? (
               <SmallSpinner />
             ) : (
-              <TouchableHighlight
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                  height: 50,
-                  backgroundColor: '#eee'
-                }}
-                disabled={disabled}
-                onPress={() => this.onSubmit()}
-              >
-                <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
-              </TouchableHighlight>
+              success
+                ? (
+                  <View>
+                    <Text style={{color: 'green', marginBottom: 20}}>
+                      Спасибо за покупку
+                    </Text>
+                    <TouchableHighlight
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: 50,
+                        backgroundColor: '#eee'
+                      }}
+                      disabled={disabled}
+                      onPress={onBack}
+                    >
+                      <Text style={{textAlign: 'center'}}>ОК</Text>
+                    </TouchableHighlight>
+                  </View>
+                ) : (
+                  <TouchableHighlight
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: '100%',
+                      height: 50,
+                      backgroundColor: '#eee'
+                    }}
+                    disabled={disabled}
+                    onPress={() => this.onSubmit()}
+                  >
+                    <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
+                  </TouchableHighlight>
+                )
             )}
           </Form>
         </Content>
