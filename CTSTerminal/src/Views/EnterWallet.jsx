@@ -121,7 +121,16 @@ class EnterWallet extends Component {
   }
 
   onScan(code) {
-    const walletId = code.slice(3).slice(0, -1);
+    const walletId = code.replace(/\s/g, '').slice(3, -1);
+    if (walletId === this.state.walletId) {
+      setTimeout(
+        () => {
+          this.QRCodeScanner.reactivate();
+        },
+        1000
+      );
+      return;
+    }
     this.setState(
       {
         walletId,
