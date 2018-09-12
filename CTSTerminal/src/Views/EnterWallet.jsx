@@ -62,7 +62,7 @@ class EnterWallet extends Component {
       .catch((error) => {
         this.setState({
           error: {
-            message: `Ошибка сервера: ${error.message}`,
+            message: `сервер вернул "${error.message}"`,
           }
         });
       });
