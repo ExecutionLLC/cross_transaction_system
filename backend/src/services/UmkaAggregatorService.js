@@ -78,6 +78,7 @@ class UmkaAggregatorService extends BaseService {
         idCard,
         epBalance,
         amount,
+        amountBail,
         operationSumma,
       ] = r;
 
@@ -91,6 +92,7 @@ class UmkaAggregatorService extends BaseService {
         return;
       }
 
+      const balance = amountBail ? epBalance - amountBail : epBalance;
       const transactionDate = new Date(dateOf);
       const timestamp = +transactionDate;
 
@@ -99,7 +101,7 @@ class UmkaAggregatorService extends BaseService {
           id: idCard.toString(),
           processingName: PROCESSING_NAME,
           balanceTimestamp: timestamp,
-          balance: epBalance,
+          balance,
         };
       } else if (balancesMap[idCard].balanceTimestamp < timestamp) {
         balancesMap[idCard].balanceTimestamp = timestamp;
@@ -183,6 +185,7 @@ class UmkaAggregatorService extends BaseService {
           + '  card.num, '
           + '  tmp.ep_balance, '
           + '  tmp.amount, '
+          + '  tmp.amount_bail, '
           + '  tmp.operation_summa '
           + 'from ('
           + '  select * '
