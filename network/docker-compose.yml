@@ -2,11 +2,15 @@ version: '2'
 
 networks:
   ctsnet:
+    ipam:
+      config:
+      - subnet: 172.16.238.0/24
+
 
 x-common:
   orderer-loglevel: &orderer-loglevel
     ORDERER_GENERAL_LOGLEVEL=DEBUG
-    
+
   cli-logglevel: &cli-logglevel
     CORE_LOGGING_PEER=DEBUG
 
