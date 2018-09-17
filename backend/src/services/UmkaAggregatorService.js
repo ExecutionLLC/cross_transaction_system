@@ -1,11 +1,12 @@
-const dateformat = require('dateformat');
+const moment = require('moment');
 const oracledb = require('oracledb');
 const BaseService = require('./BaseService');
 const config = require('../common/Config');
 
 const PROCESSING_NAME = 'УМКА';
 const SERVICE_NAME = 'Проезд в общественном транспорте';
-const DEFAULT_MIN_INS_DATE = new Date(2015, 1, 1);
+const SERVER_TIMEZONE = 'Europe/Moscow';
+const DEFAULT_MIN_INS_DATE = moment.tz('2015-01-01 12:00', SERVER_TIMEZONE);
 
 class UmkaAggregatorService extends BaseService {
   constructor(models, services) {
@@ -81,17 +82,17 @@ class UmkaAggregatorService extends BaseService {
         operationSumma,
       ] = r;
 
-      const minInsDate = new Date(insDate);
+      const minInsDate = moment.tz(insDate, SERVER_TIMEZONE);
       if (minInsDate && this._minInsDate < minInsDate) {
         this._minInsDate = minInsDate;
         minInsDateChanged = true;
       }
 
-      if (!balance || !idCard) {
+      if (!balance || !idCard || !dateOf || !insDate) {
         return;
       }
 
-      const transactionDate = new Date(dateOf);
+      const transactionDate = moment.tz(dateOf, SERVER_TIMEZONE);
       const timestamp = +transactionDate;
 
       if (balancesMap[idCard] === undefined) {
@@ -168,7 +169,7 @@ class UmkaAggregatorService extends BaseService {
 
   _getNextBatchOfData() {
     const { dbBatchSize } = this._config;
-    const minInsDate = dateformat(this._minInsDate, 'dd-mm-yyyy, HH:MM:ss');
+    const minInsDate = this._minInsDate.format('dd-mm-yyyy, HH:MM:ss');
 
     return this._getNewConnection()
       .then((connection) => {
