@@ -76,7 +76,7 @@ store.defaults({
     dbPassword: '1',
     dbBatchSize: 500,
     errorTimeout: 5 * 60 * 1000, // 5 mins
-    hasNextTimeout: 7 * 1000, // 7s
+    hasNextTimeout: 0, // immediately
     pollingTimeout: 15 * 60 * 1000, // 15 mins
   },
 });
