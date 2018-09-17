@@ -72,7 +72,6 @@ class UmkaAggregatorService extends BaseService {
       const [
         id,
         dateOf,
-        // eslint-disable-next-line no-unused-vars
         insDate,
         kind,
         idCard,
