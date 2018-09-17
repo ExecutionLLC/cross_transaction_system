@@ -75,7 +75,7 @@ class UmkaAggregatorService extends BaseService {
         insDate,
         kind,
         idCard,
-        epBalance,
+        balance,
         amount,
         amountBail,
         operationSumma,
@@ -87,11 +87,10 @@ class UmkaAggregatorService extends BaseService {
         minInsDateChanged = true;
       }
 
-      if (!epBalance || !idCard) {
+      if (!balance || !idCard) {
         return;
       }
 
-      const balance = amountBail ? epBalance - amountBail : epBalance;
       const transactionDate = new Date(dateOf);
       const timestamp = +transactionDate;
 
@@ -104,11 +103,14 @@ class UmkaAggregatorService extends BaseService {
         };
       } else if (balancesMap[idCard].balanceTimestamp < timestamp) {
         balancesMap[idCard].balanceTimestamp = timestamp;
-        balancesMap[idCard].balance = epBalance;
+        balancesMap[idCard].balance = balance;
       }
 
       let comment = '';
       let finalAmount = amount || operationSumma;
+      if (amount && amountBail) {
+        finalAmount -= amountBail;
+      }
       if (kind === 7 || kind === 8) {
         comment = 'продажа транспортной карты';
       } else if (kind === 10 || kind === 11) {
