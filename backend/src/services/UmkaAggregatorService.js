@@ -171,7 +171,7 @@ class UmkaAggregatorService extends BaseService {
 
   _getNextBatchOfData() {
     const { dbBatchSize } = this._config;
-    const minInsDate = this._minInsDate.format('dd-mm-yyyy, HH:MM:ss');
+    const minInsDate = this._minInsDate.format('DD-MM-YYYY, HH:mm:ss');
 
     return this._getNewConnection()
       .then((connection) => {
