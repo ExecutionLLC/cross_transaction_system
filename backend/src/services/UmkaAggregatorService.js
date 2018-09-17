@@ -190,7 +190,7 @@ class UmkaAggregatorService extends BaseService {
           + 'from ('
           + '  select * '
           + '  from ( '
-          + '    select id, date_of, ins_date, kind, id_card, ep_balance, amount, operation_summa '
+          + '    select id, date_of, ins_date, kind, id_card, ep_balance, amount, amount_bail, operation_summa '
           + '    from t_data '
           + '    where '
           + '      travel_doc_kind=1 and '
