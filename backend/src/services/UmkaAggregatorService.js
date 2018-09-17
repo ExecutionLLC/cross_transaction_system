@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const oracledb = require('oracledb');
 const BaseService = require('./BaseService');
 const config = require('../common/Config');
@@ -6,7 +6,7 @@ const config = require('../common/Config');
 const PROCESSING_NAME = 'УМКА';
 const SERVICE_NAME = 'Проезд в общественном транспорте';
 const SERVER_TIMEZONE = 'Europe/Moscow';
-const DEFAULT_MIN_INS_DATE = moment.tz('2015-01-01 12:00', SERVER_TIMEZONE);
+const DEFAULT_MIN_INS_DATE = moment.tz('2015-01-01T12:00:00.000Z', SERVER_TIMEZONE);
 
 class UmkaAggregatorService extends BaseService {
   constructor(models, services) {
@@ -28,7 +28,7 @@ class UmkaAggregatorService extends BaseService {
         if (!minInsDate || minInsDate < DEFAULT_MIN_INS_DATE) {
           this._minInsDate = DEFAULT_MIN_INS_DATE;
         } else {
-          this._minInsDate = minInsDate;
+          this._minInsDate = moment.tz(minInsDate, SERVER_TIMEZONE);
         }
         this._logger.info(`minInsDate loaded (${this._minInsDate})`);
 
@@ -82,7 +82,8 @@ class UmkaAggregatorService extends BaseService {
         operationSumma,
       ] = r;
 
-      const minInsDate = moment.tz(insDate, SERVER_TIMEZONE);
+      const minInsDate = moment(insDate);
+      minInsDate.tz(SERVER_TIMEZONE, true);
       if (minInsDate && this._minInsDate < minInsDate) {
         this._minInsDate = minInsDate;
         minInsDateChanged = true;
@@ -92,7 +93,8 @@ class UmkaAggregatorService extends BaseService {
         return;
       }
 
-      const transactionDate = moment.tz(dateOf, SERVER_TIMEZONE);
+      const transactionDate = moment(dateOf);
+      transactionDate.tz(SERVER_TIMEZONE, true);
       const timestamp = +transactionDate;
 
       if (balancesMap[idCard] === undefined) {
