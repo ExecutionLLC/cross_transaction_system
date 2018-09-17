@@ -87,7 +87,7 @@ class UmkaAggregatorService extends BaseService {
         minInsDateChanged = true;
       }
 
-      if (epBalance === 0) {
+      if (!epBalance || !idCard) {
         return;
       }
 
@@ -175,18 +175,30 @@ class UmkaAggregatorService extends BaseService {
         ];
 
         return Promise.all([connection, connection.execute(
-          'select * '
-          + 'from ( '
-          + '  select id, date_of, ins_date, kind, id_card, ep_balance, amount, operation_summa '
-          + '  from t_data '
+          'select '
+          + '  tmp.id, '
+          + '  tmp.date_of, '
+          + '  tmp.ins_date, '
+          + '  tmp.kind, '
+          + '  card.num, '
+          + '  tmp.ep_balance, '
+          + '  tmp.amount, '
+          + '  tmp.operation_summa '
+          + 'from ('
+          + '  select * '
+          + '  from ( '
+          + '    select id, date_of, ins_date, kind, id_card, ep_balance, amount, operation_summa '
+          + '    from t_data '
+          + '    where '
+          + '      travel_doc_kind=1 and '
+          + '      kind in (7, 8, 10, 11, 16, 29, 32, 36, 37, 38, 39) and '
+          + '      ins_date > to_date(:minInsDate, \'dd-mm-yyyy hh24:mi:ss\') '
+          + '    order by ins_date '
+          + '  ) '
           + '  where '
-          + '    travel_doc_kind=1 and '
-          + '    kind in (7, 8, 10, 11, 16, 29, 32, 36, 37, 38, 39) and '
-          + '    ins_date > to_date(:minInsDate, \'dd-mm-yyyy hh24:mi:ss\') '
-          + '  order by ins_date '
-          + ') '
-          + 'where '
-          + '  rownum <= :dbBatchSize ',
+          + '    rownum <= :dbBatchSize '
+          + ') tmp '
+          + 'inner join card on card.id=tmp.id_card ',
           bindParams,
         )]);
       })
