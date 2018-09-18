@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Text, TouchableHighlight } from 'react-native';
+import { Text, TouchableHighlight, View } from 'react-native';
 import {
   Container,
   Header,
@@ -11,7 +11,7 @@ import {
   Body,
   Title,
   Button,
-  Right,
+  Left,
   Icon,
 } from 'native-base';
 import SmallSpinner from '../Components/SmallSpinner';
@@ -25,6 +25,7 @@ class EnterWallet extends Component {
       walletId: '',
       isLoading: false,
       error: null,
+      success: false,
     };
     this.api = api.URLedAPI(props.settings.url);
   }
@@ -35,19 +36,49 @@ class EnterWallet extends Component {
     });
   }
 
+  onWalletInfo(walletInfo) {
+    const { good, onBack } = this.props;
+    if (walletInfo.balance < good.cost) {
+      this.setState({
+        isLoading: false,
+        error: {
+          message: `Недостаточно средств, баланс ${walletInfo.balance}р`,
+        }
+      });
+      return;
+    }
+    this.api.buyGood(
+      walletInfo.id,
+      good.cost,
+      good.name
+    )
+      .then(
+        () => {
+          this.setState({
+            isLoading: false,
+            error: null,
+            success: true,
+          });
+        },
+      )
+      .catch((error) => {
+        this.setState({
+          isLoading: false,
+          error: {
+            message: `сервер вернул "${error.message}"`,
+          }
+        });
+      });
+  }
+
   onSubmit() {
-    const { onWalletInfo } = this.props;
     this.setState({
       isLoading: true,
       error: null,
     });
     this.api.enterWallet(this.state.walletId)
       .then(walletInfo => {
-        this.setState({
-          isLoading: false,
-          error: null,
-        });
-        onWalletInfo(walletInfo);
+        this.onWalletInfo(walletInfo);
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {
@@ -55,7 +86,7 @@ class EnterWallet extends Component {
             isLoading: false,
             error: {
               message: 'Кошелёк не найден',
-              urlError: true,
+              walletError: true,
             },
           });
         } else {
@@ -72,36 +103,44 @@ class EnterWallet extends Component {
       walletId,
       isLoading,
       error,
+      success,
     } = this.state;
-    const {onSettings} = this.props;
+    const { onBack, good } = this.props;
     const disabled = !walletId;
     return (
       <Container>
         <Header>
+          <Left>
+            <Button
+              transparent
+              onPress={onBack}
+            >
+              <Icon name='arrow-back' />
+            </Button>
+          </Left>
           <Body style={{flex: 3}}>
             <Title>Введите № кошелька</Title>
           </Body>
-          <Right>
-            <Button
-              transparent
-              onPress={onSettings}
-            >
-              <Icon name='menu' />
-            </Button>
-          </Right>
         </Header>
         <Content>
           <Form style={{margin: 20, marginTop: 100}}>
-            <Item regular error={error && error.urlError} style={{marginBottom: 20}}>
-              <Input
-                placeholder="№ кошелька"
-                autoCorrect={false}
-                autoCapitalize="none"
-                value={walletId}
-                disabled={isLoading}
-                onChangeText={walletId => this.onWalletChange(walletId)}
-              />
-            </Item>
+            {!success &&
+              <Text style={{ marginBottom: 20 }}>
+                {`Сумма покупки: ${good.cost}р`}
+              </Text>
+            }
+            {!success &&
+              <Item regular error={error && error.walletError} style={{marginBottom: 20}}>
+                <Input
+                  placeholder="№ кошелька"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  value={walletId}
+                  disabled={isLoading}
+                  onChangeText={walletId => this.onWalletChange(walletId)}
+                />
+              </Item>
+            }
             {error && (
               <Text style={{marginBottom: 20}}>
                 {`Ошибка: ${error.message}`}
@@ -110,19 +149,41 @@ class EnterWallet extends Component {
             {isLoading ? (
               <SmallSpinner />
             ) : (
-              <TouchableHighlight
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                  height: 50,
-                  backgroundColor: '#eee'
-                }}
-                disabled={disabled}
-                onPress={() => this.onSubmit()}
-              >
-                <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
-              </TouchableHighlight>
+              success
+                ? (
+                  <View>
+                    <Text style={{color: 'green', marginBottom: 20}}>
+                      Спасибо за покупку
+                    </Text>
+                    <TouchableHighlight
+                      style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: 50,
+                        backgroundColor: '#eee'
+                      }}
+                      disabled={disabled}
+                      onPress={onBack}
+                    >
+                      <Text style={{textAlign: 'center'}}>ОК</Text>
+                    </TouchableHighlight>
+                  </View>
+                ) : (
+                  <TouchableHighlight
+                    style={{
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      width: '100%',
+                      height: 50,
+                      backgroundColor: '#eee'
+                    }}
+                    disabled={disabled}
+                    onPress={() => this.onSubmit()}
+                  >
+                    <Text style={{color: disabled ? 'lightgray' : null, textAlign: 'center'}}>Ввод</Text>
+                  </TouchableHighlight>
+                )
             )}
           </Form>
         </Content>

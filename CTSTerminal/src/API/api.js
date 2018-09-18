@@ -33,16 +33,20 @@ function URLedAPI(url) {
     return url;
   }
 
+  function translateWalletInfo(apiWalletInfo) {
+    return {
+      id: apiWalletInfo.id,
+      balance: apiWalletInfo.balance + apiWalletInfo.balanceVirtualDiff,
+    }
+  }
+
   function enterWallet(walletId) {
     return fetchival(
       `${getBaseUrl()}wallet/${getCardProcessingName()}/${walletId}`,
       { headers: { ...getAuthHeaders() } }
     )
       .get({ limit: 0, offset: 0 })
-      .then(walletInfo => ({
-        id: walletId,
-        balance: walletInfo.balance + walletInfo.balanceVirtualDiff
-      }))
+      .then(translateWalletInfo)
       .catch(error => {
         if (error.response.status === 404) {
           throw new APIError(ERRORS.NOT_FOUND, 'wallet not found');

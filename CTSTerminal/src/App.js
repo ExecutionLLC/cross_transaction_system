@@ -14,25 +14,24 @@ const { store, persistor } = configureStore();
 
 class AppWStorage extends Component {
   constructor(props) {
-    console.log(props);
     super(props);
     this.state = {
-      isWalletRequest: true,
+      isWalletRequest: false,
       isSettings: !props.settings.url,
-      walletInfo: null,
+      selectedGood: null,
     }
   }
 
-  onWalletInfo(walletInfo) {
+  onWalletDone() {
     this.setState({
-      walletInfo,
       isWalletRequest: false,
     });
   }
 
-  onExitGoods() {
+  onBuy(good) {
     this.setState({
       isWalletRequest: true,
+      selectedGood: good,
     });
   }
 
@@ -48,33 +47,32 @@ class AppWStorage extends Component {
     });
   }
 
-  onDone() {
+  onDoneSettings() {
     this.setState({
       isSettings: false,
     });
   }
 
   render() {
-    const { isWalletRequest, isSettings, walletInfo } = this.state;
+    const { isWalletRequest, isSettings, selectedGood } = this.state;
     return (
       isSettings
         ? (
           <Settings
-            onDone={() => this.onDone()}
+            onDone={() => this.onDoneSettings()}
             onCancel={() => this.onExitSettings()}
           />
         ) : (
           isWalletRequest
             ? (
               <EnterWallet
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                onSettings={() => this.onSettings()}
+                good={selectedGood}
+                onBack={() => this.onWalletDone()}
               />
             ) : (
               <ShowGoods
-                walletInfo={walletInfo}
-                onWalletInfo={walletInfo => this.onWalletInfo(walletInfo)}
-                onCancel={() => this.onExitGoods()}
+                onSettings={() => this.onSettings()}
+                onBuy={(good) => this.onBuy(good)}
               />
             )
         )

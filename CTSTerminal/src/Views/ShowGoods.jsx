@@ -4,7 +4,7 @@ import { Text, Image, View, TouchableHighlight, ActivityIndicator } from 'react-
 import {
   Container,
   Header,
-  Left,
+  Right,
   Content,
   Body,
   Title,
@@ -12,7 +12,6 @@ import {
   Card,
   Icon,
 } from 'native-base';
-import api from '../API/api';
 
 
 const goodsImages = {
@@ -46,60 +45,15 @@ const goods = [
 class ShowGoods extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isLoading: false,
-      buyingGoodName: null,
-      error: null,
-    };
-    this.api = api.URLedAPI(props.settings.url);
-  }
-
-  onBuy(good) {
-    const { walletInfo: { id } } = this.props;
-    this.setState({
-      isLoading: true,
-      error: null,
-      buyingGoodName: good.name,
-    });
-    this.api.buyGood(id, good.cost, good.name)
-      .then(res => {
-        this.setState({
-          isLoading: false,
-          error: null,
-        });
-        this.props.onWalletInfo(res.walletInfo);
-      })
-      .catch(error => {
-        this.api.enterWallet(id)
-          .then(walletInfo => {
-            this.setState({
-              isLoading: false,
-              error: {
-                message: error.message,
-              },
-            });
-            this.props.onWalletInfo(walletInfo);
-          })
-          .catch(() => {
-            this.setState({
-              isLoading: false,
-              error: {
-                message: error.message,
-              },
-            });
-          });
-      });
   }
 
   renderGood(good) {
-    const { isLoading, buyingGoodName } = this.state;
-    const { walletInfo: { balance } } = this.props;
-    const disable = balance < good.cost;
+    const { onBuy } = this.props;
     return (
       <Card
         key={good.name}
       >
-        <View style={{flex: 1, flexDirection: 'row', opacity: isLoading ? 0.2 : 1}}>
+        <View style={{flex: 1, flexDirection: 'row'}}>
           <View style={{width: '60%'}}>
             {<Image source={good.image} style={{width: '100%', flex: 1}} />}
           </View>
@@ -118,30 +72,15 @@ class ShowGoods extends Component {
                   height: '80%',
                   backgroundColor: '#eee'
                 }}
-                onPress={() => this.onBuy(good)}
-                disabled={disable || isLoading}
+                onPress={() => onBuy(good)}
               >
-                <Text style={{color: disable ? 'red' : null, textAlign: 'center'}}>
-                  {disable ? `${good.cost} руб.\nНедостаточно средств для покупки` : `${good.cost} руб.\nКупить`}
+                <Text style={{textAlign: 'center'}}>
+                  {`${good.cost} руб.\nКупить`}
                 </Text>
               </TouchableHighlight>
             </View>
           </View>
         </View>
-        {isLoading && buyingGoodName === good.name && (
-          <ActivityIndicator
-            size='large'
-            style={{
-              position: 'absolute',
-              alignItems: 'center',
-              justifyContent: 'center',
-              left: 0,
-              right: 0,
-              top: 0,
-              bottom: 0,
-            }}
-          />
-        )}
       </Card>
     );
   }
@@ -151,32 +90,23 @@ class ShowGoods extends Component {
   }
 
   render() {
-    const { error } = this.state;
-    const { walletInfo: { balance }, onCancel } = this.props;
+    const { onSettings } = this.props;
     return (
       <Container>
         <Header>
-          <Left>
+          <Body>
+            <Title>Выбор товара</Title>
+          </Body>
+          <Right>
             <Button
               transparent
-              onPress={onCancel}
+              onPress={onSettings}
             >
-              <Icon name='arrow-back' />
+              <Icon name='menu' />
             </Button>
-          </Left>
-          <Body>
-          <Title>Выбор товара</Title>
-          </Body>
+          </Right>
         </Header>
         <Content>
-          <Text style={{fontSize: 30}}>
-            {`Баланс: ${balance}`}
-          </Text>
-          {error && (
-            <Text>
-              {`Ошибка: ${error.message}`}
-            </Text>
-          )}
           {this.renderGoods()}
         </Content>
       </Container>
