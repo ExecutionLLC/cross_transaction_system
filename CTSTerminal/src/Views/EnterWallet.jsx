@@ -14,6 +14,7 @@ import {
   Left,
   Icon,
 } from 'native-base';
+import QRCodeScanner from 'react-native-qrcode-scanner';
 import SmallSpinner from '../Components/SmallSpinner';
 import api from '../API/api';
 
@@ -28,6 +29,7 @@ class EnterWallet extends Component {
       success: false,
     };
     this.api = api.URLedAPI(props.settings.url);
+    this.QRCodeScanner = null;
   }
 
   onWalletChange(walletId) {
@@ -39,12 +41,17 @@ class EnterWallet extends Component {
   onWalletInfo(walletInfo) {
     const { good, onBack } = this.props;
     if (walletInfo.balance < good.cost) {
-      this.setState({
-        isLoading: false,
-        error: {
-          message: `Недостаточно средств, баланс ${walletInfo.balance}р`,
+      this.setState(
+        {
+          isLoading: false,
+          error: {
+            message: `Недостаточно средств, баланс ${walletInfo.balance}р`,
+          }
+        },
+        () => {
+          this.QRCodeScanner.reactivate();
         }
-      });
+      );
       return;
     }
     this.api.buyGood(
@@ -62,12 +69,17 @@ class EnterWallet extends Component {
         },
       )
       .catch((error) => {
-        this.setState({
-          isLoading: false,
-          error: {
-            message: `сервер вернул "${error.message}"`,
+        this.setState(
+          {
+            isLoading: false,
+            error: {
+              message: `сервер вернул "${error.message}"`,
+            }
+          },
+          () => {
+            this.QRCodeScanner.reactivate();
           }
-        });
+        );
       });
   }
 
@@ -82,20 +94,51 @@ class EnterWallet extends Component {
       })
       .catch(error => {
         if (error.code === api.ERRORS.NOT_FOUND) {
-          this.setState({
-            isLoading: false,
-            error: {
-              message: 'Кошелёк не найден',
-              walletError: true,
+          this.setState(
+            {
+              isLoading: false,
+              error: {
+                message: 'Кошелёк не найден',
+                walletError: true,
+              },
             },
-          });
+            () => {
+              this.QRCodeScanner.reactivate();
+            }
+          );
         } else {
-          this.setState({
-            isLoading: false,
-            error,
-          });
+          this.setState(
+            {
+              isLoading: false,
+              error,
+            },
+            () => {
+              this.QRCodeScanner.reactivate();
+            }
+          );
         }
       });
+  }
+
+  onScan(code) {
+    const walletId = code.replace(/\s/g, '').slice(3, -1);
+    if (walletId === this.state.walletId) {
+      setTimeout(
+        () => {
+          this.QRCodeScanner.reactivate();
+        },
+        1000
+      );
+      return;
+    }
+    this.setState(
+      {
+        walletId,
+      },
+      () => {
+        this.onSubmit();
+      }
+    );
   }
 
   render() {
@@ -123,7 +166,14 @@ class EnterWallet extends Component {
           </Body>
         </Header>
         <Content>
-          <Form style={{margin: 20, marginTop: 100}}>
+          {!success && (
+            <QRCodeScanner
+              ref={node => { this.QRCodeScanner = node; }}
+              onRead={(event) => this.onScan(event.data)}
+              showMarker={true}
+            />
+          )}
+          <Form style={{margin: 20, marginTop: 10}}>
             {!success &&
               <Text style={{ marginBottom: 20 }}>
                 {`Сумма покупки: ${good.cost}р`}
@@ -151,7 +201,7 @@ class EnterWallet extends Component {
             ) : (
               success
                 ? (
-                  <View>
+                  <View style={{marginTop: 20}}>
                     <Text style={{color: 'green', marginBottom: 20}}>
                       Спасибо за покупку
                     </Text>

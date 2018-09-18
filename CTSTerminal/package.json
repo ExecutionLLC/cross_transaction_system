@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node node_modules/react-native/local-cli/cli.js start",
     "runa": "fuser -k 8081/tcp; react-native run-android",
-    "builda": "cd android; ./gradlew assembleRelease",
+    "builda": "mkdir android/app/main; mkdir android/app/main/assets; react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.bundle --assets-dest android/app/src/main/res/;cd android; ./gradlew assembleRelease",
     "loga": "react-native log-android",
     "make-android-keystore": "keytool -genkey -v -keystore my-release-key.keystore -alias my-key-alias -keyalg RSA -keysize 2048 -validity 10000",
     "test": "jest"
@@ -15,6 +15,8 @@
     "native-base": "^2.8.0",
     "react": "16.4.1",
     "react-native": "0.56.0",
+    "react-native-camera": "^1.2.0",
+    "react-native-qrcode-scanner": "^1.1.0",
     "react-native-vector-icons": "^5.0.0",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
