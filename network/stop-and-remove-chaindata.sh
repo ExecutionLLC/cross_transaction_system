@@ -4,7 +4,7 @@ set -e
 
 docker-compose -f docker-compose.yml down
 
-searchPattern="dev-peer[0-9].org[0-9]"
+searchPattern="dev-peer[0-9].org[0-9]-cross"
 
 containers=$( docker ps -a | grep "$searchPattern"  | awk '{print $1}' )
 if [[ -n $containers ]]; then
