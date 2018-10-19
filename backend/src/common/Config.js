@@ -67,7 +67,6 @@ store.defaults({
     chaincodeId: 'cross-transaction-system',
     ordererUrl: 'grpc://localhost:7050',
     peerUrl: 'grpc://localhost:7051',
-    eventhubUrl: 'grpc://localhost:7053',
     username: 'user1',
   },
   umkaAggregator: {

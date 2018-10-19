@@ -34,8 +34,7 @@ class ChaincodeApi extends AsyncInitializedObject {
     this._channel.addPeer(peer);
     const orderer = this._fabricClient.newOrderer(ordererUrl);
     this._channel.addOrderer(orderer);
-    this._eventHub = this._fabricClient.newEventHub();
-    this._eventHub.setPeerAddr(eventhubUrl);
+    this._eventHub = this._channel.newChannelEventHub(peer);
 
     this._chaincodeId = chaincodeId;
     this._storePath = storePath;
@@ -75,54 +74,13 @@ class ChaincodeApi extends AsyncInitializedObject {
       });
   }
 
-  _parseAndEmitChaincodeEvents(block) {
-    const envelopeDataArray = block.data.data;
-    const validationCodeArray = block.metadata.metadata[METADATA_VALIDATION_CODES_INDEX];
-
-    envelopeDataArray.forEach((envelope, index) => {
-      if (validationCodeArray[index] !== TX_STATUS_VALID_CODE) {
-        // we handle only valid transactions
-        return;
-      }
-
-      const envelopePayload = envelope.payload;
-      const channelHeader = envelopePayload.header.channel_header;
-
-      if (channelHeader.type === ENDORSER_TRANSACTION_CODE) {
-        const transaction = envelopePayload.data;
-        const chaincodeActionPayload = transaction.actions[0].payload;
-        const proposalResponsePayload = chaincodeActionPayload.action.proposal_response_payload;
-        const transactionEvent = proposalResponsePayload.extension.events;
-
-        if (transactionEvent && transactionEvent.chaincode_id) {
-          this._onChaincodeEvent(transactionEvent);
-        }
-      }
-    }, this);
-  }
-
   _onBlockEvent(block) {
-    this._logger.debug(`got new block event:\n${JSON.stringify(block.header, null, 2)}`);
-    const {
-      number: blockNumber,
-      data_hash: blockHash,
-      previous_hash: prevBlockHash,
-    } = block.header;
-    this._eventEmitter.emit('BLOCK_EVENT', blockNumber, blockHash, prevBlockHash);
-
-    this._parseAndEmitChaincodeEvents(block);
+    this._logger.debug(`got new block event: ${block.number}`);
   }
 
   _onTransactionEvent(transactionId, transactionStatus) {
     this._logger.info(`got new transaction event: ${transactionId} ${transactionStatus}`);
     this._eventEmitter.emit('TRANSACTION_EVENT', transactionId, transactionStatus);
-  }
-
-  _onChaincodeEvent(chaincodeEventObj) {
-    const { event_name: chaincodeEventName, payload } = chaincodeEventObj;
-    const chaincodeEventData = JSON.parse(payload.toString());
-    this._logger.info(`got new chaincode event (${chaincodeEventName}): ${JSON.stringify(chaincodeEventData, null, 2)}`);
-    this._eventEmitter.emit('CHAINCODE_EVENT', chaincodeEventName, chaincodeEventData);
   }
 
   _onEventHubError(error) {
